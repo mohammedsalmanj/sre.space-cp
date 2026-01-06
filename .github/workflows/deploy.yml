@@ -1,0 +1,20 @@
+name: GitOps Deployment
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to Production
+        run: |
+          echo "Simulating GitOps deployment..."
+          # docker compose -f infra/mission-control.yml up -d

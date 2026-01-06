@@ -1,0 +1,9 @@
+docker
+openai
+chromadb
+mcp
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-exporter-otlp
+requests
+pyyaml
