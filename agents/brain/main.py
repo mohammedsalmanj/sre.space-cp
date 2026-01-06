@@ -41,7 +41,14 @@ async def analyze_incident(title, body):
     Description: {body}
     Logs: {logs}
     
-    Provide a Root Cause Analysis and a Recommended Fix.
+    1. Provide a concise Root Cause Analysis.
+    2. Suggest a Recommended Fix.
+    3. IMPORTANT: If an immediate automated mitigation is possible (e.g., restarting a container), start a line with:
+       MITIGATION: RESTART [container_name]
+    
+    4. If a permanent code fix is identified (e.g., bump memory in YAML), start a line with:
+       MITIGATION: PR [branch_name] | [title] | [body]
+       (where body is the code change description).
     """
     
     try:
@@ -63,56 +70,52 @@ async def run_brain():
 
     # Connect to GitHub MCP
     server_params = StdioServerParameters(
-        command="npx",
-        args=["-y", "@modelcontextprotocol/server-github"],
+        command="mcp-server-github",
+        args=[],
         env={**os.environ, "GITHUB_PERSONAL_ACCESS_TOKEN": GITHUB_TOKEN}
     )
 
     async with stdio_client(server_params) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
-            logger.info("Connected to GitHub MCP.")
+            # Log available tools for debugging
+            response = await session.list_tools()
+            logger.info(f"Available Tools: {[t.name for t in response.tools]}")
 
             processed_issues = set()
 
             while True:
                 try:
                     # Poll for open issues
-                    # Note: You might need to adjust the filter based on available tools
                     result = await session.call_tool("list_issues", arguments={"owner": "mohammedsalmanj", "repo": "sre.space-cp", "state": "open"})
                     
-                    # Parse result (assuming JSON string or list)
-                    # This part depends on the exact return format of the MCP tool
                     import json
                     try:
-                        # The tool output is likely a text string we need to parse if it's not a dict
-                        # For safety, let's assume we get a string and try to load it, or it's a list.
-                        issues_data = result.content
-                        if isinstance(issues_data, list):
-                            # It returns a list of Content objects, usually text
-                            issues_json = json.loads(issues_data[0].text)
-                        else:
-                            issues_json = [] 
-                    except:
-                        logger.warning("Could not parse issues list.")
+                        issues_json = json.loads(result.content[0].text)
+                    except Exception as e:
+                        logger.warning(f"Could not parse issues list: {e}")
                         issues_json = []
 
                     for issue in issues_json:
                         number = issue.get("number")
                         title = issue.get("title")
+                        body = issue.get("body", "")
+                        
+                        logger.info(f"Checking Issue: #{number} - {title}")
                         
                         if number in processed_issues:
                             continue
 
+                        # Check if already diagnosed by checking description or comments (we'll just use processed_issues for now)
                         if "[INCIDENT]" in title:
                             logger.info(f"New Incident Found: #{number}")
                             
                             # Analyze
-                            rca = await analyze_incident(title, issue.get("body", ""))
+                            rca = await analyze_incident(title, body)
                             
-                            # Post Comment
+                            # 1. Post Comment
                             await session.call_tool(
-                                "create_issue_comment", 
+                                "add_issue_comment", 
                                 arguments={
                                     "owner": "mohammedsalmanj", 
                                     "repo": "sre.space-cp", 
@@ -120,13 +123,27 @@ async def run_brain():
                                     "body": f"## 🧠 Brain Agent Diagnosis\n\n{rca}"
                                 }
                             )
+
+                            # 2. Update issue body to include diagnosis for Fixer agent searchability
+                            new_body = f"{body}\n\n---\n## 🧠 Brain Agent Diagnosis\n\n{rca}"
+                            await session.call_tool(
+                                "update_issue",
+                                arguments={
+                                    "owner": "mohammedsalmanj",
+                                    "repo": "sre.space-cp",
+                                    "issue_number": number,
+                                    "body": new_body
+                                }
+                            )
+
                             processed_issues.add(number)
                     
                     await asyncio.sleep(60)
 
                 except Exception as e:
                     logger.error(f"Brain Loop Error: {e}")
-                    await asyncio.sleep(30)
+                    # Exponential backoff for transient network issues
+                    await asyncio.sleep(min(120, 30 * (1.5 ** (len(processed_issues) % 5))))
 
 if __name__ == "__main__":
     asyncio.run(run_brain())

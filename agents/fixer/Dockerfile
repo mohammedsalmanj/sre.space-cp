@@ -1,8 +1,11 @@
-FROM python:3.10-slim
+# Use local image to bypass Docker Hub issues
+FROM infra-brain:latest
 
 WORKDIR /app
 
-RUN pip install mcp openai requests docker
+# Node.js and MCP are already installed in the base image!
+# Just add Fixer specific dependencies (docker SDK)
+RUN pip install docker
 
 COPY . .
 

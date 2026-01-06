@@ -1,12 +1,10 @@
-FROM python:3.10-slim
+# Use local image to bypass Docker Hub issues
+FROM infra-memory:latest
 
 WORKDIR /app
 
-# Install Node.js (required for GitHub MCP Server)
-RUN apt-get update && apt-get install -y nodejs npm git && \
-    npm install -g @modelcontextprotocol/server-github
-
-RUN pip install mcp openai requests docker
+# Node.js and MCP are already in the base image
+RUN pip install docker
 
 COPY . .
 

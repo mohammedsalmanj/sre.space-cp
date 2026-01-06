@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE.Space | Control Plane</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="glow-bg"></div>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">▲</span>
+                <span class="logo-text">SRE.SPACE</span>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item active">
+                    <span class="icon">📊</span> Dashboard
+                </div>
+                <div class="nav-item">
+                    <span class="icon">🤖</span> Agent Fleet
+                </div>
+                <div class="nav-item">
+                    <span class="icon">📚</span> Knowledge Base
+                </div>
+                <div class="nav-item">
+                    <span class="icon">⚙️</span> Settings
+                </div>
+            </nav>
+            <div class="agent-status-card">
+                <h3>Agent Health</h3>
+                <div class="agent-list">
+                    <div class="agent-status online">
+                        <span class="dot"></span> Scout <span class="tag">ACTIVE</span>
+                    </div>
+                    <div class="agent-status online">
+                        <span class="dot"></span> Brain <span class="tag">ACTIVE</span>
+                    </div>
+                    <div class="agent-status online">
+                        <span class="dot"></span> Memory <span class="tag">ACTIVE</span>
+                    </div>
+                    <div class="agent-status online">
+                        <span class="dot"></span> Fixer <span class="tag">READY</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-left">
+                    <h1>Mission Control</h1>
+                    <p class="subtitle">Autonomous Reliability Management Platform</p>
+                </div>
+                <div class="header-right">
+                    <div class="status-badge live">LIVE FEED</div>
+                </div>
+            </header>
+
+            <section class="metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-label">MTTR (Auto)</span>
+                    <span class="metric-value">4.2m</span>
+                    <span class="metric-delta pos">↓ 12%</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Auto-Mitigations</span>
+                    <span class="metric-value">124</span>
+                    <span class="metric-delta pos">↑ 24%</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Accuracy (Brain)</span>
+                    <span class="metric-value">98.4%</span>
+                    <span class="metric-delta pos">↑ 0.5%</span>
+                </div>
+            </section>
+
+            <section class="incident-feed">
+                <div class="feed-header">
+                    <h2>Recent Incidents</h2>
+                    <button class="btn-ghost">View All</button>
+                </div>
+                <div class="feed-list" id="incident-list">
+                    <!-- Incidents will be injected here -->
+                    <div class="incident-item loading">
+                        Connecting to Agent Stream...
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

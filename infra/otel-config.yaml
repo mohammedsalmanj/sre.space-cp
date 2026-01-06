@@ -24,12 +24,12 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/jaeger, otlp/newrelic]
+      exporters: [otlp/jaeger, otlp/newrelic, debug]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/newrelic]
+      exporters: [otlp/newrelic, debug]
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/newrelic]
+      exporters: [otlp/newrelic, debug]

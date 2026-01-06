@@ -40,15 +40,16 @@ services:
       context: ../agents/brain
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+    env_file:
+      - ../.env
     depends_on:
       - chromadb
 
   memory:
     build:
       context: ../agents/memory
+    env_file:
+      - ../.env
     environment:
       - CHROMA_DB_HOST=chromadb
       - CHROMA_DB_PORT=8000
@@ -60,8 +61,45 @@ services:
       context: ../agents/fixer
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - ../.env
+
+  dashboard:
+    build:
+      context: ../dashboard
+    ports:
+      - "8080:80"
+    depends_on:
+      - brain
+      - fixer
+
+  policy-service:
+    build:
+      context: ../apps/insure-app/backend/policy-service
     environment:
+      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
+      - FAILURE_MODE=normal
+    ports:
+      - "8001:8001"
+
+  insure-frontend:
+    build:
+      context: ../apps/insure-app/frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - policy-service
+
+  scout-insure:
+    build:
+      context: ../agents/scout
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+      - TARGET_URL=http://policy-service:8001/health
+    depends_on:
+      - otel-collector
+      - policy-service
 
 volumes:
   chroma-data:
