@@ -88,11 +88,14 @@ services:
     depends_on:
       - quote-service
 
-  # --- AGENTS ---
+  # --- AGENTS (Unified Build) ---
   scout:
-    build: ./agents/scout
+    build:
+      context: .
+      dockerfile: ./agents_new/Dockerfile
     dns:
       - 8.8.8.8
+    command: [ "python", "agents_new/scout.py" ]
     environment:
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
@@ -101,25 +104,34 @@ services:
         condition: service_healthy
 
   brain:
-    build: ./agents/brain
+    build:
+      context: .
+      dockerfile: ./agents_new/Dockerfile
     dns:
       - 8.8.8.8
+    command: [ "python", "agents_new/brain.py" ]
     env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
   memory:
-    build: ./agents/memory
+    build:
+      context: .
+      dockerfile: ./agents_new/Dockerfile
     dns:
       - 8.8.8.8
+    command: [ "python", "agents_new/memory.py" ]
     env_file: .env
     depends_on:
       - chromadb
 
   fixer:
-    build: ./agents/fixer
+    build:
+      context: .
+      dockerfile: ./agents_new/Dockerfile
     dns:
       - 8.8.8.8
+    command: [ "python", "agents_new/fixer.py" ]
     env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
