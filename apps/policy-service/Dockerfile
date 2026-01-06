@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y gcc librdkafka-dev && rm -rf /var/lib/apt/lists/*
 
-RUN pip install fastapi uvicorn confluent-kafka opentelemetry-api opentelemetry-sdk \
+RUN pip install --default-timeout 100 fastapi uvicorn confluent-kafka opentelemetry-api opentelemetry-sdk \
     opentelemetry-instrumentation-fastapi opentelemetry-exporter-otlp
 
 COPY . .

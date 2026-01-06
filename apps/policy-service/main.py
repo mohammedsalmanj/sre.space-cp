@@ -1,6 +1,7 @@
 import json
 import os
 import time
+import requests
 from confluent_kafka import Consumer, Producer, KafkaError
 from opentelemetry import trace
 from opentelemetry.propagate import extract, inject
@@ -52,7 +53,7 @@ async def process_messages():
             time.sleep(0.5)
             
             # Chance of failure for demo
-            if os.getenv("FAILURE_MODE") == "crash" or data.get("premium", 0) > 450:
+            if os.getenv("FAILURE_MODE") == "crash" or data.get("premium", 0) >= 0:
                  span.set_status(trace.Status(trace.StatusCode.ERROR))
                  logger.error(f"High premium policy failed: {quote_id}")
                  continue

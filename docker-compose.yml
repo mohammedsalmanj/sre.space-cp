@@ -22,7 +22,7 @@ services:
     healthcheck:
       test: [ "CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092" ]
       interval: 10s
-      timeout: 5s
+      timeout: 10s
       retries: 5
 
   jaeger:
@@ -91,6 +91,8 @@ services:
   # --- AGENTS ---
   scout:
     build: ./agents/scout
+    dns:
+      - 8.8.8.8
     environment:
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
@@ -100,18 +102,24 @@ services:
 
   brain:
     build: ./agents/brain
+    dns:
+      - 8.8.8.8
     env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
   memory:
     build: ./agents/memory
+    dns:
+      - 8.8.8.8
     env_file: .env
     depends_on:
       - chromadb
 
   fixer:
     build: ./agents/fixer
+    dns:
+      - 8.8.8.8
     env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
