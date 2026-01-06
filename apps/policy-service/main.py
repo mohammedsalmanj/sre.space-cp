@@ -37,7 +37,17 @@ async def process_messages():
         with tracer.start_as_current_span("purchase_policy", context=ctx) as span:
             data = json.loads(msg.value().decode())
             quote_id = data.get("quote_id")
+            user_id = data.get("user_id", "guest")
             
+            # Call User Service to fetch profile (Distributed Trace Step #3)
+            try:
+                with tracer.start_as_current_span("call_user_service"):
+                    user_res = requests.get(f"http://user-service:8003/user/{user_id}", timeout=2)
+                    user_profile = user_res.json()
+                    logger.info(f"Fetched user profile: {user_profile}")
+            except Exception as e:
+                logger.warning(f"Failed to fetch user profile: {e}")
+
             # Simulate processing
             time.sleep(0.5)
             

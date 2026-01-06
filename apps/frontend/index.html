@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE-Space | Insurance Cloud</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text: #f8fafc;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #0f172a 100%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 40px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .status-badge {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 30px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .logs {
+            margin-top: 40px;
+            background: #000;
+            border-radius: 16px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #334155;
+            color: #94a3b8;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+        }
+
+        .log-entry.success {
+            color: #4ade80;
+        }
+
+        .log-entry.error {
+            color: #f87171;
+        }
+
+        .log-entry.info {
+            color: #38bdf8;
+        }
+
+        .service-path {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            position: relative;
+        }
+
+        .service-path::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+
+        .step {
+            background: #1e293b;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            border: 2px solid #334155;
+            transition: all 0.5s;
+        }
+
+        .step.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>SRE-Space v2</h1>
+            <span class="status-badge">● KAFKA EVENT-DRIVEN CLOUD</span>
+        </header>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Generate Quote <span>✨</span></h2>
+                <p>Request a custom insurance quote. This triggers an asynchronous event-driven journey through 3
+                    microservices.</p>
+                <input type="text" id="userId" placeholder="Enter User ID (default: guest)"
+                    style="width: 90%; background: #0f172a; border: 1px solid #334155; color: white; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                <button class="btn" onclick="requestQuote()">Get Instant Quote</button>
+            </div>
+
+            <div class="card">
+                <h2>Platform Visualizer <span>🔍</span></h2>
+                <div class="service-path">
+                    <div id="step1" class="step">Q</div>
+                    <div id="step2" class="step">P</div>
+                    <div id="step3" class="step">U</div>
+                </div>
+                <p style="text-align: center; font-size: 0.8rem; color: #64748b; margin-top: 20px;">
+                    Quote → Policy → User
+                </p>
+            </div>
+        </div>
+
+        <div class="logs" id="logs">
+            <div class="log-entry info">> SRE-Space Ready for input...</div>
+        </div>
+    </div>
+
+    <script>
+        const logs = document.getElementById('logs');
+
+        function addLog(text, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerText = `[${new Date().toLocaleTimeString()}] ${text}`;
+            logs.appendChild(entry);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        async function requestQuote() {
+            const userId = document.getElementById('userId').value || 'guest';
+            addLog(`Initializing Quote Request for User: ${userId}...`, 'info');
+
+            // Animation
+            document.getElementById('step1').classList.add('active');
+
+            try {
+                // Fetch from Quote Service (exposed on 8001 via proxy)
+                const response = await fetch(`/api/quote/quote?user_id=${userId}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    addLog(`Quote Generated: ${data.quote_id} | Premium: $${data.premium}`, 'success');
+
+                    // Simulate Event Propagation View
+                    setTimeout(() => {
+                        document.getElementById('step2').classList.add('active');
+                        addLog('Kafka Event: quote_requested produced. Policy Service processing...', 'info');
+                    }, 1000);
+
+                    setTimeout(() => {
+                        document.getElementById('step3').classList.add('active');
+                        addLog('Policy Service calling User Service for profile validation...', 'info');
+                    }, 2500);
+
+                    setTimeout(() => {
+                        addLog('User Journey Complete. Traces exported to Jaeger & New Relic.', 'success');
+                        // Fade out highlights
+                        setTimeout(() => {
+                            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+                        }, 2000);
+                    }, 4000);
+
+                } else {
+                    addLog(`Quote Failed: ${data.error || 'Unknown Error'}`, 'error');
+                }
+            } catch (err) {
+                addLog(`Network Error: ${err.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+
+</html>

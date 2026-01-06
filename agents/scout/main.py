@@ -67,25 +67,39 @@ async def run_scout():
                     logger.info(f"Metrics Update: Quotes={metrics.quotes}, Purchases={metrics.purchases}")
 
 async def check_conversion(session):
-    if metrics.quotes > 10:
+    if metrics.quotes > 5: # Lower threshold for demo
         rate = (metrics.purchases / metrics.quotes) * 100
-        if rate < 30: # Alert if conversion is below 30%
-            logger.warning(f"Conversion Drop Detected! Rate: {rate:.2f}%")
+        logger.info(f"Checking Conversion Health: {rate:.2f}% ({metrics.purchases}/{metrics.quotes})")
+        
+        if rate < 50: # Alert if conversion is below 50% for demo
+            logger.warning(f"CRITICAL: Conversion Drop Detected! Rate: {rate:.2f}%")
             
             # Create GitHub Incident
-            await session.call_tool(
-                "create_issue",
-                arguments={
-                    "owner": "mohammedsalmanj",
-                    "repo": "sre.space-cp",
-                    "title": "[INCIDENT] Low Conversion Rate in Insurance Cloud",
-                    "body": f"The Scout Agent detected a conversion rate drop: **{rate:.2f}%**\n\n**Total Quotes**: {metrics.quotes}\n**Total Purchases**: {metrics.purchases}\n\nPlease analyze traces for failures in `policy-service`."
-                }
-            )
-            # Reset metrics to avoid spamming
-            metrics.quotes = 0
-            metrics.purchases = 0
-            await asyncio.sleep(600)
+            try:
+                await session.call_tool(
+                    "create_issue",
+                    arguments={
+                        "owner": "mohammedsalmanj",
+                        "repo": "sre.space-cp",
+                        "title": f"[INCIDENT] SRE-Space Conversion Drop: {rate:.2f}%",
+                        "body": f"The Scout Agent detected a business logic failure in the Insurance Cloud.\n\n"
+                                f"**Metric**: Conversion Rate (Quotes -> Purchases)\n"
+                                f"**Current Rate**: {rate:.2f}%\n"
+                                f"**Threshold**: 50.00%\n\n"
+                                f"**Details**:\n"
+                                f"- Total Quotes Requested: {metrics.quotes}\n"
+                                f"- Total Policies Purchased: {metrics.purchases}\n\n"
+                                f"Possible Root Causes: Latency in `policy-service`, Kafka consumer lag, or `user-service` validation errors.\n"
+                                f"Brain Agent should analyze the Jaeger traces for TraceID propagation."
+                    }
+                )
+                logger.info("Incident Issue Created successfully.")
+                # Reset metrics
+                metrics.quotes = 0
+                metrics.purchases = 0
+                await asyncio.sleep(300) # Cooldown
+            except Exception as e:
+                logger.error(f"Failed to create incident: {e}")
 
 if __name__ == "__main__":
     asyncio.run(run_scout())

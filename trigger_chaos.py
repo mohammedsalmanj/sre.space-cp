@@ -5,23 +5,19 @@ import random
 BASE_URL = "http://localhost:8001" # Quote Service
 
 def trigger_chaos():
-    print("🚀 Triggering SRE-Space Chaos: Generating High-Premium Quotes (Policy will fail)...")
+    print("Triggering Chaos: Generating requests...")
     
-    for i in range(20):
-        # We target high-premium quotes to trigger the simulated failure in Policy Service
-        # User ID is randomized
+    for i in range(10):
         uid = f"user-{random.randint(1, 100)}"
-        print(f"[{i+1}/20] Requesting quote for {uid}...")
+        print(f"[{i+1}/10] Requesting health check or simulation...")
         try:
-            res = requests.get(f"{BASE_URL}/quote?user_id={uid}")
-            data = res.json()
-            print(f"   Response: {data}")
+            # The current running infra-policy-service is on port 8001
+            res = requests.get(f"http://localhost:8001/health")
+            print(f"   Response: {res.status_code}")
         except Exception as e:
             print(f"   Error: {e}")
         
         time.sleep(1)
-
-    print("\n✅ Chaos Loop Finished. Wait for Scout Agent to detect conversion drop.")
 
 if __name__ == "__main__":
     trigger_chaos()
