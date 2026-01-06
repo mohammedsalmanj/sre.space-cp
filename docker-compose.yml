@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # --- EVENT BUS (KAFKA KRAFT) ---
+  # --- INFRASTRUCTURE ---
   kafka:
     image: bitnami/kafka:latest
     ports:
@@ -14,35 +14,25 @@ services:
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
     healthcheck:
-      test: ["CMD", "/opt/bitnami/kafka/bin/kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:9092"]
+      test: [ "CMD", "/opt/bitnami/kafka/bin/kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:9092" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    ports:
-      - "9000:9000"
-    environment:
-      - KAFKA_BROKERCONNECT=kafka:9092
-    depends_on:
-      - kafka
-
-  # --- OBSERVABILITY ---
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
       - "16686:16686"
-      - "4317:4317" # OTLP gRPC
+      - "4317:4317"
     environment:
       - COLLECTOR_OTLP_ENABLED=true
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
     volumes:
-      - ./otel-config.yaml:/etc/otelcol-contrib/config.yaml
+      - ./infra/otel-config.yaml:/etc/otelcol-contrib/config.yaml
     ports:
-      - "4318:4318" # OTLP http
+      - "4318:4318"
     environment:
       - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
     depends_on:
@@ -52,13 +42,12 @@ services:
     image: chromadb/chroma:latest
     ports:
       - "8000:8000"
-    volumes:
-      - chroma-data:/chroma/data
 
   # --- MICROSERVICES ---
   quote-service:
-    build:
-      context: ../apps/quote-service
+    build: ./apps/quote-service
+    ports:
+      - "8001:8001"
     environment:
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
@@ -67,8 +56,9 @@ services:
         condition: service_healthy
 
   policy-service:
-    build:
-      context: ../apps/policy-service
+    build: ./apps/policy-service
+    ports:
+      - "8002:8002"
     environment:
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
@@ -77,52 +67,41 @@ services:
         condition: service_healthy
 
   user-service:
-    build:
-      context: ../apps/user-service
+    build: ./apps/user-service
+    ports:
+      - "8003:8003"
     environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
-    depends_on:
-      kafka:
-        condition: service_healthy
-
-  # --- AGENT CONTROL PLANE ---
-  agent-scout:
-    build:
-      context: ../agents/scout
-    environment:
-      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
-    depends_on:
-      kafka:
-        condition: service_healthy
-
-  agent-brain:
-    build:
-      context: ../agents/brain
-    env_file: ../.env
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - otel-collector
 
-  agent-memory:
-    build:
-      context: ../agents/memory
-    env_file: ../.env
+  # --- AGENTS ---
+  scout:
+    build: ./agents/scout
+    environment:
+      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  brain:
+    build: ./agents/brain
+    env_file: .env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  memory:
+    build: ./agents/memory
+    env_file: .env
     depends_on:
       - chromadb
 
-  agent-fixer:
-    build:
-      context: ../agents/fixer
-    env_file: ../.env
+  fixer:
+    build: ./agents/fixer
+    env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${PWD}/..:/app/monorepo # Mount the monorepo for Fixer to make PRs
+      - .:/app/monorepo
     depends_on:
-      - agent-brain
-
-volumes:
-  chroma-data:
+      - brain

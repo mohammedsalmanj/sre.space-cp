@@ -1,62 +1,39 @@
+import os
 import asyncio
 import logging
-import os
+import json
 import chromadb
-from openai import OpenAI
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
-import json
+from openai import OpenAI
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("memory")
 
-# Config
-CHROMADB_HOST = os.getenv("CHROMA_DB_HOST", "chromadb")
-CHROMADB_PORT = os.getenv("CHROMA_DB_PORT", "8000")
+CHROMA_HOST = os.getenv("CHROMA_DB_HOST", "chromadb")
+CHROMA_PORT = int(os.getenv("CHROMA_DB_PORT", "8000"))
 GITHUB_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# Initialize Clients
-try:
-    chroma_client = chromadb.HttpClient(host=CHROMADB_HOST, port=CHROMADB_PORT)
-    logger.info(f"Connected to ChromaDB at {CHROMADB_HOST}:{CHROMADB_PORT}")
-except Exception as e:
-    logger.error(f"Failed to connect to ChromaDB: {e}")
-    chroma_client = None
+# Initialize OpenAI for Manual Embeddings
+openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
-openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-async def query_knowledge_base(query_text):
-    if not chroma_client:
-        return "Memory Offline."
-        
-    logger.info(f"Querying knowledge base for: {query_text}")
-    try:
-        # Generate embedding
-        response = openai_client.embeddings.create(input=query_text, model="text-embedding-3-small")
-        embedding = response.data[0].embedding
-        
-        # Query Chroma
-        collection = chroma_client.get_or_create_collection("incidents")
-        results = collection.query(query_embeddings=[embedding], n_results=2)
-        
-        if not results['documents'] or not results['documents'][0]:
-            return "No similar past incidents found."
-            
-        kb_text = "\n".join([str(doc) for doc in results['documents'][0]])
-        return f"Found similar past incidents:\n{kb_text}"
-    except Exception as e:
-        logger.error(f"Error querying memory: {e}")
-        return f"Error querying memory: {e}"
+def get_embedding(text):
+    text = text.replace("\n", " ")
+    return openai_client.embeddings.create(input=[text], model="text-embedding-3-small").data[0].embedding
 
 async def run_memory():
-    logger.info("Memory Agent starting...")
+    logger.info("Memory Agent v2 starting... SRE Knowledge Retrieval Active.")
 
-    if not GITHUB_TOKEN:
-        logger.error("Missing GITHUB_TOKEN")
-        return
+    # Chroma Client
+    chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
+    try:
+        collection = chroma_client.get_collection("sre_knowledge")
+    except:
+        collection = chroma_client.create_collection("sre_knowledge")
+        logger.info("Created new knowledge collection.")
 
-    # Connect to GitHub MCP
     server_params = StdioServerParameters(
         command="mcp-server-github",
         args=[],
@@ -66,54 +43,45 @@ async def run_memory():
     async with stdio_client(server_params) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
-            logger.info("Connected to GitHub MCP.")
-
             processed_issues = set()
 
             while True:
                 try:
-                    # Poll for open issues
                     result = await session.call_tool("list_issues", arguments={"owner": "mohammedsalmanj", "repo": "sre.space-cp", "state": "open"})
-                    
-                    issues_json = []
-                    try:
-                       if isinstance(result.content, list):
-                            issues_json = json.loads(result.content[0].text)
-                    except:
-                        pass
+                    issues = json.loads(result.content[0].text)
 
-                    for issue in issues_json:
+                    for issue in issues:
                         number = issue.get("number")
                         title = issue.get("title")
-                        
-                        if number in processed_issues:
-                            continue
+                        body = issue.get("body", "")
 
-                        # Memory acts if Brain has already diagnosed (look for brain comment) OR just generally on Incidents
-                        # For simplicity, let's have Memory post initial context on any NEW Incident
-                        if "[INCIDENT]" in title:
-                            logger.info(f"Processing Incident #{number} for Memory Context")
+                        if "[INCIDENT]" in title and number not in processed_issues and "Memory Context" not in body:
+                            logger.info(f"Retrieving context for Incident #{number}")
                             
-                            # Query Memory
-                            memory_context = await query_knowledge_base(title + " " + issue.get("body", ""))
+                            # Query ChromaDB
+                            query_text = f"{title} {body}"
+                            query_embedding = get_embedding(query_text)
                             
-                            # Post Comment
-                            await session.call_tool(
-                                "add_issue_comment", 
-                                arguments={
-                                    "owner": "mohammedsalmanj", 
-                                    "repo": "sre.space-cp", 
-                                    "issue_number": number, 
-                                    "body": f"## 📚 Memory Agent Context\n\n{memory_context}"
-                                }
+                            results = collection.query(
+                                query_embeddings=[query_embedding],
+                                n_results=2
                             )
-                            processed_issues.add(number)
-                    
-                    await asyncio.sleep(60)
 
+                            context_str = "\n".join(results['documents'][0]) if results['documents'] else "No similar past incidents found."
+                            
+                            comment_body = f"## 📚 Memory Agent Context\n\nI found the following similar patterns in my knowledge base:\n\n{context_str}"
+                            
+                            await session.call_tool("add_issue_comment", arguments={
+                                "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number,
+                                "body": comment_body
+                            })
+                            
+                            processed_issues.add(number)
+
+                    await asyncio.sleep(45)
                 except Exception as e:
-                    logger.error(f"Memory Loop Error: {e}")
-                    await asyncio.sleep(min(120, 30 * (1.5 ** (len(processed_issues) % 5))))
+                    logger.error(f"Memory Error: {e}")
+                    await asyncio.sleep(30)
 
 if __name__ == "__main__":
     asyncio.run(run_memory())
