@@ -1,5 +1,9 @@
 import chromadb
 import os
+from dotenv import load_dotenv
+
+# Load local .env file
+load_dotenv(override=True)
 # from openai import OpenAI # Removed OpenAI import
 
 # Initialize OpenAI # Removed OpenAI client initialization
