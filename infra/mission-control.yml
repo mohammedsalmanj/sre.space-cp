@@ -31,12 +31,15 @@ services:
       context: ../agents/scout
     environment:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
     depends_on:
       - otel-collector
 
   brain:
     build:
       context: ../agents/brain
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
