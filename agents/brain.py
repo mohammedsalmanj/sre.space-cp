@@ -109,37 +109,38 @@ async def run_brain():
                                 "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number, "body": new_body
                             })
 
-                        # Scenario 2: Fixer signaled completion (Status: Fixed found in comments)
+                        # Scenario 2: Detect Recovery (Signal from Fixer)
                         comments_res = await session.call_tool("get_issue_comments", arguments={
                             "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number
                         })
                         comments = json.loads(comments_res.content[0].text)
+                        
+                        # Look for 'Status: Fixed' but ensure we haven't already written a PM
                         is_fixed = any("Status: Fixed" in c.get("body", "") for c in comments)
                         has_pm = any("POST-MORTEM" in c.get("body", "") for c in comments)
 
                         if is_fixed and not has_pm:
-                            logger.info(f"Learning Loop: Creating Post-Mortem for Incident #{number}")
+                            logger.info(f"🚀 RECOVERY DETECTED for #{number}. Initiating Learning Loop...")
                             pm_content = await generate_post_mortem(title, body, number)
                             
-                            # Save locally for Learning (Memory agent will pick this up)
-                            history_path = f"/app/shared/history/PM-{number}.md"
+                            # Save to persistent history for Memory Agent (Auto-Learning)
+                            history_path = f"/app/shared/history/PM-{time.strftime('%Y%m%d')}-{number}.md"
                             os.makedirs(os.path.dirname(history_path), exist_ok=True)
                             with open(history_path, "w") as f:
                                 f.write(pm_content)
                             
-                            # Post to GitHub
+                            # Post final report and close via MCP
                             await session.call_tool("add_issue_comment", arguments={
                                 "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number,
-                                "body": f"## 📝 POST-MORTEM\n\n{pm_content}"
+                                "body": f"## 📝 AUTOMATED POST-MORTEM\n\n{pm_content}\n\n---\n**Status: AI-Resolved**"
                             })
                             
-                            # Close Issue via MCP
                             await session.call_tool("update_issue", arguments={
                                 "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number, 
                                 "state": "closed",
-                                "labels": ["Status: AI-Resolved"]
+                                "labels": ["Status: AI-Resolved", "Learning: Indexed"]
                             })
-                            logger.info(f"Incident #{number} closed and archived.")
+                            logger.info(f"✅ Learning Loop Complete for Incident #{number}.")
 
                     await asyncio.sleep(30)
                 except Exception as e:

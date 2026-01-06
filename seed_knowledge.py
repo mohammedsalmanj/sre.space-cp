@@ -10,7 +10,19 @@ load_dotenv(override=True)
 # client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Initialize ChromaDB
+import time as time_lib
 chroma_client = chromadb.HttpClient(host="localhost", port=8000)
+
+def wait_for_chroma(max_retries=5):
+    for i in range(max_retries):
+        try:
+            chroma_client.heartbeat()
+            print("ChromaDB is alive!")
+            return True
+        except Exception as e:
+            print(f"Waiting for ChromaDB... ({i+1}/{max_retries})")
+            time_lib.sleep(3)
+    return False
 
 from openai import OpenAI
 import os
@@ -26,6 +38,10 @@ def get_embedding(text):
     return client.embeddings.create(input=[text], model="text-embedding-3-small").data[0].embedding
 
 def seed():
+    if not wait_for_chroma():
+        print("Error: Could not connect to ChromaDB. Is it running?")
+        return
+
     # Delete if exists to avoid duplicates
     try:
         chroma_client.delete_collection("sre_knowledge")
@@ -52,18 +68,22 @@ def seed():
         }
     ]
 
+    print(f"Beginning knowledge seeding into collection: 'sre_knowledge'...")
     ids = [p["id"] for p in patterns]
     docs = [p["doc"] for p in patterns]
     metas = [p["meta"] for p in patterns]
+    
+    print(f"Generating embeddings for {len(patterns)} patterns...")
     embeddings = [get_embedding(p["doc"]) for p in patterns]
 
+    print("Upserting into ChromaDB...")
     collection.add(
         ids=ids,
         documents=docs,
         metadatas=metas,
         embeddings=embeddings
     )
-    print(f"Successfully seeded {len(patterns)} SRE knowledge patterns into ChromaDB.")
+    print(f"✅ Successfully seeded {len(patterns)} SRE knowledge patterns into ChromaDB.")
 
 if __name__ == "__main__":
     seed()
