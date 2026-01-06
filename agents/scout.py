@@ -2,6 +2,7 @@ import os
 import asyncio
 import json
 import logging
+import time
 from confluent_kafka import Consumer, KafkaError
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -66,40 +67,65 @@ async def run_scout():
                     
                     logger.info(f"Metrics Update: Quotes={metrics.quotes}, Purchases={metrics.purchases}")
 
+import requests
+
+SERVICES = {
+    "policy-service": "http://policy-service:8002/health",
+    "quote-service": "http://quote-service:8001/health",
+    "user-service": "http://user-service:8003/health"
+}
+
+async def check_service_health(session):
+    for name, url in SERVICES.items():
+        try:
+            res = requests.get(url, timeout=2)
+            if res.status_code != 200:
+                logger.warning(f"CRITICAL: {name} is UNHEALTHY (Status: {res.status_code})")
+                await create_health_incident(session, name, f"Status Code: {res.status_code}")
+        except Exception as e:
+            logger.error(f"CRITICAL: {name} is DOWN (Error: {e})")
+            await create_health_incident(session, name, str(e))
+
+async def create_health_incident(session, service, error):
+    await session.call_tool(
+        "create_issue",
+        arguments={
+            "owner": "mohammedsalmanj",
+            "repo": "sre.space-cp",
+            "title": f"[INCIDENT] Service Down: {service}",
+            "body": f"The Scout Agent detected that `{service}` is unavailable or unhealthy.\n\n"
+                    f"**Error**: {error}\n"
+                    f"**Timestamp**: {time.ctime()}\n\n"
+                    f"**Possible Cause**: Resource Leak (OOM), Network Partition, or Process Crash.\n"
+                    f"Brain Agent please diagnose and trigger RESTART if necessary."
+        }
+    )
+    logger.info(f"Health Incident Created for {service}.")
+    await asyncio.sleep(60) # Cooldown
+
 async def check_conversion(session):
-    if metrics.quotes > 5: # Lower threshold for demo
+    await check_service_health(session) # Mix in health checks
+    if metrics.quotes > 5:
         rate = (metrics.purchases / metrics.quotes) * 100
         logger.info(f"Checking Conversion Health: {rate:.2f}% ({metrics.purchases}/{metrics.quotes})")
         
-        if rate < 50: # Alert if conversion is below 50% for demo
+        if rate < 50:
             logger.warning(f"CRITICAL: Conversion Drop Detected! Rate: {rate:.2f}%")
-            
-            # Create GitHub Incident
-            try:
-                await session.call_tool(
-                    "create_issue",
-                    arguments={
-                        "owner": "mohammedsalmanj",
-                        "repo": "sre.space-cp",
-                        "title": f"[INCIDENT] SRE-Space Conversion Drop: {rate:.2f}%",
-                        "body": f"The Scout Agent detected a business logic failure in the Insurance Cloud.\n\n"
-                                f"**Metric**: Conversion Rate (Quotes -> Purchases)\n"
-                                f"**Current Rate**: {rate:.2f}%\n"
-                                f"**Threshold**: 50.00%\n\n"
-                                f"**Details**:\n"
-                                f"- Total Quotes Requested: {metrics.quotes}\n"
-                                f"- Total Policies Purchased: {metrics.purchases}\n\n"
-                                f"Possible Root Causes: Latency in `policy-service`, Kafka consumer lag, or `user-service` validation errors.\n"
-                                f"Brain Agent should analyze the Jaeger traces for TraceID propagation."
-                    }
-                )
-                logger.info("Incident Issue Created successfully.")
-                # Reset metrics
-                metrics.quotes = 0
-                metrics.purchases = 0
-                await asyncio.sleep(300) # Cooldown
-            except Exception as e:
-                logger.error(f"Failed to create incident: {e}")
+            await session.call_tool(
+                "create_issue",
+                arguments={
+                    "owner": "mohammedsalmanj",
+                    "repo": "sre.space-cp",
+                    "title": f"[INCIDENT] SRE-Space Conversion Drop: {rate:.2f}%",
+                    "body": f"The Scout Agent detected a business logic failure in the Insurance Cloud.\n\n"
+                            f"**Metric**: Conversion Rate (Quotes -> Purchases)\n"
+                            f"**Current Rate**: {rate:.2f}%\n"
+                            f"**Threshold**: 50.00%\n\n"
+                            f"Possible Root Causes: Latency in `policy-service`, Kafka consumer lag, or `user-service` validation errors."
+                }
+            )
+            metrics.quotes, metrics.purchases = 0, 0
+            await asyncio.sleep(300)
 
 if __name__ == "__main__":
     asyncio.run(run_scout())

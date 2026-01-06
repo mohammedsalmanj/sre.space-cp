@@ -88,53 +88,62 @@ services:
     depends_on:
       - quote-service
 
-  # --- AGENTS (Unified Build) ---
+  # --- AGENTS (Final Unified Build) ---
   scout:
     build:
       context: .
-      dockerfile: ./agents_new/Dockerfile
+      dockerfile: ./agents/Dockerfile
     dns:
       - 8.8.8.8
-    command: [ "python", "agents_new/scout.py" ]
+    command: [ "python", "agents/scout.py" ]
     environment:
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       kafka:
         condition: service_healthy
+    volumes:
+      - history_data:/app/shared/history
 
   brain:
     build:
       context: .
-      dockerfile: ./agents_new/Dockerfile
+      dockerfile: ./agents/Dockerfile
     dns:
       - 8.8.8.8
-    command: [ "python", "agents_new/brain.py" ]
+    command: [ "python", "agents/brain.py" ]
     env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - history_data:/app/shared/history
 
   memory:
     build:
       context: .
-      dockerfile: ./agents_new/Dockerfile
+      dockerfile: ./agents/Dockerfile
     dns:
       - 8.8.8.8
-    command: [ "python", "agents_new/memory.py" ]
+    command: [ "python", "agents/memory.py" ]
     env_file: .env
     depends_on:
       - chromadb
+    volumes:
+      - history_data:/app/shared/history
 
   fixer:
     build:
       context: .
-      dockerfile: ./agents_new/Dockerfile
+      dockerfile: ./agents/Dockerfile
     dns:
       - 8.8.8.8
-    command: [ "python", "agents_new/fixer.py" ]
+    command: [ "python", "agents/fixer.py" ]
     env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/app/monorepo
+      - history_data:/app/shared/history
     depends_on:
       - brain
+
+volumes:
+  history_data:

@@ -1,0 +1,150 @@
+from openai import OpenAI
+import os
+import asyncio
+import logging
+import json
+import time
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+from shared.schemas import Incident
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("brain")
+
+GITHUB_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+client = OpenAI(api_key=OPENAI_API_KEY)
+
+async def generate_post_mortem(title, body, issue_number):
+    prompt = f"""
+    You are the Brain Agent of SRE-Space. A fix has been verified for the following incident.
+    Write a professional SRE Post-Mortem in Markdown.
+    
+    Incident Title: {title}
+    Full Incident Logs: {body}
+    
+    Use this structure:
+    # Incident Post-Mortem: PM-{issue_number}
+    ## Incident Summary
+    ## Detailed Timeline (Detection to Resolution)
+    ## Root Cause
+    ## Lessons Learned & 'Next Actions'
+    """
+    
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "system", "content": "You are a senior SRE. Write detailed, blameless post-mortems."},
+                  {"role": "user", "content": prompt}]
+    )
+    return response.choices[0].message.content
+
+async def analyze_incident(title, body, traces="No trace data available yet."):
+    incident_obj = Incident(
+        id=str(int(time.time())),
+        title=title,
+        description=body,
+        severity="High",
+        status="Investigating",
+        service="InsuranceCloud"
+    )
+    
+    prompt = f"""
+    You are the Brain Agent of SRE-Space. 
+    Analyze this incident object:
+    {incident_obj.to_dict()}
+    
+    Traces: {traces}
+
+    Provide:
+    1. Root Cause Analysis (RCA).
+    2. Recommended Fix.
+    3. MITIGATION command for the Fixer Agent:
+       - MITIGATION: RESTART [container_name]
+       - MITIGATION: PR [branch] | [title] | [change_description]
+    """
+    
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "system", "content": "You are a senior SRE agent focus on cost-efficient diagnosis."},
+                  {"role": "user", "content": prompt}]
+    )
+    return response.choices[0].message.content
+
+async def run_brain():
+    logger.info("Brain Agent v4 starting... Learning Loop Active.")
+
+    server_params = StdioServerParameters(
+        command="mcp-server-github",
+        args=[],
+        env={**os.environ, "GITHUB_PERSONAL_ACCESS_TOKEN": GITHUB_TOKEN}
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            
+            while True:
+                try:
+                    result = await session.call_tool("list_issues", arguments={"owner": "mohammedsalmanj", "repo": "sre.space-cp", "state": "open"})
+                    issues = json.loads(result.content[0].text)
+
+                    for issue in issues:
+                        number = issue.get("number")
+                        title = issue.get("title")
+                        body = issue.get("body", "")
+
+                        # Scenario 1: New Incident Diagnosis
+                        if "[INCIDENT]" in title and "Brain Agent Diagnosis" not in body:
+                            logger.info(f"Diagnosing Incident #{number}")
+                            diagnosis = await analyze_incident(title, body)
+                            await session.call_tool("add_issue_comment", arguments={
+                                "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number,
+                                "body": f"## 🧠 Brain Agent Diagnosis\n\n{diagnosis}"
+                            })
+                            # Append to body to mark as diagnosed (mental state)
+                            new_body = f"{body}\n\n---\n## 🧠 Brain Agent Diagnosis\n\n{diagnosis}"
+                            await session.call_tool("update_issue", arguments={
+                                "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number, "body": new_body
+                            })
+
+                        # Scenario 2: Fixer signaled completion (Status: Fixed found in comments)
+                        comments_res = await session.call_tool("get_issue_comments", arguments={
+                            "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number
+                        })
+                        comments = json.loads(comments_res.content[0].text)
+                        is_fixed = any("Status: Fixed" in c.get("body", "") for c in comments)
+                        has_pm = any("POST-MORTEM" in c.get("body", "") for c in comments)
+
+                        if is_fixed and not has_pm:
+                            logger.info(f"Learning Loop: Creating Post-Mortem for Incident #{number}")
+                            pm_content = await generate_post_mortem(title, body, number)
+                            
+                            # Save locally for Learning (Memory agent will pick this up)
+                            history_path = f"/app/shared/history/PM-{number}.md"
+                            os.makedirs(os.path.dirname(history_path), exist_ok=True)
+                            with open(history_path, "w") as f:
+                                f.write(pm_content)
+                            
+                            # Post to GitHub
+                            await session.call_tool("add_issue_comment", arguments={
+                                "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number,
+                                "body": f"## 📝 POST-MORTEM\n\n{pm_content}"
+                            })
+                            
+                            # Close Issue via MCP
+                            await session.call_tool("update_issue", arguments={
+                                "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number, 
+                                "state": "closed",
+                                "labels": ["Status: AI-Resolved"]
+                            })
+                            logger.info(f"Incident #{number} closed and archived.")
+
+                    await asyncio.sleep(30)
+                except Exception as e:
+                    logger.error(f"Brain Error: {e}")
+                    await asyncio.sleep(30)
+
+if __name__ == "__main__":
+    asyncio.run(run_brain())

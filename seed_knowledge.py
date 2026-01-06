@@ -8,15 +8,18 @@ import os
 # Initialize ChromaDB
 chroma_client = chromadb.HttpClient(host="localhost", port=8000)
 
-# Optimized for Local Execution
-from sentence_transformers import SentenceTransformer
+from openai import OpenAI
+import os
 
-# Initialize Local Model
-embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+# Initialize OpenAI
+api_key = os.getenv("OPENAI_API_KEY")
+if api_key:
+    api_key = api_key.strip()
+client = OpenAI(api_key=api_key)
 
 def get_embedding(text):
     text = text.replace("\n", " ")
-    return embedding_model.encode(text).tolist()
+    return client.embeddings.create(input=[text], model="text-embedding-3-small").data[0].embedding
 
 def seed():
     # Delete if exists to avoid duplicates

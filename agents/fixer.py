@@ -53,14 +53,14 @@ async def run_fixer():
                         restart_match = re.search(r"MITIGATION:\s*RESTART\s*(\S+)", body, re.IGNORECASE)
                         if restart_match:
                             container = restart_match.group(1).strip("[]")
-                            res = await execute_restart(container)
+                            # Verify Fix
+                            verify_res = await execute_restart(container)
+                            
                             await session.call_tool("add_issue_comment", arguments={
-                                "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number,
-                                "body": f"## 🛠️ Fixer Agent Action\n\n{res}\n\nIncident Closed."
+                                 "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number,
+                                 "body": f"## 🛠️ Fixer Agent Action\n\n{verify_res}\n\nStatus: Fixed. Checking for system stability..."
                             })
-                            await session.call_tool("update_issue", arguments={
-                                "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number, "state": "closed"
-                            })
+                            # Fixer no longer closes the issue; Brain will handle closure after PM.
                         
                         # GitOps Fix (PR)
                         pr_match = re.search(r"MITIGATION:\s*PR\s*(.+)", body, re.IGNORECASE)

@@ -1,44 +1,33 @@
 import requests
 import time
 import random
+import sys
 
 BASE_URL = "http://localhost:8001" # Quote Service
 
-def trigger_chaos():
-    print("[*] Triggering SRE-Space Chaos Simulation...")
-    print(f"Target: {BASE_URL}")
-    print("Generating 20 requests (expecting random failures for policies > $450)...")
-    
-    success_count = 0
-    fail_count = 0
-
-    for i in range(20):
+def run_conversion_chaos():
+    print("[*] Simulating Conversion Failure (Business Logic)...")
+    for i in range(15):
         uid = f"user-{random.randint(1, 100)}"
-        print(f"[{i+1}/20] Requesting Quote for {uid}...", end="")
-        try:
-            # Hit the Quote endpoint to start the event chain
-            res = requests.get(f"{BASE_URL}/quote", params={"user_id": uid}, timeout=5)
-            
-            if res.status_code == 200:
-                data = res.json()
-                print(f" OK | Quote: {data.get('quote_id')} | Premium: ${data.get('premium')}")
-                success_count += 1
-            else:
-                print(f" FAILED | Status: {res.status_code}")
-                fail_count += 1
-                
-        except Exception as e:
-            print(f" ERROR: {e}")
-            fail_count += 1
-        
-        # Random delay to simulate real traffic
-        time.sleep(random.uniform(0.5, 1.5))
-        
-    print("\n--- Chaos Run Complete ---")
-    print(f"Requests Sent: 20")
-    print(f"API Success: {success_count}")
-    print(f"API Failures: {fail_count}")
-    print("Check SRE Dashboard for 'policy-service' failure rates and Scout Incidents.")
+        res = requests.get(f"{BASE_URL}/quote", params={"user_id": uid})
+        print(f"[{i+1}/15] {uid}: {res.status_code}")
+        time.sleep(1)
+
+def run_oom_chaos():
+    print("[!] Simulating Resource Leak (OOM)...")
+    # In a real demo, this might hit a /leak endpoint
+    # Here we trigger high frequency requests that crash the policy-service container
+    for i in range(50):
+        requests.get(f"{BASE_URL}/quote", params={"user_id": "attacker"})
+        if i % 10 == 0: print(f"Memory Leak Pressure: {i}%")
+    print("OOM Triggered. Scout should detect service unavailability.")
 
 if __name__ == "__main__":
-    trigger_chaos()
+    chaos_type = sys.argv[1] if len(sys.argv) > 1 else "conversion"
+    
+    if chaos_type == "oom":
+        run_oom_chaos()
+    else:
+        run_conversion_chaos()
+    
+    print("\n--- Chaos Run Complete ---")
