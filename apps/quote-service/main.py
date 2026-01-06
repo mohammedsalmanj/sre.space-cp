@@ -46,7 +46,8 @@ async def get_quote(background_tasks: BackgroundTasks, user_id: str = "guest"):
         # Kafka Event with Context Propagation
         background_tasks.add_task(produce_event, event)
         
-        return {"quote_id": quote_id, "premium": premium}
+        trace_id = format(span.get_span_context().trace_id, '032x')
+        return {"quote_id": quote_id, "premium": premium, "trace_id": trace_id}
 
 def produce_event(event):
     headers = {}

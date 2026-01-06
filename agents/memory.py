@@ -14,8 +14,8 @@ logger = logging.getLogger("memory")
 
 CHROMA_HOST = os.getenv("CHROMA_DB_HOST", "chromadb")
 CHROMA_PORT = int(os.getenv("CHROMA_DB_PORT", "8000"))
-GITHUB_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GITHUB_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN", "").strip()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 
 # SRE-Space: OpenAI Embeddings (Fallback due to network)
 from openai import OpenAI

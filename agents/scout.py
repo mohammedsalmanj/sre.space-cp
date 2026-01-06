@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("scout")
 
 KAFKA_BROKER = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
-GITHUB_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN")
+GITHUB_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN", "").strip()
 
 class ScoutMetrics:
     def __init__(self):
@@ -87,20 +87,24 @@ async def check_service_health(session):
             await create_health_incident(session, name, str(e))
 
 async def create_health_incident(session, service, error):
-    await session.call_tool(
-        "create_issue",
-        arguments={
-            "owner": "mohammedsalmanj",
-            "repo": "sre.space-cp",
-            "title": f"[INCIDENT] Service Down: {service}",
-            "body": f"The Scout Agent detected that `{service}` is unavailable or unhealthy.\n\n"
-                    f"**Error**: {error}\n"
-                    f"**Timestamp**: {time.ctime()}\n\n"
-                    f"**Possible Cause**: Resource Leak (OOM), Network Partition, or Process Crash.\n"
-                    f"Brain Agent please diagnose and trigger RESTART if necessary."
-        }
-    )
-    logger.info(f"Health Incident Created for {service}.")
+    logger.info(f"Creating Health Incident for {service}...")
+    try:
+        await session.call_tool(
+            "create_issue",
+            arguments={
+                "owner": "mohammedsalmanj",
+                "repo": "sre.space-cp",
+                "title": f"[INCIDENT] Service Down: {service}",
+                "body": f"The Scout Agent detected that `{service}` is unavailable or unhealthy.\n\n"
+                        f"**Error**: {error}\n"
+                        f"**Timestamp**: {time.ctime()}\n\n"
+                        f"**Possible Cause**: Resource Leak (OOM), Network Partition, or Process Crash.\n"
+                        f"Brain Agent please diagnose and trigger RESTART if necessary."
+            }
+        )
+        logger.info(f"✅ Health Incident Created for {service}.")
+    except Exception as e:
+        logger.error(f"❌ Failed to create health incident: {e}")
     await asyncio.sleep(60) # Cooldown
 
 async def check_conversion(session):

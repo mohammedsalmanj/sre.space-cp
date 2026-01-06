@@ -12,8 +12,8 @@ from shared.schemas import Incident
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("brain")
 
-GITHUB_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GITHUB_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN", "").strip()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
@@ -121,7 +121,10 @@ async def run_brain():
 
                         if is_fixed and not has_pm:
                             logger.info(f"🚀 RECOVERY DETECTED for #{number}. Initiating Learning Loop...")
-                            pm_content = await generate_post_mortem(title, body, number)
+                            
+                            # Extract potential Trace ID from body if exists, or just provide a search link
+                            trace_link = f"http://localhost:16686/search?service=quote-service"
+                            pm_content = await generate_post_mortem(title, f"{body}\n\nObservability: {trace_link}", number)
                             
                             # Save to persistent history for Memory Agent (Auto-Learning)
                             history_path = f"/app/shared/history/PM-{time.strftime('%Y%m%d')}-{number}.md"
@@ -132,7 +135,7 @@ async def run_brain():
                             # Post final report and close via MCP
                             await session.call_tool("add_issue_comment", arguments={
                                 "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number,
-                                "body": f"## 📝 AUTOMATED POST-MORTEM\n\n{pm_content}\n\n---\n**Status: AI-Resolved**"
+                                "body": f"## 📝 AUTOMATED POST-MORTEM\n\n{pm_content}\n\n---\n**🔍 Trace Analysis**: [View in Jaeger]({trace_link})\n**Status: AI-Resolved**"
                             })
                             
                             await session.call_tool("update_issue", arguments={

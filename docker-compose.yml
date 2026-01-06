@@ -104,6 +104,7 @@ services:
         condition: service_healthy
     volumes:
       - history_data:/app/shared/history
+      - .:/app
 
   brain:
     build:
@@ -116,6 +117,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - history_data:/app/shared/history
+      - .:/app
 
   memory:
     build:
@@ -129,6 +131,7 @@ services:
       - chromadb
     volumes:
       - history_data:/app/shared/history
+      - .:/app
 
   fixer:
     build:
@@ -142,6 +145,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/app/monorepo
       - history_data:/app/shared/history
+      - .:/app
     depends_on:
       - brain
 

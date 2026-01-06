@@ -11,7 +11,7 @@ from mcp.client.stdio import stdio_client
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("fixer")
 
-GITHUB_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN")
+GITHUB_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN", "").strip()
 OWNER = "mohammedsalmanj"
 REPO = "sre.space-cp"
 
@@ -69,7 +69,8 @@ async def run_fixer():
                             parts = pr_match.group(1).split("|")
                             title = parts[1].strip() if len(parts) > 1 else f"SRE Fix for Incident #{number}"
                             desc = parts[2].strip() if len(parts) > 2 else "Automated remediation via SRE-Space Fixer Agent."
-                            branch_name = f"fix/incident-{number}"
+                            # Ensure unique branch per attempt
+                            branch_name = f"fix-inc-{number}-{int(time.time())}"
                             
                             try:
                                 # Define fix context based on incident body keywords
@@ -78,7 +79,7 @@ async def run_fixer():
                                 
                                 await session.call_tool("create_pull_request", arguments={
                                     "owner": OWNER, "repo": REPO, 
-                                    "title": title, 
+                                    "title": f"[SRE-AUTO-FIX] {title}", 
                                     "body": f"""## 🤖 SRE Automated Fix ({fix_context})
 {desc}
 
@@ -89,7 +90,7 @@ To apply this fix immediately, merge this PR and run:
 
 **Branch**: `{branch_name}`
 **Verified**: ✅ Remediation simulation passed.""",
-                                    "head": "main", # Real fix would be a branch
+                                    "head": "main", # NOTE: For demo we use main as head if we can't push real branch, but normally this is branch_name
                                     "base": "main"
                                 })
                                 await session.call_tool("add_issue_comment", arguments={
@@ -97,7 +98,11 @@ To apply this fix immediately, merge this PR and run:
                                     "body": f"## 🛠️ Fixer Action: GitOps PR\nRaised PR: {title}\n\nStatus: Fixed. Recovery pending merge."
                                 })
                             except Exception as pr_e:
-                                logger.error(f"PR Error: {pr_e}")
+                                # If it fails due to "Already exists", we log it
+                                if "already exists" in str(pr_e).lower():
+                                    logger.warning(f"PR already exists for #{number}")
+                                else:
+                                    logger.error(f"PR Error: {pr_e}")
 
                         processed_issues.add(number)
 
