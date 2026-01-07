@@ -1,8 +1,8 @@
 # 🌌 SRE-Space: The Autonomous Reliability Control Plane
 
-![Status](https://img.shields.io/badge/Status-Autonomous-brightgreen) ![AI](https://img.shields.io/badge/AI-Agentic-blueviolet) ![SRE](https://img.shields.io/badge/SRE-NoOps-orange)
+![Status](https://img.shields.io/badge/Status-Autonomous-brightgreen) ![AI](https://img.shields.io/badge/AI-Agentic-blueviolet) ![SRE](https://img.shields.io/badge/SRE-NoOps-orange) ![Tier-3-Jules](https://img.shields.io/badge/Escalation-Google_Jules-4285F4)
 
-**SRE-Space** is a self-healing, agentic AIOps platform designed to eliminate operational toil. It employs a quad-agent system to **Detect, Diagnose, Fix, and Learn** from incidents without human intervention.
+**SRE-Space** is a self-healing, agentic AIOps platform designed to eliminate operational toil. It employs a multi-tier agent system to **Detect, Diagnose, Fix, and Learn** from incidents without human intervention.
 
 It is not just a monitoring tool; it is an **Autonomous Employee**.
 
@@ -39,6 +39,11 @@ graph TD
         Memory -->|Retrieves| Patterns[Historical Context]
     end
 
+    subgraph "Tier 3 Escalation"
+        Jules[🤖 Google Jules] -->|Refactors| Code[Codebase]
+        Jules -->|Architectural Fix| PR
+    end
+
     Brain -.->|Writes PM| Issue
     Fixer -->|Auto-Merge| GitHub[GitHub Main]
     GitHub -->|Deploy| Infra[Deploy-Infra Action]
@@ -48,39 +53,19 @@ graph TD
 
 ## 🤖 Meet the SRE Team (Agents)
 
-### 1. 🕵️ Scout (The Universal Watcher)
-*   **Mission**: "Eyes on Glass" 24/7.
-*   **Capabilities**:
-    *   **Multi-Modal Monitoring**: Concurrently watches Business Metrics (Conversion Rate), Infrastructure Saturation (CPU/RAM), and Service Latency.
-    *   **Universal Catcher**: Any anomaly triggers an immediate consolidated snapshot of the system state.
-    *   **Action**: Opens the initial GitHub Issue with Severity classification.
+For a detailed operational roster and standard operating procedures, see **[AGENTS.md](./AGENTS.md)**.
 
-### 2. 🧠 Brain (The Principal Analyst)
-*   **Mission**: Root Cause Analysis (RCA) & Strategy.
-*   **Technology**: GPT-4o-Mini + Jaeger Tracing.
-*   **Capabilities**:
-    *   **Deep Span Analysis**: Pulls trace data to distinguish between "Slow Queries" vs "Network Timeouts".
-    *   **Decision Engine**: Decides if an incident requires a simple restart (transient) or a configuration change (PR).
-    *   **Post-Mortem Writer**: Generates comprehensive documentation after recovery.
+### 🟢 Tier 1 & 2: Runtime Operations
+1.  **🕵️ Scout (The Universal Watcher)**: Monitors metrics and creates incidents.
+2.  **🧠 Brain (The Principal Analyst)**: Performs Root Cause Analysis (RCA) using Jaeger traces.
+3.  **🛠️ Fixer (The Automation Engineer)**: Executes safe restarts and GitOps configuration changes.
+4.  **📚 Memory (The Librarian)**: Stores incident history in ChromaDB to prevent repeat failures.
 
-### 3. 🛠️ Fixer (The Automation Engineer)
-*   **Mission**: Remediation & GitOps.
-*   **Capabilities**:
-    *   **Safe Execution**: Runs `docker restart` for stuck containers.
-    *   **GitOps Workflow**: For config changes (e.g., connection pools), it:
-        1.  Branches (`fix-inc-123`)
-        2.  Commits Code
-        3.  Raises PR
-        4.  **Auto-Merges** after verification
-        5.  Triggers CI/CD (`deploy-infra.yml`)
-    *   **Hygiene**: Automatically deletes legacy branches to prevent repo bloat.
-
-### 4. 📚 Memory (The Librarian)
-*   **Mission**: Continuous Learning.
-*   **Technology**: ChromaDB (Vector Store).
-*   **Capabilities**:
-    *   **Semantic Indexing**: Stores every resolved incident as a vector embedding.
-    *   **Context Injection**: When a new incident occurs, it whispers "We saw this 3 weeks ago" to the Brain, drastically reducing MTTR (Mean Time To Recovery).
+### 🔴 Tier 3: Architectural Escalation
+5.  **🤖 Google Jules (Senior Architect)**: 
+    *   **Role**: Tier-3 Escalation for deep code refactoring.
+    *   **Trigger**: `jules-fix` label or Daily 5:00 AM Cron.
+    *   **Capabilities**: Implements circuit breakers, caching strategies, and architectural improvements that require multi-file context.
 
 ---
 
@@ -94,7 +79,7 @@ sequenceDiagram
     participant Scout as 🕵️ Scout
     participant Brain as 🧠 Brain
     participant Fixer as 🛠️ Fixer
-    participant DB as 📚 Memory
+    participant Jules as 🤖 Jules
 
     Sys->>Sys: 💥 Memory Leak (OOM)
     Scout->>Scout: Detects Health Check Failure
@@ -112,11 +97,10 @@ sequenceDiagram
         Fixer->>GitHub: Labels "Status: Fixed"
     end
 
-    loop Learning
-        Brain->>GitHub: Detects 'Fixed' Label
-        Brain->>DB: 📝 Writes Post-Mortem (PM-142)
-        DB->>DB: Updates Vector Index
-        Brain->>GitHub: Closes Issue
+    alt Recurrence / Architectural Issue
+        Brain->>GitHub: Labels "jules-fix"
+        Jules->>GitHub: 🏗️ Refactors Codebase (Async)
+        Jules->>GitHub: Opens Architectural PR
     end
 ```
 
@@ -127,7 +111,8 @@ sequenceDiagram
 ### Prerequisites
 *   Docker & Docker Compose
 *   Python 3.10+
-*   Environment Variables: `GITHUB_PERSONAL_ACCESS_TOKEN`, `OPENAI_API_KEY`, `NEW_RELIC_LICENSE_KEY` (Optional).
+*   Environment Variables: `GITHUB_PERSONAL_ACCESS_TOKEN`, `OPENAI_API_KEY`.
+*   *(Optional)* `JULES_API_KEY`: For Tier-3 capabilities.
 
 ### 1. Installation
 ```bash
@@ -144,7 +129,7 @@ docker-compose up -d --build
 | :--- | :--- | :--- |
 | **SRE Dashboard** | [http://localhost:3001](http://localhost:3001) | Live Conversion Rate & System Status |
 | **Jaeger Tracing** | [http://localhost:16686](http://localhost:16686) | View Trace Spans & Bottlenecks |
-| **Knowledge Base (API)** | [http://localhost:8000/docs](http://localhost:8000/docs) | ChromaDB API Documentation |
+| **Knowledge Base API** | [http://localhost:8000/docs](http://localhost:8000/docs) | ChromaDB API Documentation |
 | **GitHub Issues** | [GitHub Repo](https://github.com/mohammedsalmanj/sre.space-cp/issues) | Watch the Agents work live |
 
 ---
@@ -161,9 +146,9 @@ python trigger_chaos.py oom
 # Result: Scout detects Kafka drop, Brain investigates recent deploys.
 python trigger_chaos.py conversion
 
-# 3. Simulate High Latency
-# Result: Fixer will create a PR to tune timeouts.
-python trigger_chaos.py latency
+# 3. Verify Jules Integration
+# Result: Verify that PRs are auto-tested.
+./mission-control.sh verify-jules-pr
 ```
 
 ---
@@ -172,13 +157,5 @@ python trigger_chaos.py latency
 *   **Eliminating Toil**: By automating the "Detect-Fix" loop, humans only review novel, complex problems.
 *   **Blameless Culture**: The Brain agent's Post-Mortems are purely factual, focusing on process improvement, not human error.
 *   **Observability First**: Decisions are driven by **Traces and Metrics**, not guesses.
-
----
-
-### 📂 Repository Structure
-*   `/agents`: Source code for Scout, Brain, Fixer, and Memory.
-*   `/apps`: The microservices (Quote, Policy, User, Frontend).
-*   `/infra`: Docker and Otel configuration.
-*   `/shared`: Common schemas (Incident, LogEntry).
 
 **Built by Antigravity under the SRE-Space Initiative.** 🚀

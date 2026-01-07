@@ -1,0 +1,32 @@
+name: SRE Jules Auto-Heal
+on:
+  schedule:
+    - cron: '0 5 * * *'
+  issues:
+    types: [labeled]
+
+jobs:
+  jules-auto-fix:
+    if: github.event_name == 'schedule' || contains(github.event.issue.labels.*.name, 'jules-fix')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Invoke Google Jules (Tier-3 Escalation)
+        uses: google-labs-code/jules-invoke@v1
+        with:
+          api-key: ${{ secrets.JULES_API_KEY }}
+          model: "gemini-1.5-pro-002" # or relevant model
+          context-paths: "docs/incidents,apps/"
+          task: |
+            Act as a Senior SRE Architect. Analyze the current failure context in docs/incidents and the code in apps/. 
+            Refactor the offending microservice to prevent recurrence, ensuring all OpenTelemetry traces are preserved.
+            Focus on robust error handling, circuit breaking, and resource efficiency.
+          pr-branch: "jules-auto-fix-${{ github.run_id }}"
+          pr-title: "feat(jules): SRE Architectural Refactor [Auto-Heal]"
