@@ -1,20 +1,20 @@
 {
   "name": "docker-compose.yml",
   "path": "docker-compose.yml",
-  "sha": "5c11ff1dd0341b8499ff55d56065103288c82c33",
-  "size": 66,
+  "sha": "1c483d9735ada8ff6f3b371846ea60a13def4475",
+  "size": 1104,
   "url": "https://api.github.com/repos/mohammedsalmanj/sre.space-cp/contents/docker-compose.yml?ref=main",
   "html_url": "https://github.com/mohammedsalmanj/sre.space-cp/blob/main/docker-compose.yml",
-  "git_url": "https://api.github.com/repos/mohammedsalmanj/sre.space-cp/git/blobs/5c11ff1dd0341b8499ff55d56065103288c82c33",
+  "git_url": "https://api.github.com/repos/mohammedsalmanj/sre.space-cp/git/blobs/1c483d9735ada8ff6f3b371846ea60a13def4475",
   "download_url": "https://raw.githubusercontent.com/mohammedsalmanj/sre.space-cp/main/docker-compose.yml",
   "type": "file",
-  "content": "\n# Auto-Fix applied for Incident #108 at Wed Jan  7 01:23:52 2026\n",
+  "content": "{\n  \"name\": \"docker-compose.yml\",\n  \"path\": \"docker-compose.yml\",\n  \"sha\": \"5c11ff1dd0341b8499ff55d56065103288c82c33\",\n  \"size\": 66,\n  \"url\": \"https://api.github.com/repos/mohammedsalmanj/sre.space-cp/contents/docker-compose.yml?ref=main\",\n  \"html_url\": \"https://github.com/mohammedsalmanj/sre.space-cp/blob/main/docker-compose.yml\",\n  \"git_url\": \"https://api.github.com/repos/mohammedsalmanj/sre.space-cp/git/blobs/5c11ff1dd0341b8499ff55d56065103288c82c33\",\n  \"download_url\": \"https://raw.githubusercontent.com/mohammedsalmanj/sre.space-cp/main/docker-compose.yml\",\n  \"type\": \"file\",\n  \"content\": \"\\n# Auto-Fix applied for Incident #108 at Wed Jan  7 01:23:52 2026\\n\",\n  \"encoding\": \"base64\",\n  \"_links\": {\n    \"self\": \"https://api.github.com/repos/mohammedsalmanj/sre.space-cp/contents/docker-compose.yml?ref=main\",\n    \"git\": \"https://api.github.com/repos/mohammedsalmanj/sre.space-cp/git/blobs/5c11ff1dd0341b8499ff55d56065103288c82c33\",\n    \"html\": \"https://github.com/mohammedsalmanj/sre.space-cp/blob/main/docker-compose.yml\"\n  }\n}\n\n# Auto-Fix applied for Incident #138 at Wed Jan  7 03:27:59 2026\n",
   "encoding": "base64",
   "_links": {
     "self": "https://api.github.com/repos/mohammedsalmanj/sre.space-cp/contents/docker-compose.yml?ref=main",
-    "git": "https://api.github.com/repos/mohammedsalmanj/sre.space-cp/git/blobs/5c11ff1dd0341b8499ff55d56065103288c82c33",
+    "git": "https://api.github.com/repos/mohammedsalmanj/sre.space-cp/git/blobs/1c483d9735ada8ff6f3b371846ea60a13def4475",
     "html": "https://github.com/mohammedsalmanj/sre.space-cp/blob/main/docker-compose.yml"
   }
 }
 
-# Auto-Fix applied for Incident #138 at Wed Jan  7 03:27:59 2026
+# Auto-Fix applied for Incident #142 at Wed Jan  7 03:36:39 2026
