@@ -1,99 +1,184 @@
-# 🌌 SRE-Space: The Autonomous Reliability Engine (Deep Dive)
+# 🌌 SRE-Space: The Autonomous Reliability Control Plane
 
-SRE-Space is a cutting-edge AIOps platform that replaces traditional on-call rotations with a team of specialized AI agents. Unlike standard monitoring, SRE-Space is **agentic**: it doesn't just alert; it investigates, codes, merges, and learns.
+![Status](https://img.shields.io/badge/Status-Autonomous-brightgreen) ![AI](https://img.shields.io/badge/AI-Agentic-blueviolet) ![SRE](https://img.shields.io/badge/SRE-NoOps-orange)
 
----
+**SRE-Space** is a self-healing, agentic AIOps platform designed to eliminate operational toil. It employs a quad-agent system to **Detect, Diagnose, Fix, and Learn** from incidents without human intervention.
 
-## 🏗️ System Architecture
-
-### 1. The Protected Microservices (The Application)
-The "Cloud Insurance" app consists of three interconnected services and a frontend:
-- **Quote Service (`apps/quote-service`)**: The entry point. It receives quote requests, communicates with downstream services, and emits events to Kafka (e.g., `quote_requested`, `quote_purchased`).
-- **Policy Service (`apps/policy-service`)**: Handles policy generation and risk assessment.
-- **User Service (`apps/user-service`)**: Manages customer profiles.
-- **Frontend (`apps/frontend`)**: A glassmorphic SRE dashboard providing real-time visibility into "Conversion Rate" (Purchases vs. Quotes).
-
-### 2. The SRE Agent Team (The Intelligence)
-Four collaborative agents work in a closed-loop to maintain a **99.9% CUJ (Critical User Journey) success rate**:
-
-#### 🔍 Scout Agent (The Observer)
-- **Role**: Continuous Monitoring & Incident Creation.
-- **Capabilities**: 
-    - **Watchers**: Runs concurrent threads for **CUJ Monitoring** (Kafka consumption), **Latency tracking**, **Saturation/Infrastructure checks**, and **API Error detection**.
-    - **Incident Orchestrator**: When a threshold is breached (e.g., Conversion < 50%), it gathers system snapshots and opens a **GitHub Issue** as the central source of truth.
-
-#### 🧠 Brain Agent (The Analyst)
-- **Role**: Deep Span Analysis & Remediation Strategy.
-- **Capabilities**:
-    - **Trace Analysis**: Utilizes OpenTelemetry traces from **Jaeger** to identify the exact service or database query causing bottlenecks.
-    - **Heuristic Reasoning**: Connects "Symptom" (Conversion Drop) to "Root Cause" (e.g., Policy Service OOM).
-    - **Orchestration**: Directs the Fixer Agent by commenting `MITIGATION: PR` or `MITIGATION: RESTART` on the GitHub issue.
-
-#### 🛠️ Fixer Agent (The Engineer)
-- **Role**: GitOps & Automated Remediation.
-- **Capabilities**:
-    - **Auto-Healing**: Executes `docker-restart` for transient crashes or memory leaks.
-    - **GitOps Lifecycle**: For configuration or infrastructure changes, it creates a new branch, commits the fix, raises a **Pull Request**, and executes an **Auto-Merge (Squash)**.
-    - **Hygiene**: Maintains a "Top 5" branch policy, deleting legacy remediation branches after successful deployment.
-
-#### 📚 Memory Agent (The Librarian)
-- **Role**: Knowledge Loop & Pattern Matching.
-- **Capabilities**:
-    - **ChromaDB Integration**: Stores every incident and Post-Mortem as vector embeddings.
-    - **Context Injection**: Provides the Brain Agent with "Historical Context" if a similar incident has occurred before, accelerating resolution time.
+It is not just a monitoring tool; it is an **Autonomous Employee**.
 
 ---
 
-## 🚦 Infrastructure Components
+## 🏛️ System Architecture
 
-| Tech | Role in Project | URL |
+The platform consists of a **Protected Microservices Layer** (the app) and the **SRE Control Plane** (the agents).
+
+```mermaid
+graph TD
+    subgraph "Protected Infrastructure"
+        QS[Quote Service] -->|Events| Kafka
+        PS[Policy Service] -->|Events| Kafka
+        US[User Service] -->|Events| Kafka
+        Frontend --> QS
+        QS -->|Traces| Jaeger
+        PS -->|Traces| Jaeger
+    end
+
+    subgraph "SRE Control Plane (Agents)"
+        Scout[🕵️ Scout Agent] -->|Monitors| Kafka
+        Scout -->|Checks| Health[Health Checks]
+        Scout -->|Creates| Issue[GitHub Incident]
+
+        Brain[🧠 Brain Agent] -->|Analyzes| Issue
+        Brain -->|Deep Span Analysis| Jaeger
+        Brain -->|Instructs| Fixer
+
+        Fixer[🛠️ Fixer Agent] -->|Executes| Cmd[Docker Restart]
+        Fixer -->|GitOps| PR[Pull Request]
+        
+        Memory[📚 Memory Agent] -->|Indexes| ChromaDB[(Knowledge Base)]
+        Memory -->|Retrieves| Patterns[Historical Context]
+    end
+
+    Brain -.->|Writes PM| Issue
+    Fixer -->|Auto-Merge| GitHub[GitHub Main]
+    GitHub -->|Deploy| Infra[Deploy-Infra Action]
+```
+
+---
+
+## 🤖 Meet the SRE Team (Agents)
+
+### 1. 🕵️ Scout (The Universal Watcher)
+*   **Mission**: "Eyes on Glass" 24/7.
+*   **Capabilities**:
+    *   **Multi-Modal Monitoring**: Concurrently watches Business Metrics (Conversion Rate), Infrastructure Saturation (CPU/RAM), and Service Latency.
+    *   **Universal Catcher**: Any anomaly triggers an immediate consolidated snapshot of the system state.
+    *   **Action**: Opens the initial GitHub Issue with Severity classification.
+
+### 2. 🧠 Brain (The Principal Analyst)
+*   **Mission**: Root Cause Analysis (RCA) & Strategy.
+*   **Technology**: GPT-4o-Mini + Jaeger Tracing.
+*   **Capabilities**:
+    *   **Deep Span Analysis**: Pulls trace data to distinguish between "Slow Queries" vs "Network Timeouts".
+    *   **Decision Engine**: Decides if an incident requires a simple restart (transient) or a configuration change (PR).
+    *   **Post-Mortem Writer**: Generates comprehensive documentation after recovery.
+
+### 3. 🛠️ Fixer (The Automation Engineer)
+*   **Mission**: Remediation & GitOps.
+*   **Capabilities**:
+    *   **Safe Execution**: Runs `docker restart` for stuck containers.
+    *   **GitOps Workflow**: For config changes (e.g., connection pools), it:
+        1.  Branches (`fix-inc-123`)
+        2.  Commits Code
+        3.  Raises PR
+        4.  **Auto-Merges** after verification
+        5.  Triggers CI/CD (`deploy-infra.yml`)
+    *   **Hygiene**: Automatically deletes legacy branches to prevent repo bloat.
+
+### 4. 📚 Memory (The Librarian)
+*   **Mission**: Continuous Learning.
+*   **Technology**: ChromaDB (Vector Store).
+*   **Capabilities**:
+    *   **Semantic Indexing**: Stores every resolved incident as a vector embedding.
+    *   **Context Injection**: When a new incident occurs, it whispers "We saw this 3 weeks ago" to the Brain, drastically reducing MTTR (Mean Time To Recovery).
+
+---
+
+## 🔄 The Autonomous Loop (Workflow)
+
+Here is exactly what happens when `policy-service` crashes due to OOM:
+
+```mermaid
+sequenceDiagram
+    participant Sys as Infrastructure
+    participant Scout as 🕵️ Scout
+    participant Brain as 🧠 Brain
+    participant Fixer as 🛠️ Fixer
+    participant DB as 📚 Memory
+
+    Sys->>Sys: 💥 Memory Leak (OOM)
+    Scout->>Scout: Detects Health Check Failure
+    Scout->>GitHub: 🚨 Opens Incident #142
+
+    loop Diagnosis
+        Brain->>GitHub: Reads Incident
+        Brain->>Sys: Queries Jaeger Traces
+        Brain->>GitHub: Comment "Root Cause: OOM. MITIGATION: RESTART"
+    end
+
+    loop Remediation
+        Fixer->>GitHub: Reads Mitigation Command
+        Fixer->>Sys: 🚑 Docker Restart policy-service
+        Fixer->>GitHub: Labels "Status: Fixed"
+    end
+
+    loop Learning
+        Brain->>GitHub: Detects 'Fixed' Label
+        Brain->>DB: 📝 Writes Post-Mortem (PM-142)
+        DB->>DB: Updates Vector Index
+        Brain->>GitHub: Closes Issue
+    end
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+*   Docker & Docker Compose
+*   Python 3.10+
+*   Environment Variables: `GITHUB_PERSONAL_ACCESS_TOKEN`, `OPENAI_API_KEY`, `NEW_RELIC_LICENSE_KEY` (Optional).
+
+### 1. Installation
+```bash
+# Clone the repository
+git clone https://github.com/mohammedsalmanj/sre.space-cp.git
+cd sre.space-cp
+
+# Start the Control Plane
+docker-compose up -d --build
+```
+
+### 2. Access the Consoles
+| Console | URL | Description |
 | :--- | :--- | :--- |
-| **Kafka** | Event bus for business metrics (Quotes/Purchases). | `localhost:9092` |
-| **Jaeger** | Distributed tracing backend for bottleneck identification. | `localhost:16686` |
-| **ChromaDB** | Vector database for long-term incident memory. | `localhost:8000` |
-| **GitHub MCP** | The "Hands" of the agents to create issues, PRs, and comments. | GitHub Repository |
-| **Otel-Collector** | Central pipe for telemetry from all microservices. | `localhost:4317` |
+| **SRE Dashboard** | [http://localhost:3001](http://localhost:3001) | Live Conversion Rate & System Status |
+| **Jaeger Tracing** | [http://localhost:16686](http://localhost:16686) | View Trace Spans & Bottlenecks |
+| **Knowledge Base (API)** | [http://localhost:8000/docs](http://localhost:8000/docs) | ChromaDB API Documentation |
+| **GitHub Issues** | [GitHub Repo](https://github.com/mohammedsalmanj/sre.space-cp/issues) | Watch the Agents work live |
 
 ---
 
-## 🔄 The Autonomous Recovery Lifecycle
+## 🧪 Chaos Engineering (Test the AI)
+We have included a chaos suite to demonstrate the AI's capabilities.
 
-1.  **Detection**: `trigger_chaos.py` kills the Policy Service. **Scout** detects the health check failure.
-2.  **Alerting**: Scout opens a GitHub Issue: `[INCIDENT] Infrastructure Alert`.
-3.  **Diagnosis**: **Brain** performs Deep Span Analysis, identifies the dead service, and comments `MITIGATION: RESTART policy-service`.
-4.  **Action**: **Fixer** reads the command, restarts the container, and labels the issue `Status: Fixed`.
-5.  **Audit/Learning**: **Brain** detects recovery, generates a Markdown **Post-Mortem**, and **Memory** indexes it into the Knowledge Base.
-6.  **Deployment**: Any PR created by Fixer triggers the `.github/workflows/deploy-infra.yml` for automated rollout.
-
----
-
-## 🧪 Chaos Testing Suite
-Test the AI's resilience using the `trigger_chaos.py` script:
-- `oom`: Simulates a memory leak/saturation high-pressure event.
-- `conversion`: Simulates a business logic failure where quotes happen but purchases stop.
-- `latency`: Simulates slow network responses in downstream services.
-
----
-
-## 🛠️ Developer Setup
-
-### Environment Variables (.env)
 ```bash
-GITHUB_PERSONAL_ACCESS_TOKEN=your_pat
-OPENAI_API_KEY=your_key
-REPO_OWNER=mohammedsalmanj
-REPO_NAME=sre.space-cp
+# 1. Simulate a Memory Leak (OOM)
+# Result: Brain will order a RESTART.
+python trigger_chaos.py oom
+
+# 2. Simulate Business Logic Failure (Conversion Drop)
+# Result: Scout detects Kafka drop, Brain investigates recent deploys.
+python trigger_chaos.py conversion
+
+# 3. Simulate High Latency
+# Result: Fixer will create a PR to tune timeouts.
+python trigger_chaos.py latency
 ```
 
-### Installation
-```bash
-# 1. Start all infra and agents
-docker compose up -d --build
+---
 
-# 2. Monitor Agent Logs
-docker logs -f sre-cp-scout-1
-docker logs -f sre-cp-brain-1
-docker logs -f sre-cp-fixer-1
-```
+## 🛡️ SRE Philosophy Alignment
+*   **Eliminating Toil**: By automating the "Detect-Fix" loop, humans only review novel, complex problems.
+*   **Blameless Culture**: The Brain agent's Post-Mortems are purely factual, focusing on process improvement, not human error.
+*   **Observability First**: Decisions are driven by **Traces and Metrics**, not guesses.
 
-**SRE-Space is a prototype for the future of "No-Ops" - where the infrastructure manages itself through a decentralized team of AI professionals.**
+---
+
+### 📂 Repository Structure
+*   `/agents`: Source code for Scout, Brain, Fixer, and Memory.
+*   `/apps`: The microservices (Quote, Policy, User, Frontend).
+*   `/infra`: Docker and Otel configuration.
+*   `/shared`: Common schemas (Incident, LogEntry).
+
+**Built by Antigravity under the SRE-Space Initiative.** 🚀
