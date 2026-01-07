@@ -1,168 +1,88 @@
-SRE-Space: Operational Intelligence Roster
+# 🤖 SRE-Space: Operational Intelligence Roster
 
-This document defines the Standard Operating Procedure (SOP) for the SRE-Space autonomous agent cluster.
-It formalizes how operational intelligence flows through the system, including agent responsibilities, telemetry boundaries, and escalation paths required to maintain reliability at scale.
+This document formalizes the **Standard Operating Procedure (SOP)** for the SRE-Space autonomous agent cluster. It defines how telemetry flows from raw signals into architectural improvements.
 
-SRE-Space is designed to behave like a mature SRE organization, not a collection of scripts.
+---
 
-⚡ Interaction Flow: From Signal to Architecture
+## ⚡ The Incident Lifecycle: Signal to Architecture
 
-SRE-Space follows a deliberate, staged progression from runtime signal to long-term system improvement.
+SRE-Space follows a disciplined escalation path. Every incident is a learning opportunity.
 
-Detection
-Scout identifies abnormal system behavior (e.g., sustained latency increase in the Policy Service).
+```mermaid
+sequenceDiagram
+    participant Scout as 🕵️ Scout (Tier 1)
+    participant Brain as 🧠 Brain (Tier 2)
+    participant Fixer as 🛠️ Fixer (Tier 2)
+    participant Jules as 🤖 Jules (Tier 3)
+    participant Memory as 📚 Memory
 
-Analysis
-Brain performs trace-driven RCA and isolates the dominant contributor (e.g., inefficient database query).
+    Note over Scout: SIGNAL ACQUISITION
+    Scout->>Scout: Detects Threshold Breach
+    Scout->>GitHub: Opens Incident Issue
 
-Remediation
-Fixer applies a bounded mitigation (e.g., connection pool restart or configuration adjustment).
+    Note over Brain: COGNITIVE ANALYSIS
+    Brain->>Jaeger: Performs Deep Span Analysis
+    Brain->>Memory: Checks Knowledge Base
+    Memory-->>Brain: Returns Historical Context
+    Brain->>GitHub: Formulates Mitigation Plan
 
-Escalation
-If the behavior persists or indicates structural risk, the jules-fix label is applied, triggering architectural refactoring.
+    Note over Fixer: STABILIZATION
+    Fixer->>Infra: Executes Restart / Patch
+    Fixer->>GitHub: Merges Fix & Labels 'Fixed'
 
-This flow ensures speed first, safety always, and architecture only when justified.
+    Note over Jules: EVOLUTION
+    GitHub->>Jules: Triggered by 'jules-fix' / Schedule
+    Jules->>Code: Multi-file Refactor
+    Jules->>Fixer: Verification Chaos Test
+    Fixer-->>GitHub: Post-Verification Approval
+```
 
-🟢 Runtime Operations Cluster (Tier 1 & Tier 2)
+---
 
-These agents form the continuous operations layer.
-They handle the majority of reliability work without human intervention.
+## 🟢 Runtime Operations Cluster (Tier 1 & 2)
 
-Agent	Core Specialization	Operational Logic	Key Tooling
-Scout	Watchdog	Real-time interpretation of business SLIs and service health	Kafka, OTel Metrics
-Brain	Principal Analyst	Root Cause Analysis via telemetry correlation	Jaeger, ChromaDB
-Fixer	Ops Executor	Controlled remediation and GitOps state management	GitHub MCP, Docker
-1️⃣ Scout Agent — The Observer
+These agents manage the pulse of the system. They are optimized for **speed** and **safety**.
 
-Focus: Service Health & Conversion Yield
+| Agent | Persona | Mission | Core Stack |
+| :--- | :--- | :--- | :--- |
+| **🕵️ Scout** | The Watchdog | Real-time monitoring of CUJs and infrastructure health. | Kafka, Python, HealthChecks |
+| **🧠 Brain** | The Strategist | Context-aware Root Cause Analysis (RCA). | GPT-4o, Jaeger, OpenTelemetry |
+| **🛠️ Fixer** | The Mechanic | Controlled remediation and GitOps state management. | GitHub MCP, Docker, Git |
+| **📚 Memory** | The Historian | Continuous knowledge indexing and context retrieval. | ChromaDB, Vector Embeddings |
 
-Scout continuously evaluates:
+### 1️⃣ Scout Agent — The Observer
+*   **Operational Logic**: Monitors Kafka event streams for business SLIs (Quotes vs Purchases).
+*   **Boundary**: Scout does not diagnose. It validates that a breach is "Real" and creates the shared workspace (GitHub Issue).
 
-Kafka event streams for business SLIs (e.g., quotes vs purchases)
+### 2️⃣ Brain Agent — The Analyst
+*   **Operational Logic**: Consumes Scout's context. Performed "Deep Span Analysis" to isolate bottlenecks (e.g., Latency vs Saturation).
+*   **Boundary**: Brain identifies *what* and *why*. It does not execute.
 
-latency trends and saturation signals
+### 3️⃣ Fixer Agent — The Executor
+*   **Operational Logic**: Applies Brain’s decisions using bounded actions (Restarts or PRs).
+*   **Governance**: No change bypasses version control. Maintains strict branch hygiene (pruning all but the Top 5 fix branches).
 
-service availability and restart patterns
+---
 
-When Critical User Journeys (CUJ) degrade beyond tolerance, Scout automatically opens a GitHub Issue containing telemetry context and timestamps.
+## 🔴 Architectural Evolution Layer (Tier 3)
 
-Scout does not diagnose or fix.
-Its responsibility is to validate that something meaningful has changed.
+### 4️⃣ Google Jules — Senior SRE Architect
+Jules represents the **Tier-3 escalation**, responsible for deep refactoring that addresses systemic risks rather than transient symptoms.
 
-2️⃣ Brain Agent — The Strategist
+*   **Activation**: 
+    - Explicit `jules-fix` label (Urgent Refactor).
+    - Daily **05:00 AM** maintenance window (System Tuning).
+*   **Strategic Objectives**:
+    - **Resilience**: Implementing Circuit Breakers and Retry Backoffs.
+    - **Optimization**: SQL/NoSQL query tuning and caching layers.
+    - **Integrity**: **NEVER** removes `otel_setup.py` hooks. Telemetry is non-negotiable.
 
-Focus: Intelligent Diagnostics & Decision Making
+---
 
-Brain consumes the context surfaced by Scout and performs:
+## 📊 Shared Knowledge Base (Memory Persistence)
 
-Deep Span Analysis to identify the dominant execution bottleneck
+SRE-Space turns operations into knowledge.
+- **Ingestion**: Every Post-Mortem written by **Brain** is vectorized by **Memory**.
+- **Retrieval**: When **Scout** opens a new issue, **Memory** automatically injects the top 2 similar past incidents as a comment to assist **Brain**.
 
-correlation of traces, metrics, and historical behavior
-
-classification of the issue as transient, systemic, or architectural
-
-Brain does not execute changes directly.
-Instead, it produces explicit remediation intent, guiding downstream action.
-
-3️⃣ Fixer Agent — The Mechanic
-
-Focus: Self-Healing Execution & Change Control
-
-Fixer applies Brain’s decisions using bounded and auditable actions:
-
-runtime mitigations for short-lived conditions
-
-GitOps pull requests for persistent configuration or infrastructure changes
-
-Fixer maintains strict hygiene:
-
-controlled branch lifecycle
-
-squash merges
-
-rollback-ready history
-
-No permanent change bypasses version control.
-
-🔴 Architectural Evolution Layer (Tier 3)
-
-Not all problems should be solved through automation.
-
-SRE-Space includes an explicit architectural escalation tier for issues that indicate deeper systemic risk.
-
-4️⃣ Google Jules — Senior SRE Architect (Asynchronous)
-
-Jules represents Tier-3 escalation, responsible for deep, multi-file refactoring that goes beyond configuration tuning.
-
-Activation
-
-Explicit jules-fix label
-
-Scheduled maintenance window (default: 05:00)
-
-Primary Objective
-
-Improve long-term stability and resilience through:
-
-circuit breakers
-
-retry and backoff strategies
-
-caching and query optimization
-
-architectural simplification
-
-Jules operates asynchronously and intentionally — mirroring how real SRE teams escalate from operations to architecture.
-
-🛡️ Critical Guardrails for Jules
-
-To preserve observability integrity and operational continuity, Jules operates under strict constraints:
-
-OpenTelemetry Integrity
-otel_setup.py must not be removed or bypassed.
-All new logic must remain fully instrumented.
-
-Event Contract Stability
-Kafka headers and event semantics must remain backward-compatible.
-
-Verification Discipline
-Every PR must include:
-
-a summary of architectural changes
-
-expected impact on Mean Time to Recovery (MTTR)
-
-Automation may evolve — visibility must not regress.
-
-📊 Shared Knowledge Base (Memory)
-
-All agents read from and contribute to a central ChromaDB vector store.
-
-This ensures:
-
-architectural changes made by Jules are immediately visible to Brain
-
-repeated RCA loops are avoided
-
-operational knowledge compounds over time
-
-Example:
-
-A refactor performed at 05:00 is part of Brain’s reasoning context by 09:00.
-
-Memory is the mechanism that turns operations into learning, not just recovery.
-
-🧠 Why This Model Is Effective
-
-This structure enforces:
-
-fast response without reckless automation
-
-clear separation of responsibility
-
-explicit escalation for complex problems
-
-long-term system improvement
-
-SRE-Space does not attempt to “self-heal everything.”
-It automates what should be automated and escalates what should be designed.
+**SRE-Space: Designing reliability, one autonomous decision at a time.** 🚀
