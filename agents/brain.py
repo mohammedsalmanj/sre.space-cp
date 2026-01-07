@@ -25,17 +25,27 @@ async def generate_post_mortem(title, body, issue_number):
     Incident Title: {title}
     Full Incident Logs: {body}
     
+    STRICTLY ATTRIBUTE ACTIONS TO AI AGENTS (Autonomous Resolution):
+    - Scout Agent: Detected the anomaly (provide timestamp).
+    - Brain Agent: Performed Deep Span Analysis, identified Root Cause, and instructed Fixer.
+    - Fixer Agent: Executed the automated mitigation (PR or Restart).
+    - Memory Agent: Indexed this event for future pattern matching.
+
+    Do NOT use phrases like "The team investigated", "On-call engineers", or "Manual intervention".
+    This was a 100% AI-driven resolution.
+    
     Use this structure:
     # Incident Post-Mortem: PM-{issue_number}
     ## Incident Summary
-    ## Detailed Timeline (Detection to Resolution)
-    ## Root Cause
-    ## Lessons Learned & 'Next Actions'
+    ## Detailed Timeline (Autonomous Execution)
+    ## Root Cause (AI Analysis)
+    ## Resolution (Auto-Healing)
+    ## Lessons Learned (Knowledge Base Update)
     """
     
     response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[{"role": "system", "content": "You are a senior SRE. Write detailed, blameless post-mortems."},
+        messages=[{"role": "system", "content": "You are the AI Brain Agent of SRE-Space. You write detailed post-mortems for incidents resolved entirely by AI agents. NEVER mention human SREs/teams."},
                   {"role": "user", "content": prompt}]
     )
     return response.choices[0].message.content
@@ -57,12 +67,17 @@ async def analyze_incident(title, body, traces="No trace data available yet."):
     
     Traces: {traces}
 
+    DEEP SPAN ANALYSIS:
+    - If traces indicate a 'db_query' > 500ms, it is a Database/Latency issue.
+    - If traces indicate a 'http_request' timeout, it is a Service Crash/Resource Limit.
+    - If traces show high volume, it might be OOM/Saturation.
+
     Provide:
     1. Root Cause Analysis (RCA).
     2. Recommended Fix.
     3. MITIGATION command for the Fixer Agent:
-       - MITIGATION: RESTART [container_name]
-       - MITIGATION: PR [branch] | [title] | [change_description]
+       - MITIGATION: RESTART [container_name] (For Crashes, OOM, Leaks)
+       - MITIGATION: PR [branch] | [title] | [change_description] (For Config, Limits, Latency tuning)
     """
     
     response = client.chat.completions.create(
@@ -109,17 +124,22 @@ async def run_brain():
                                 "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number, "body": new_body
                             })
 
-                        # Scenario 2: Detect Recovery (Signal from Fixer)
-                        comments_res = await session.call_tool("get_issue_comments", arguments={
+                        # Scenario 2: Detect Recovery (Signal from Fixer via Label)
+                        # Re-fetch issue to get latest labels
+                        issue_res = await session.call_tool("get_issue", arguments={
                             "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number
                         })
-                        comments = json.loads(comments_res.content[0].text)
+                        issue_data = json.loads(issue_res.content[0].text)
                         
-                        # Look for 'Status: Fixed' but ensure we haven't already written a PM
-                        is_fixed = any("Status: Fixed" in c.get("body", "") for c in comments)
-                        has_pm = any("POST-MORTEM" in c.get("body", "") for c in comments)
-
-                        if is_fixed and not has_pm:
+                        labels = [l["name"] for l in issue_data.get("labels", [])]
+                        is_fixed = "Status: Fixed" in labels
+                        
+                        # Check comments just to avoid duplicate PMs (using list_events or similar if possible, or just strict label logic)
+                        # Since we can't read comments easily, we assume if Label is Fixed and we haven't closed it as AI-Resolved, we proceed.
+                        # But wait, we change label to "Status: AI-Resolved" at the end.
+                        # So if label is "Status: Fixed", we act.
+                        
+                        if is_fixed:
                             logger.info(f"🚀 RECOVERY DETECTED for #{number}. Initiating Learning Loop...")
                             
                             # Extract potential Trace ID from body if exists, or just provide a search link

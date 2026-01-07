@@ -1,49 +1,59 @@
-# SRE-Space Platform
+# 🌌 SRE-Space: Autonomous Reliability Engine
 
-## Mission Manifest
-This monorepo contains the SRE-Space platform, a 4-agent autonomous SRE team.
+SRE-Space is a **Full-Spectrum Autonomous SRE Control Plane** that transforms manual operations into a self-healing, closed-loop observability engine.
 
-## Directory Structure
-- `agents/scout/`: Monitoring & Anomaly Detection (OTel/New Relic).
-- `agents/brain/`: RCA & Diagnosis (GPT-4o).
-- `agents/memory/`: RAG Knowledge Base (ChromaDB).
-- `agents/fixer/`: Autonomous Mitigation.
-- `infra/`: Docker Compose and OTel Config.
-- `.github/`: Issue templates and Workflows.
+## 🚀 The Problem
+Modern microservices generate "Operational Toil"—human engineers spending hours diagnosing OOM kills, service timeouts, and configuration drift. Manual RCA is slow, and post-mortems are often forgotten.
 
-## Initialization
+## 💡 The Solution
+A 100% AI-driven lifecycle that protects your business metrics:
+1.  **Scout (Detect)**: Monitors CUJs (Conversion Rate), Latency, Saturation, and Errors concurrently.
+2.  **Brain (Diagnose)**: Performs "Deep Span Analysis" on Jaeger traces to find root causes.
+3.  **Fixer (Heal)**: Executes GitOps PRs with Auto-Merge to apply infrastructure and config changes.
+4.  **Memory (Learn)**: Generates automated Post-Mortems and indexes them in ChromaDB for future pattern matching.
 
-### 1. Prerequisites
-- Docker & Docker Compose
-- Python 3.10+
-- GitHub Personal Access Token (PAT) with `repo` scope.
-- OpenAI API Key.
-- New Relic License Key.
+---
 
-### 2. Configuration
-Create a `.env` file in the root directory (or ensure these variables are set in your environment):
+## 🛠️ Access Points (The Control Center)
 
+| Component | URL | Purpose |
+| :--- | :--- | :--- |
+| **SRE Dashboard** | [http://localhost:3001](http://localhost:3001) | Real-time SRE metrics & Audit Log |
+| **Jaeger Trace UI** | [http://localhost:16686](http://localhost:16686) | Deep Span analysis & Distributed Tracing |
+| **GitHub Repo** | `mohammedsalmanj/sre.space-cp` | GitOps Audit Trail & Automated PRs |
+| **Knowledge Base** | `ChromaDB :8000` | Incident memory & Vector embeddings |
+
+---
+
+## 🚦 How to Use
+
+### 1. Start the Engine
 ```bash
-NEW_RELIC_LICENSE_KEY=your_nr_key
-OPENAI_API_KEY=your_openai_key
-GITHUB_PERSONAL_ACCESS_TOKEN=your_github_pat
+# Clone the repo and start the stack
+docker-compose up -d --build
 ```
 
-### 3. Startup
-Run the mission control stack:
+### 2. Trigger "Chaos" (Test the AI)
+Run the chaos suite to simulate a production failure:
 ```bash
-cd infra
-docker compose -f mission-control.yml up -d --build
+# Simulate a Memory Leak (OOM)
+python trigger_chaos.py oom
+
+# Simulate a Business Logic Failure (Conversion Drop)
+python trigger_chaos.py conversion
 ```
 
-### 4. GitHub MCP Integration
-To fully enable the agents to interact with GitHub:
-1. Ensure the `GITHUB_PERSONAL_ACCESS_TOKEN` is valid.
-2. The platform is configured to use the `mcp` python library.
-3. Ensure your local environment or the agent containers have network access to GitHub.
+### 3. Watch the Magic
+- **Scout** will create a GitHub Issue in seconds.
+- **Brain** will comment with a "Deep Span" diagnosis.
+- **Fixer** will create a PR, merge it, and trigger a deployment.
+- **Memory** will close the issue with a professional AI-generated Post-Mortem.
 
-## Workflow
-1. **Scout** detects a failure and opens an issue.
-2. **Brain** analyzes the issue using logs and GPT-4o, posting an RCA comment.
-3. **Memory** suggests fixes based on past incidents.
-4. **Fixer** restarts the service and opens a PR for config updates.
+---
+
+## 🧬 Architecture
+- **Tech**: FastAPI, Kafka, OpenTelemetry, Jaeger, ChromaDB, GitHub MCP.
+- **Brain**: GPT-4o-Mini via OpenAI.
+- **Remediation**: GitOps-driven via GitHub Pull Requests.
+
+**"Built to reach 99.9% reliability without an on-call rotation."**

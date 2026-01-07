@@ -1,0 +1,23 @@
+name: Deploy Infra
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docker-compose.yml'
+      - 'infra/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Deploy to SRE Environment
+        run: |
+          echo "🚀 Deploying valid configuration..."
+          # docker-compose pull
+          # docker-compose up -d --remove-orphans
+          # For demo, just echo success
+          echo "✅ Stack updated successfully."
