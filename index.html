@@ -7,6 +7,16 @@
     <title>SRE.Space | Insurance Control Plane</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap"
         rel="stylesheet">
+    <!-- OpenTelemetry Web SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@opentelemetry/api@1.4.1/dist/index.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/@opentelemetry/sdk-trace-web@1.13.0/dist/bundles/opentelemetry-sdk-trace-web.umd.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/@opentelemetry/exporter-trace-otlp-http@0.39.1/dist/bundles/opentelemetry-exporter-trace-otlp-http.umd.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/@opentelemetry/resources@1.13.0/dist/bundles/opentelemetry-resources.umd.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/@opentelemetry/semantic-conventions@1.13.0/dist/bundles/opentelemetry-semantic-conventions.umd.js"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -125,6 +135,37 @@
             transform: scale(1.02);
         }
 
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #334155;
+            padding: 15px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #6366f1;
+        }
+
+        .trace-link {
+            color: var(--primary);
+            font-size: 0.75rem;
+            text-decoration: none;
+            margin-left: 10px;
+            border-bottom: 1px dashed var(--primary);
+        }
+
+        .trace-link:hover {
+            color: #818cf8;
+        }
+
         .visualizer {
             display: flex;
             justify-content: space-around;
@@ -231,6 +272,8 @@
 
                     <input type="text" id="userId" placeholder="Customer Identity (e.g. user-123)">
                     <button class="btn-primary" onclick="requestQuote()">PROCESS INSTANT QUOTE</button>
+                    <button id="purchaseBtn" class="btn-secondary" onclick="purchasePolicy()"
+                        style="display: none;">PURCHASE POLICY</button>
 
                     <div class="visualizer">
                         <div id="step1" class="node">QUOTE</div>
@@ -252,56 +295,130 @@
     </div>
 
     <script>
+        const { webVitals } = window;
+        const { WebTracerProvider } = window.otel.sdkTraceWeb;
+        const { SimpleSpanProcessor } = window.otel.sdkTraceBase;
+        const { OTLPTraceExporter } = window.otel.exporterTraceOtlpHttp;
+        const { Resource } = window.otel.resources;
+        const { SemanticResourceAttributes } = window.otel.semanticConventions;
+        const { trace, context } = window.otel.api;
+
+        // --- OTel Setup ---
+        const provider = new WebTracerProvider({
+            resource: new Resource({
+                [SemanticResourceAttributes.SERVICE_NAME]: 'sre-dashboard-ui',
+            }),
+        });
+
+        const exporter = new OTLPTraceExporter({
+            url: 'http://localhost:4318/v1/traces',
+        });
+
+        provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+        provider.register();
+
+        const tracer = trace.get_tracer('sre-dashboard-tracer');
+
         const logs = document.getElementById('logs');
         let quotes = 0, successful = 0;
+        let currentQuoteId = null;
 
-        function addLog(text, type = 'info') {
+        function addLog(text, type = 'info', traceId = null) {
             const entry = document.createElement('div');
             entry.className = `log-entry ${type}`;
-            entry.innerText = `[${new Date().toLocaleTimeString()}] ${text}`;
+
+            const time = new Date().toLocaleTimeString();
+            let content = `[${time}] ${text}`;
+            entry.innerText = content;
+
+            if (traceId) {
+                const link = document.createElement('a');
+                link.href = `http://localhost:16686/trace/${traceId}`;
+                link.target = "_blank";
+                link.className = "trace-link";
+                link.innerText = "View Trace";
+                entry.appendChild(link);
+            }
+
             logs.appendChild(entry);
             logs.scrollTop = logs.scrollHeight;
         }
 
         async function requestQuote() {
             const userId = document.getElementById('userId').value || 'guest';
+
+            const span = tracer.startSpan('ui_request_quote');
+            span.setAttribute('user.id', userId);
+
             addLog(`Triggering journey for ${userId}`, 'info');
             quotes++;
 
             document.querySelectorAll('.node').forEach(n => n.className = 'node');
-            document.getElementById('step1').classList.add('active');
+            document.getElementById('step1').className = 'node active';
 
             try {
-                const response = await fetch(`/api/quote/quote?user_id=${userId}`);
+                const response = await fetch(`/api/quote?user_id=${userId}`);
                 const data = await response.json();
 
                 if (response.ok) {
                     successful++;
-                    addLog(`Success: ${data.quote_id} generated.`, 'success');
-                    if (data.trace_id) {
-                        addLog(`Trace ID: ${data.trace_id}`, 'info');
-                    }
+                    currentQuoteId = data.quote_id;
+                    addLog(`Success: ${data.quote_id} generated.`, 'success', data.trace_id);
+
+                    document.getElementById('purchaseBtn').style.display = 'block';
 
                     setTimeout(() => {
-                        document.getElementById('step2').classList.add('active');
+                        document.getElementById('step2').className = 'node active';
                         addLog('Kafka: quote_requested broadcasted.', 'info');
                     }, 800);
 
                     setTimeout(() => {
-                        document.getElementById('step3').classList.add('active');
+                        document.getElementById('step3').className = 'node active';
                         addLog('Background: User profile validated.', 'success');
                     }, 1800);
 
                 } else {
-                    document.getElementById('step1').classList.add('error');
+                    document.getElementById('step1').className = 'node error';
                     addLog(`Incident: ${data.error || 'Request Timeout'}`, 'error');
                 }
             } catch (err) {
-                document.getElementById('step1').classList.add('error');
+                document.getElementById('step1').className = 'node error';
                 addLog(`Network Failure: APM data export broken`, 'error');
+            } finally {
+                span.end();
+                updateMetrics();
             }
+        }
 
-            updateMetrics();
+        async function purchasePolicy() {
+            const userId = document.getElementById('userId').value || 'guest';
+            if (!currentQuoteId) return;
+
+            const span = tracer.startSpan('ui_purchase_policy');
+            span.setAttribute('user.id', userId);
+            span.setAttribute('quote.id', currentQuoteId);
+
+            addLog(`Purchasing policy for ${currentQuoteId}...`, 'info');
+
+            try {
+                const response = await fetch('/api/purchase', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ quote_id: currentQuoteId, user_id: userId })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    addLog(`Policy Issued: ${data.policy_id}`, 'success', data.trace_id);
+                    document.getElementById('purchaseBtn').style.display = 'none';
+                } else {
+                    addLog('Purchase failed.', 'error');
+                }
+            } catch (err) {
+                addLog('Network Error during purchase.', 'error');
+            } finally {
+                span.end();
+            }
         }
 
         function updateMetrics() {

@@ -9,8 +9,8 @@ RUN echo 'server { \
     root /usr/share/nginx/html; \
     index index.html; \
     } \
-    location /api/quote/ { \
-    proxy_pass http://quote-service:8001/; \
+    location /api/ { \
+    proxy_pass http://mock-api:8080/api/; \
     } \
     }' > /etc/nginx/conf.d/default.conf
 
