@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "start": "serve .",
-        "build": "echo 'No build step required'"
+        "build": "mkdir -p public && cp index.html public/"
     },
     "dependencies": {
         "serve": "^14.0.0"

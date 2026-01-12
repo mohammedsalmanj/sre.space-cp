@@ -7,10 +7,6 @@
         {
             "source": "/api/(.*)",
             "destination": "https://sre-space-api.vercel.app/api/$1"
-        },
-        {
-            "source": "/(.*)",
-            "destination": "/apps/frontend/$1"
         }
     ],
     "cleanUrls": true

@@ -5,7 +5,7 @@
     "description": "Autonomous SRE Platform Control Plane",
     "scripts": {
         "dev": "docker-compose up",
-        "build": "echo 'Building SRE Control Plane...'"
+        "build": "mkdir -p public && cp apps/frontend/index.html public/"
     },
     "dependencies": {},
     "devDependencies": {}
