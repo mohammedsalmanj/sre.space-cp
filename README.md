@@ -1,8 +1,8 @@
 # 🌌 SRE-Space: The Cognitive Reliability Engine
 
-![Status](https://img.shields.io/badge/Status-Autonomous-brightgreen) ![AI](https://img.shields.io/badge/AI-Agentic-blueviolet) ![Architecture](https://img.shields.io/badge/Architecture-Event__Driven-orange) ![Tier-3-Jules](https://img.shields.io/badge/Escalation-Google_Jules-4285F4)
+![Status](https://img.shields.io/badge/Status-Autonomous-brightgreen) ![AI](https://img.shields.io/badge/AI-Agentic-blueviolet) ![Tracing](https://img.shields.io/badge/Observability-OpenTelemetry-orange) ![Escalation](https://img.shields.io/badge/Escalation-Google_Jules-4285F4)
 
-**SRE-Space** is a self-evolving **AIOps Control Plane** that transforms traditional incident response into a cognitive, self-improving lifecycle. It goes beyond automation by integrating distributed tracing, vector memory, and architectural refactoring into a single cohesive system.
+**SRE-Space** is a self-evolving **AIOps Control Plane** that transforms traditional incident response into a cognitive, self-improving lifecycle. It goes beyond simple automation by integrating **Real-Time Distributed Tracing (OTel)**, **Vector Memory (RAG)**, and **Architectural Refactoring** into a single cohesive system.
 
 Instead of manual triage, SRE-Space deploys a coordinated squad of AI Agents that **Detect, Diagnose, Fix, and Learn**. It analyzes failure patterns across the stack and re-architects the microservices in real-time to prevent recurrence.
 
@@ -13,25 +13,24 @@ Instead of manual triage, SRE-Space deploys a coordinated squad of AI Agents tha
 | Feature | The Human Limit | The SRE-Space Advantage |
 | :--- | :--- | :--- |
 | **Response Time** | 15-30m (Paged) | **< 60s (Autonomous)** |
-| **Root Cause** | Guesses or Wiki-Checks | **Deep Span Trace Analysis** |
-| **Memory** | Subject to engineer churn | **Persistent Vector Knowledge Base** |
-| **System Evolution** | Becomes "Legacy" Code | **Daily Architectural Refactoring** |
+| **Root Cause** | Guesses or Wiki-Checks | **Deep Span Trace Analysis (Jaeger)** |
+| **Memory** | Subject to engineer churn | **Persistent Vector Knowledge Base (ChromaDB)** |
+| **System Evolution** | Becomes "Legacy" Code | **Daily Architectural Refactoring (Jules)** |
 
 ---
 
 ## 🏛️ System Architecture
 
-The platform consists of a **Protected Microservices Layer** (the app) guarded by the **Cognitive Control Plane**.
+The platform consists of a **Protected Microservices Layer** guarded by the **Cognitive Control Plane**.
 
 ```mermaid
 graph TD
     subgraph "Protected Infrastructure"
-        QS[Quote Service] -->|Events| Kafka
-        PS[Policy Service] -->|Events| Kafka
-        US[User Service] -->|Events| Kafka
-        Frontend --> QS
-        QS -->|Traces| Jaeger
-        PS -->|Traces| Jaeger
+        UI[SRE Dashboard] -->|OTLP Traces| OTel[OTel Collector]
+        UI -->|API Calls| MockAPI[Mock Backend API]
+        MockAPI -->|OTLP Traces| OTel
+        MockAPI -->|Events| Kafka[Kafka Event Bus]
+        OTel -->|Export| Jaeger[Jaeger UI]
     end
 
     subgraph "Cognitive Control Plane"
@@ -40,13 +39,13 @@ graph TD
         Scout -->|Creates| Issue[GitHub Incident]
 
         Brain[🧠 Brain Agent] -->|Analyzes| Issue
-        Brain -->|Deep Span Analysis| Jaeger
+        Brain -->|Trace Analysis| Jaeger
         Brain -->|Instructs| Fixer
 
-        Fixer[🛠️ Fixer Agent] -->|Executes| Cmd[Docker Restart]
+        Fixer[🛠️ Fixer Agent] -->|Executes| Cmd[Docker Auto-Heal]
         Fixer -->|GitOps| PR[Pull Request]
         
-        Memory[📚 Memory Agent] -->|Indexes| ChromaDB[(Vector Knowledge Base)]
+        Memory[📚 Memory Agent] -->|Indexes| ChromaDB[(Vector DB)]
         Memory -->|Retrieves| Patterns[Historical Context]
     end
 
@@ -57,7 +56,7 @@ graph TD
 
     Brain -.->|Writes PM| Issue
     Fixer -->|Auto-Merge| GitHub[GitHub Main]
-    GitHub -->|Deploy| Infra[Deploy-Infra Action]
+    GitHub -->|Deploy| Vercel[Vercel Cloud]
 ```
 
 ---
@@ -67,8 +66,8 @@ graph TD
 For the full detailed roster and SOPs, read **[AGENTS.md](./AGENTS.md)**.
 
 ### 🟢 Tactical Response (Real-Time)
-*   **🕵️ Scout (The Watchdog)**: Correlates Business Yield (Conversion Rate) with Service Health. 
-*   **🧠 Brain (The Strategist)**: Uses distributed traces (Jaeger) to perform "X-Ray" diagnostics.
+*   **🕵️ Scout (The Watchdog)**: Correlates Business Yield (Conversion Rate) with Service Health via Kafka.
+*   **🧠 Brain (The Strategist)**: Uses distributed traces (Jaeger/OTel) to perform "X-Ray" diagnostics.
 *   **🛠️ Fixer (The Mechanic)**: Safely applies remediations via Docker or GitOps PRs.
 *   **📚 Memory (The Historian)**: A RAG-enabled librarian that ensures the system never repeats a mistake.
 
@@ -77,62 +76,54 @@ For the full detailed roster and SOPs, read **[AGENTS.md](./AGENTS.md)**.
 
 ---
 
-## 🔄 The Cognitive Loop (Workflow)
+## 🛠️ Tech Stack
 
-```mermaid
-sequenceDiagram
-    participant Sys as Infrastructure
-    participant Scout as 🕵️ Scout
-    participant Brain as 🧠 Brain
-    participant Fixer as 🛠️ Fixer
-    participant Jules as 🤖 Jules
-
-    Sys->>Sys: 💥 Failure Detected
-    Scout->>GitHub: 🚨 Opens Incident Issue
-    Brain->>Jaeger: Queries Trace Spans
-    Brain->>GitHub: Post RCA & Mitigation Plan
-    Fixer->>Sys: 🚑 Executes Stabilization Fix
-    alt Recurrence
-        Brain->>GitHub: Escalates to 'jules-fix'
-        Jules->>Code: 🏗️ Architectural Refactor
-    end
-```
+- **Frontend**: Vanilla JS, CSS3 (Glassmorphic), OpenTelemetry SDK.
+- **Backend**: Node.js, Express, Python (FastAPI).
+- **Observability**: OpenTelemetry, Jaeger, OTLP.
+- **Data/Events**: Kafka, ChromaDB (Vector Storage).
+- **Core AI**: Google Agentic SDK, RAG.
+- **Infrastructure**: Docker, Vercel, GitHub Actions.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started (Local Development)
 
-### 1. Installation
+### 1. Prerequisites
+- Docker & Docker Compose
+- Node.js (v18+)
+
+### 2. Installation
 ```bash
 # Clone the repository
 git clone https://github.com/mohammedsalmanj/sre.space-cp.git
 cd sre.space-cp
 
-# Start the Cognitive Control Plane
+# Start the entire local stack
 docker-compose up -d --build
 ```
 
-### 2. Live Consoles
+### 3. Live Consoles & Observability
 | Console | URL | Description |
 | :--- | :--- | :--- |
 | **SRE Dashboard** | [http://localhost:3001](http://localhost:3001) | Real-time SLIs & AI Audit Log |
 | **Jaeger Traces** | [http://localhost:16686](http://localhost:16686) | Deep Bottleneck Identification |
+| **Mock API** | [http://localhost:8080/api/quote](http://localhost:8080/api/quote) | Backend logic for traces |
 | **Knowledge Base** | [http://localhost:8000/docs](http://localhost:8000/docs) | Search the AI's "Memory" |
-| **Cloud Dashboard** | [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmohammedsalmanj%2Fsre.space-cp&root-directory=apps/frontend) | One-Click Cloud Deployment |
 
 ---
 
-## 🧪 Chaos Lab
-Validate the AI's intelligence:
-- `python trigger_chaos.py oom`: Test the **Fixer's** auto-healing.
-- `python trigger_chaos.py saturation`: Test the **Brain's** diagnostics.
-- `./mission-control.sh verify-jules-pr`: Test the **Architect's** verification loop.
+## 🧪 Chaos Lab (Validation)
+Test the AI's intelligence:
+- `python trigger_chaos.py oom`: Test the **Fixer's** auto-healing capability.
+- `python trigger_chaos.py saturation`: Verify the **Brain's** diagnostics via Jaeger.
+- `./mission-control.sh verify-jules-pr`: Validate the **Architect's** refactoring loop.
 
 ---
 
-## 🛡️ Core Ethics
-*   **Observability First**: Decisions are driven by telemetry, not heuristics.
-*   **Safe-Fail**: Every automated change is version-controlled and reversible.
+## 🛡️ Core Ethics & Design
+- **Observability First**: No decision is made without telemetry evidence.
+- **Safe-Fail**: Every automated change is version-controlled, isolated, and reversible.
+- **Transparency**: Every AI thought process is logged to the dashboard audit log.
 
-**Designing a more resilient future.** 🌌
-
+**Designing a more resilient future, autonomously.** 🌌
