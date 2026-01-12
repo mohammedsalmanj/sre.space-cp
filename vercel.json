@@ -1,13 +1,15 @@
 {
     "version": 2,
     "name": "sre-space-cp",
-    "framework": "other",
+    "framework": null,
     "public": true,
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "outputDirectory": "public",
     "rewrites": [
         {
             "source": "/api/(.*)",
             "destination": "https://sre-space-api.vercel.app/api/$1"
         }
-    ],
-    "cleanUrls": true
+    ]
 }
