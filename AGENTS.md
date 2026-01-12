@@ -1,88 +1,92 @@
-# 🤖 SRE-Space: Operational Intelligence Roster
+# 🤖 SRE-Space: Cognitive Agent Roster
 
-This document formalizes the **Standard Operating Procedure (SOP)** for the SRE-Space autonomous agent cluster. It defines how telemetry flows from raw signals into architectural improvements.
+This document formalizes the **Standard Operating Procedure (SOP)** for the SRE-Space autonomous agent cluster. It defines how telemetry flows from raw signals into permanent architectural improvements.
 
 ---
 
 ## ⚡ The Incident Lifecycle: Signal to Architecture
 
-SRE-Space follows a disciplined escalation path. Every incident is a learning opportunity.
+SRE-Space follows a disciplined escalation path. Every incident is a data-point for the **Infinite Knowledge Base**.
 
 ```mermaid
 sequenceDiagram
     participant Scout as 🕵️ Scout (Tier 1)
     participant Brain as 🧠 Brain (Tier 2)
     participant Fixer as 🛠️ Fixer (Tier 2)
-    participant Jules as 🤖 Jules (Tier 3)
     participant Memory as 📚 Memory
+    participant Jules as 🤖 Jules (Tier 3)
 
-    Note over Scout: SIGNAL ACQUISITION
-    Scout->>Scout: Detects Threshold Breach
-    Scout->>GitHub: Opens Incident Issue
+    Note over Scout: DETECTION
+    Scout->>Scout: Threshold Breach (Kafka/Health)
+    Scout->>GitHub: Spawn War-Room (Issue)
 
     Note over Brain: COGNITIVE ANALYSIS
-    Brain->>Jaeger: Performs Deep Span Analysis
-    Brain->>Memory: Checks Knowledge Base
-    Memory-->>Brain: Returns Historical Context
-    Brain->>GitHub: Formulates Mitigation Plan
+    Brain->>Memory: Retrieve Historical Context
+    Memory-->>Brain: PM-104 & PM-82 Found
+    Brain->>Jaeger: Deep Span Analysis (Tracing)
+    Brain->>GitHub: Emit RCA & Mitigation Intent
 
     Note over Fixer: STABILIZATION
-    Fixer->>Infra: Executes Restart / Patch
-    Fixer->>GitHub: Merges Fix & Labels 'Fixed'
+    Fixer->>Infra: Exec Docker/GitOps Mitigation
+    Fixer->>GitHub: Label 'Status: Fixed'
 
     Note over Jules: EVOLUTION
-    GitHub->>Jules: Triggered by 'jules-fix' / Schedule
-    Jules->>Code: Multi-file Refactor
-    Jules->>Fixer: Verification Chaos Test
-    Fixer-->>GitHub: Post-Verification Approval
+    GitHub->>Jules: Triggered by Label / Schedule
+    Jules->>Code: Multi-file Refactor (Architectural)
+    Jules->>Fixer: Run Verification Chaos Lab
+    Fixer-->>GitHub: Verification Passed ✅
 ```
 
 ---
 
-## 🟢 Runtime Operations Cluster (Tier 1 & 2)
+## 🟢 Tactical Response Cluster (T1 & T2)
 
-These agents manage the pulse of the system. They are optimized for **speed** and **safety**.
+These agents manage the pulse of the system. They are optimized for **low-latency recovery**.
 
-| Agent | Persona | Mission | Core Stack |
+| Agent | Specialty | Tools | Mission Command |
 | :--- | :--- | :--- | :--- |
-| **🕵️ Scout** | The Watchdog | Real-time monitoring of CUJs and infrastructure health. | Kafka, Python, HealthChecks |
-| **🧠 Brain** | The Strategist | Context-aware Root Cause Analysis (RCA). | GPT-4o, Jaeger, OpenTelemetry |
-| **🛠️ Fixer** | The Mechanic | Controlled remediation and GitOps state management. | GitHub MCP, Docker, Git |
-| **📚 Memory** | The Historian | Continuous knowledge indexing and context retrieval. | ChromaDB, Vector Embeddings |
+| **🕵️ Scout** | The Watchdog | Kafka, HealthChecks | "Validate reality, don't guess." |
+| **🧠 Brain** | The Strategist | GPT-4o, Jaeger, OTel | "Diagnose the trace, not the symptoms." |
+| **🛠️ Fixer** | The Mechanic | GitHub MCP, Docker | "Heal the state, preserve the history." |
+| **📚 Memory** | The Historian | ChromaDB, Vector-RAG | "Never solve the same problem twice." |
 
-### 1️⃣ Scout Agent — The Observer
-*   **Operational Logic**: Monitors Kafka event streams for business SLIs (Quotes vs Purchases).
-*   **Boundary**: Scout does not diagnose. It validates that a breach is "Real" and creates the shared workspace (GitHub Issue).
+### 🔍 Agent Deep-Dive
 
-### 2️⃣ Brain Agent — The Analyst
-*   **Operational Logic**: Consumes Scout's context. Performed "Deep Span Analysis" to isolate bottlenecks (e.g., Latency vs Saturation).
-*   **Boundary**: Brain identifies *what* and *why*. It does not execute.
+#### 1️⃣ Scout Agent (The Watcher)
+- **Primary Signal**: Kafka business events (Success vs Failure ratios).
+- **Behavior**: When conversion yield drops below 95%, Scout freezes the system state and opens a GitHub Incident.
+- **Constraint**: Scout does not speculate. It only reports ground truth.
 
-### 3️⃣ Fixer Agent — The Executor
-*   **Operational Logic**: Applies Brain’s decisions using bounded actions (Restarts or PRs).
-*   **Governance**: No change bypasses version control. Maintains strict branch hygiene (pruning all but the Top 5 fix branches).
+#### 2️⃣ Brain Agent (The Analyst)
+- **Primary Signal**: Distributed Tracing spans from OpenTelemetry.
+- **Behavior**: Brain reads trace segments like an X-ray. It identifies if a failure is a "Database Deadlock" or a "Connection Timeout".
+- **Learning**: Brain generates the **Post-Mortem** which fuels the system's memory.
 
----
-
-## 🔴 Architectural Evolution Layer (Tier 3)
-
-### 4️⃣ Google Jules — Senior SRE Architect
-Jules represents the **Tier-3 escalation**, responsible for deep refactoring that addresses systemic risks rather than transient symptoms.
-
-*   **Activation**: 
-    - Explicit `jules-fix` label (Urgent Refactor).
-    - Daily **05:00 AM** maintenance window (System Tuning).
-*   **Strategic Objectives**:
-    - **Resilience**: Implementing Circuit Breakers and Retry Backoffs.
-    - **Optimization**: SQL/NoSQL query tuning and caching layers.
-    - **Integrity**: **NEVER** removes `otel_setup.py` hooks. Telemetry is non-negotiable.
+#### 3️⃣ Fixer Agent (The Executor)
+- **Behavior**: Acts as the interface between Brain's plan and the Physical Layer.
+- **Hygiene**: Automatically prunes stale remediation branches, keeping only the most recent successful fixes.
 
 ---
 
-## 📊 Shared Knowledge Base (Memory Persistence)
+## 🔴 Strategic Evolution Layer (Tier 3)
 
-SRE-Space turns operations into knowledge.
-- **Ingestion**: Every Post-Mortem written by **Brain** is vectorized by **Memory**.
-- **Retrieval**: When **Scout** opens a new issue, **Memory** automatically injects the top 2 similar past incidents as a comment to assist **Brain**.
+### 4️⃣ Google Jules (The Senior Architect)
+Jules is the **Tier-3 escalation**, responsible for deep code refactoring. While Fixer heals the *instance*, Jules heals the *design*.
 
-**SRE-Space: Designing reliability, one autonomous decision at a time.** 🚀
+*   **Activation Triggers**:
+    - **Label**: `jules-fix` (Immediate structural refactor).
+    - **Cron**: `0 5 * * *` (Daily architectural refinement).
+*   **Mission Constraints**:
+    - **Telemetry Persistence**: Never remove `otel_setup.py` hooks. Visibility is mandatory.
+    - **Resilience First**: Priority always given to Circuit Breakers and Retry Backoffs.
+
+---
+
+## 📊 Persistence Logic (The Unified Knowledge Base)
+
+SRE-Space turns ephemeral operations into permanent knowledge.
+1.  **Ingestion**: Every recovery cycle ends with a vector-indexed Post-Mortem.
+2.  **Context Injection**: New incidents are automatically compared against the **Infinite Memory** using ChromaDB.
+3.  **Compound Learning**: The more the system fails, the smarter it becomes. MTTR decreases exponentially over time.
+
+**SRE-Space: The future of reliability is autonomous.** 🚀

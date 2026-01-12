@@ -1,0 +1,12 @@
+{
+    "name": "sre-space-dashboard",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "start": "serve .",
+        "build": "echo 'No build step required'"
+    },
+    "dependencies": {
+        "serve": "^14.0.0"
+    }
+}
