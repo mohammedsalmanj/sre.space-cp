@@ -113,6 +113,23 @@ docker-compose up -d --build
 
 ---
 
+## ☁️ Cloud Deployment (Vercel)
+
+The **SRE Dashboard UI** is optimized for Vercel deployment. Every push to the `main` branch triggers an autonomous build and deploy.
+
+### ⚙️ Vercel Configuration
+- **Output Directory**: `public` (Generated during build).
+- **API Rewrites**: Automatically routes `/api/*` requests to the distributed backend services.
+- **Auto-Alignment**: The root `package.json` includes a specialized build script: `"mkdir -p public && cp index.html public/"` to ensure zero-config static hosting.
+
+| Deployment | URL |
+| :--- | :--- |
+| **Live Dashboard** | [https://sre-space-cp.vercel.app/](https://sre-space-cp.vercel.app/) |
+
+---
+
+---
+
 ## 🧪 Chaos Lab (Validation)
 Test the AI's intelligence:
 - `python trigger_chaos.py oom`: Test the **Fixer's** auto-healing capability.
