@@ -317,7 +317,7 @@
         provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
         provider.register();
 
-        const tracer = trace.get_tracer('sre-dashboard-tracer');
+        const tracer = trace.getTracer('sre-dashboard-tracer');
 
         const logs = document.getElementById('logs');
         let quotes = 0, successful = 0;

@@ -31,7 +31,7 @@ registerInstrumentations({
     ],
 });
 
-const tracer = trace.get_tracer('mock-api-tracer');
+const tracer = trace.getTracer('mock-api-tracer');
 
 // --- Express App ---
 const app = express();
