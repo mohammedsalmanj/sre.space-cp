@@ -1,0 +1,11 @@
+{
+    "version": 2,
+    "name": "sre-space-dashboard",
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "https://sre-space-api.vercel.app/api/$1"
+        }
+    ],
+    "cleanUrls": true
+}

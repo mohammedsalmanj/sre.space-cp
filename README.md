@@ -118,6 +118,7 @@ docker-compose up -d --build
 | **SRE Dashboard** | [http://localhost:3001](http://localhost:3001) | Real-time SLIs & AI Audit Log |
 | **Jaeger Traces** | [http://localhost:16686](http://localhost:16686) | Deep Bottleneck Identification |
 | **Knowledge Base** | [http://localhost:8000/docs](http://localhost:8000/docs) | Search the AI's "Memory" |
+| **Cloud Dashboard** | [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmohammedsalmanj%2Fsre.space-cp&root-directory=apps/frontend) | One-Click Cloud Deployment |
 
 ---
 
