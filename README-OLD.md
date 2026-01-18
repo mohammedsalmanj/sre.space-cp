@@ -48,3 +48,20 @@
 ## 5. Migration Notes
 - Ensure `docker-compose.yml` does not contain JSON metadata wrappers (fixed during verification).
 - Agents require `curl` in their Docker image for health checks and MCP connectivity (patched).
+
+## 6. Git Protocol & Agent Standards
+The `Fixer` agent now enforces strict GitOps best practices for all autonomous remediation:
+
+### Commit Convention
+All agent-generated commits must follow the **Conventional Commits** standard:
+> `fix(agent-action): [brief description] | Ref: [IncidentID]`
+
+### Branching Strategy
+- **Format**: `fix-inc-{incident_id}-{timestamp}`
+- **Lifecycle**: Created by Fixer -> PR Raised -> Squashed & Merged -> Branch Deleted.
+
+### Pull Requests
+All automated PRs are populated with a standard template including:
+- **Root Cause Analysis** (from Brain Agent)
+- **Jaeger Trace Links** (from Scout/Otel)
+- **Verification Steps** (Auto-fail if K6 tests fail)

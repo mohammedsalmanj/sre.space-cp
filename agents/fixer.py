@@ -107,7 +107,7 @@ async def run_fixer():
                                 
                                 await session.call_tool("create_or_update_file", arguments={
                                     "owner": OWNER, "repo": REPO, "path": "docker-compose.yml",
-                                    "message": f"fix(infra): auto-remediation for #{number}",
+                                    "message": f"fix(infra-auto): update resource limits | Ref: INC-{number}",
                                     "branch": branch_name,
                                     "content": config_change
                                 })
@@ -116,7 +116,7 @@ async def run_fixer():
                                 await session.call_tool("create_or_update_file", arguments={
                                     "owner": OWNER, "repo": REPO, 
                                     "path": f"remediations/fix-{number}.yaml",
-                                    "message": f"fix(infra): mitigation metadata for #{number}",
+                                    "message": f"fix(audit): mitigation metadata log | Ref: INC-{number}",
                                     "branch": branch_name,
                                     "content": f"incident: {number}\ntimestamp: {time.ctime()}\ncontext: {fix_context}\nchange: Resource limits verified and applied.\nstatus: deployed\n"
                                 })
