@@ -15,6 +15,17 @@ logger = logging.getLogger("scout")
 KAFKA_BROKER = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
 GITHUB_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN", "").strip()
 
+# Kafka Producer for Reactive Stream
+from confluent_kafka import Producer
+producer = Producer({'bootstrap.servers': KAFKA_BROKER})
+
+def broadcast_event(topic, data):
+    try:
+        producer.produce(topic, value=json.dumps(data))
+        producer.flush()
+    except Exception as e:
+        logger.error(f"Failed to broadcast to {topic}: {e}")
+
 SERVICES = {
     "policy-service": "http://policy-service:8002/health",
     "quote-service": "http://quote-service:8001/health",
@@ -102,6 +113,12 @@ async def create_incident(session, trigger_type, error_digest, category):
                 "body": f"## 🚨 SRE Scout Alert\n\n{snapshot}\n\n**Brain Analysis Required**"
             }
         )
+        broadcast_event("incident_updates", {
+            "status": "OPEN",
+            "message": f"{category}: {trigger_type} Alert",
+            "trigger": trigger_type,
+            "timestamp": time.time()
+        })
     except Exception as e:
         logger.error(f"Failed to create incident: {e}")
 

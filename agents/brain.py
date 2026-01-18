@@ -14,6 +14,15 @@ logger = logging.getLogger("brain")
 
 GITHUB_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN", "").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
+KAFKA_BROKER = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
+
+# Kafka Producer
+from confluent_kafka import Producer
+producer = Producer({'bootstrap.servers': KAFKA_BROKER})
+
+def broadcast_thought(thought):
+    producer.produce("agent_thoughts", value=json.dumps({"thought": thought, "timestamp": time.time()}))
+    producer.flush()
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
@@ -123,6 +132,7 @@ async def run_brain():
                             await session.call_tool("update_issue", arguments={
                                 "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number, "body": new_body
                             })
+                            broadcast_thought(f"Incident #{number} diagnosis: {diagnosis[:100]}...")
 
                         # Scenario 2: Detect Recovery (Signal from Fixer via Label)
                         labels = [l["name"] for l in issue.get("labels", [])]

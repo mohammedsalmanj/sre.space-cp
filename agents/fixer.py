@@ -15,6 +15,19 @@ logger = logging.getLogger("fixer")
 GITHUB_TOKEN = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN", "").strip()
 OWNER = "mohammedsalmanj"
 REPO = "sre.space-cp"
+KAFKA_BROKER = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
+
+# Kafka Producer
+from confluent_kafka import Producer
+producer = Producer({'bootstrap.servers': KAFKA_BROKER})
+
+def broadcast_remediation(action, incident_id):
+    producer.produce("remediation_log", value=json.dumps({
+        "action": action, 
+        "incident_id": incident_id, 
+        "timestamp": time.time()
+    }))
+    producer.flush()
 
 async def execute_restart(container_name):
     try:
@@ -63,6 +76,7 @@ async def run_fixer():
                                  "owner": OWNER, "repo": REPO, "issue_number": number,
                                  "body": f"## 🛠️ Fixer Action: Auto-Healing\n{msg}\n\nStatus: Fixed. Monitoring for stability."
                             })
+                            broadcast_remediation(f"Auto-Restart: {container}", number)
 
                         # Scenario B: GitOps (PR)
                         pr_match = re.search(r"MITIGATION:\s*PR\s*(.+)", body, re.IGNORECASE)
@@ -132,6 +146,7 @@ async def run_fixer():
                                     "head": branch_name, 
                                     "base": "main"
                                 })
+                                broadcast_remediation(f"Created PR for {fix_context}", number)
                                 
                                 # Extract PR Number (assuming response format)
                                 # MCP returns a list of TextContent. We need to parse JSON if it is structured, or regex.

@@ -1,0 +1,13 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    gcc librdkafka-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir fastapi uvicorn confluent-kafka
+
+COPY backend/websocket_bridge.py /app/websocket_bridge.py
+
+CMD ["python", "websocket_bridge.py"]

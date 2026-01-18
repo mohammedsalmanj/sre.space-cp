@@ -47,3 +47,11 @@ docker-compose.override.yml
 
 # Agent Data
 chroma-data/
+history_data/
+
+# Javascript
+node_modules/
+
+# Logs & Traces
+*.trace
+*.log

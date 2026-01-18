@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Heart, Car, Dog, Stethoscope, Terminal } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Heart, Car, Dog, Stethoscope, Terminal, Activity, Shield, Sparkles } from 'lucide-react';
 import PolicyCard from './components/PolicyCard';
 import AgentTerminal from './components/AgentTerminal';
 import ChaosToggle from './components/ChaosToggle';
@@ -9,25 +9,68 @@ function App() {
     const [logs, setLogs] = useState([
         { id: 1, timestamp: new Date().toLocaleTimeString(), msg: "System connected to SRE Control Plane." }
     ]);
+    const [stats, setStats] = useState({
+        uptime: "99.98%",
+        latency: "24ms"
+    });
 
-    const addLog = (msg) => {
+    const addLog = (msg, topic = "system") => {
         const newLog = {
-            id: Date.now(),
+            id: Date.now() + Math.random(),
             timestamp: new Date().toLocaleTimeString(),
-            msg: msg
+            msg: `[${topic.toUpperCase()}] ${msg}`
         };
-        setLogs(prev => [...prev, newLog]);
+        setLogs(prev => [...prev.slice(-49), newLog]);
     };
 
-    // Simulate background chatter
+    // WebSocket Connection
     useEffect(() => {
-        const interval = setInterval(() => {
-            if (Math.random() > 0.8) {
-                addLog(`[SYSTEM] Heartbeat check: Healthy. Latency: ${Math.floor(Math.random() * 20 + 10)}ms`);
+        const ws = new WebSocket(`ws://${window.location.hostname}:8005/ws/stream`);
+
+        ws.onopen = () => {
+            addLog("WebSocket Stream Connected", "network");
+        };
+
+        ws.onmessage = (event) => {
+            const message = json.parse(event.data);
+            const { topic, data } = message;
+
+            if (topic === "agent_thoughts") {
+                addLog(data.thought || data.message, "brain");
+            } else if (topic === "incident_updates") {
+                addLog(`Incident ${data.id}: ${data.status}`, "scout");
+            } else if (topic === "remediation_log") {
+                addLog(`Remediation: ${data.action}`, "fixer");
+            } else {
+                addLog(JSON.stringify(data), topic);
             }
-        }, 8000);
-        return () => clearInterval(interval);
+        };
+
+        ws.onclose = () => {
+            addLog("WebSocket Stream Disconnected. Retrying...", "network");
+        };
+
+        return () => ws.close();
     }, []);
+
+    const triggerQuote = async (policyType) => {
+        addLog(`Initiating ${policyType} quote...`, "user");
+        try {
+            const response = await fetch('/api/v1/quote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: json.stringify({
+                    policy_type: policyType,
+                    user_id: "user-" + Math.floor(Math.random() * 1000),
+                    timestamp: Date.now()
+                })
+            });
+            const data = await response.json();
+            addLog(`Quote request broadcasted: ${data.quote_id}`, "system");
+        } catch (error) {
+            addLog(`Failed to initiate quote: ${error.message}`, "error");
+        }
+    };
 
     const policies = [
         { title: "Life Insurance", icon: Heart },
@@ -39,14 +82,26 @@ function App() {
     return (
         <div className="min-h-screen p-8 flex flex-col items-center">
             {/* Header */}
-            <header className="w-full max-w-7xl flex justify-between items-center mb-12 animate-fade-in-down">
+            <header className="w-full max-w-7xl flex justify-between items-center mb-12">
                 <div>
                     <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 mb-2">
-                        SRE.Space Policy Hub
+                        Anti-Gravity Control Plane
                     </h1>
                     <p className="text-slate-400 font-mono text-sm">Reactive Insurance Platform // Autonomy Level 5</p>
                 </div>
-                <ChaosToggle enabled={chaosMode} setEnabled={setChaosMode} />
+                <div className="flex items-center gap-6">
+                    <div className="flex gap-4">
+                        <div className="flex flex-col items-end">
+                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Uptime</span>
+                            <span className="text-sm font-mono text-accent">{stats.uptime}</span>
+                        </div>
+                        <div className="flex flex-col items-end">
+                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Latency</span>
+                            <span className="text-sm font-mono text-primary">{stats.latency}</span>
+                        </div>
+                    </div>
+                    <ChaosToggle enabled={chaosMode} setEnabled={setChaosMode} />
+                </div>
             </header>
 
             {/* Main Grid */}
@@ -60,26 +115,31 @@ function App() {
                             title={p.title}
                             icon={p.icon}
                             chaosMode={chaosMode}
-                            onQuote={addLog}
+                            onQuote={(msg) => addLog(msg, "ui")}
+                            triggerAction={() => triggerQuote(p.title)}
                         />
                     ))}
                 </div>
 
                 {/* SRE Terminal Side Panel */}
                 <div className="lg:col-span-4 flex flex-col gap-6">
-                    <div className="glass-panel p-6 rounded-2xl">
-                        <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                            <Terminal className="w-5 h-5 text-primary" />
-                            System Status
+                    <div className="glass-panel p-6 rounded-2xl flex flex-col gap-4">
+                        <h2 className="text-lg font-bold flex items-center gap-2">
+                            <Activity className="w-5 h-5 text-primary" />
+                            Agent Pulse
                         </h2>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-white/5 p-4 rounded-xl text-center">
-                                <span className="block text-2xl font-bold text-accent">99.98%</span>
-                                <span className="text-xs text-slate-500 uppercase tracking-widest">Uptime</span>
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between text-xs font-mono">
+                                <span className="text-slate-500">Scout (Monitoring)</span>
+                                <span className="text-accent">CONNECTED</span>
                             </div>
-                            <div className="bg-white/5 p-4 rounded-xl text-center">
-                                <span className="block text-2xl font-bold text-primary">24ms</span>
-                                <span className="text-xs text-slate-500 uppercase tracking-widest">Avg Latency</span>
+                            <div className="flex items-center justify-between text-xs font-mono">
+                                <span className="text-slate-500">Brain (Reasoning)</span>
+                                <span className="text-purple-400">ACTIVE</span>
+                            </div>
+                            <div className="flex items-center justify-between text-xs font-mono">
+                                <span className="text-slate-500">Fixer (Remediation)</span>
+                                <span className="text-blue-400">WAITING</span>
                             </div>
                         </div>
                     </div>

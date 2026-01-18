@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Sparkles, AlertTriangle, CheckCircle2, Activity } from 'lucide-react';
 
-const PolicyCard = ({ title, icon: Icon, onQuote, chaosMode }) => {
+const PolicyCard = ({ title, icon: Icon, onQuote, chaosMode, triggerAction }) => {
     const [status, setStatus] = useState('idle'); // idle, checking, scanning, analyzing, success, error, remediating
 
     const handleQuote = async () => {
         if (status !== 'idle') return;
+
+        // Trigger real backend action
+        if (triggerAction) triggerAction();
 
         // Sequence
         setStatus('checking');
