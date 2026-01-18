@@ -2,7 +2,6 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 COPY package.json package-lock.json* ./
-# Install deps (allow legacy peer deps if needed, clean cache)
 RUN npm install --legacy-peer-deps
 
 COPY . .
@@ -14,7 +13,7 @@ FROM nginx:alpine
 # Copy built assets
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Replace default config to handle SPA routing (optional but good practice)
+# Replace default config to handle SPA routing and multiple backend proxies
 RUN echo 'server { \
     listen 80; \
     location / { \
@@ -22,8 +21,16 @@ RUN echo 'server { \
     index index.html index.htm; \
     try_files $uri $uri/ /index.html; \
     } \
-    location /api/ { \
-    proxy_pass http://mock-api:8080; \
+    # Proxy legacy API calls to Mock API \
+    location /api/quote { \
+    proxy_pass http://mock-api:8080/api/quote; \
+    } \
+    location /api/purchase { \
+    proxy_pass http://mock-api:8080/api/purchase; \
+    } \
+    # Proxy Pro-Grade API calls to Quote Service \
+    location /api/v1/ { \
+    proxy_pass http://quote-service:8001/api/v1/; \
     } \
     }' > /etc/nginx/conf.d/default.conf
 

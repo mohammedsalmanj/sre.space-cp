@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const AgentTerminal = ({ logs }) => {
+const AgentTerminal = ({ logs, title }) => {
     const bottomRef = useRef(null);
 
     useEffect(() => {
@@ -16,7 +16,7 @@ const AgentTerminal = ({ logs }) => {
                     <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
                     <div className="w-3 h-3 rounded-full bg-green-500/50" />
                 </div>
-                <span className="text-xs font-mono text-slate-400">SRE-SPACE AGENT FEED // LIVE</span>
+                <span className="text-xs font-mono text-slate-400 capitalize">{title || 'AGENT FEED // LIVE'}</span>
             </div>
 
             <div className="flex-1 p-4 overflow-y-auto font-mono text-sm space-y-2 relative">
@@ -27,11 +27,11 @@ const AgentTerminal = ({ logs }) => {
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             className={`flex gap-3 pb-2 border-l-2 pl-3 ${log.msg.includes('[CRITICAL]') || log.msg.includes('Error') ? 'border-red-500 text-red-200 bg-red-500/5' :
-                                    log.msg.includes('[FIXER]') ? 'border-blue-500 text-blue-200' :
-                                        log.msg.includes('[SUCCESS]') ? 'border-green-500 text-green-200' :
-                                            log.msg.includes('[SCOUT]') ? 'border-yellow-500 text-yellow-100' :
-                                                log.msg.includes('[BRAIN]') ? 'border-purple-500 text-purple-200' :
-                                                    'border-slate-700 text-slate-400'
+                                log.msg.includes('[FIXER]') ? 'border-blue-500 text-blue-200' :
+                                    log.msg.includes('[SUCCESS]') ? 'border-green-500 text-green-200' :
+                                        log.msg.includes('[SCOUT]') ? 'border-yellow-500 text-yellow-100' :
+                                            log.msg.includes('[BRAIN]') ? 'border-purple-500 text-purple-200' :
+                                                'border-slate-700 text-slate-400'
                                 }`}
                         >
                             <span className="opacity-50 text-xs mt-[2px]">{log.timestamp}</span>
