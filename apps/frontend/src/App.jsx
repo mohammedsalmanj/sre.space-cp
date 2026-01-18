@@ -89,9 +89,9 @@ function App() {
             <header className="w-full max-w-7xl flex justify-between items-center mb-12">
                 <div>
                     <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 mb-2">
-                        Anti-Gravity System | v3.0 Live-Logic
+                        Insurance Platform
                     </h1>
-                    <p className="text-slate-400 font-mono text-sm tracking-tight">Autonomous Reliability Engine | Production Baseline</p>
+                    <p className="text-slate-400 font-mono text-sm tracking-tight">Autonomous Reliability Engine | Production Ready</p>
                 </div>
                 <div className="flex items-center gap-6">
                     <div className="flex gap-4">
