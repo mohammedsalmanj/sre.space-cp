@@ -24,13 +24,19 @@ RUN echo 'server { \
     # Proxy legacy API calls to Mock API \
     location /api/quote { \
     proxy_pass http://mock-api:8080/api/quote; \
+    proxy_set_header Host $host; \
+    proxy_set_header X-Real-IP $remote_addr; \
     } \
     location /api/purchase { \
     proxy_pass http://mock-api:8080/api/purchase; \
+    proxy_set_header Host $host; \
+    proxy_set_header X-Real-IP $remote_addr; \
     } \
     # Proxy Pro-Grade API calls to Quote Service \
     location /api/v1/ { \
     proxy_pass http://quote-service:8001/api/v1/; \
+    proxy_set_header Host $host; \
+    proxy_set_header X-Real-IP $remote_addr; \
     } \
     }' > /etc/nginx/conf.d/default.conf
 

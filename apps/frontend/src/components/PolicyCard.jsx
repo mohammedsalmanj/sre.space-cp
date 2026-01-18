@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Sparkles, AlertTriangle, CheckCircle2, Activity } from 'lucide-react';
 
 const PolicyCard = ({ title, icon: Icon, onQuote, chaosMode, triggerAction }) => {
@@ -60,11 +59,8 @@ const PolicyCard = ({ title, icon: Icon, onQuote, chaosMode, triggerAction }) =>
     };
 
     return (
-        <motion.div
+        <div
             className="glass-panel p-6 rounded-2xl border-t relative overflow-hidden cursor-pointer group"
-            variants={variants}
-            animate={status}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
             onClick={handleQuote}
         >
             <div className="flex justify-between items-start mb-4">
@@ -91,14 +87,12 @@ const PolicyCard = ({ title, icon: Icon, onQuote, chaosMode, triggerAction }) =>
 
             {/* Progress Bar for Loading States */}
             {(status === 'checking' || status === 'scanning' || status === 'analyzing') && (
-                <motion.div
-                    className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-primary to-secondary"
-                    initial={{ width: "0%" }}
-                    animate={{ width: "100%" }}
-                    transition={{ duration: 2 }}
+                <div
+                    className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-primary to-secondary transition-all duration-[2000ms]"
+                    style={{ width: "100%" }}
                 />
             )}
-        </motion.div>
+        </div>
     );
 };
 
