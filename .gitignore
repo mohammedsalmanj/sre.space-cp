@@ -30,6 +30,7 @@ ENV/
 
 # Environment Variables
 .env
+*.env
 .env.local
 .env.*.local
 
@@ -51,7 +52,10 @@ history_data/
 
 # Javascript
 node_modules/
+dist/
+.vite/
 
 # Logs & Traces
 *.trace
 *.log
+*.sqlite

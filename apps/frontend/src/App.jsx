@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, Car, Dog, Stethoscope, Terminal, Activity, Shield, Sparkles } from 'lucide-react';
 import PolicyCard from './components/PolicyCard';
 import AgentTerminal from './components/AgentTerminal';
@@ -7,11 +7,11 @@ import ChaosToggle from './components/ChaosToggle';
 function App() {
     const [chaosMode, setChaosMode] = useState(false);
     const [logs, setLogs] = useState([
-        { id: 1, timestamp: new Date().toLocaleTimeString(), msg: "System connected to SRE Control Plane." }
+        { id: 1, timestamp: new Date().toLocaleTimeString(), msg: "Autonomous Reliability Engine Initialized." }
     ]);
     const [stats, setStats] = useState({
-        uptime: "99.98%",
-        latency: "24ms"
+        uptime: "99.99%",
+        latency: "18ms"
     });
 
     const addLog = (msg, topic = "system") => {
@@ -28,47 +28,51 @@ function App() {
         const ws = new WebSocket(`ws://${window.location.hostname}:8005/ws/stream`);
 
         ws.onopen = () => {
-            addLog("WebSocket Stream Connected", "network");
+            addLog("Telemetry Stream Connected", "network");
         };
 
         ws.onmessage = (event) => {
-            const message = json.parse(event.data);
-            const { topic, data } = message;
+            try {
+                const message = JSON.parse(event.data);
+                const { topic, data } = message;
 
-            if (topic === "agent_thoughts") {
-                addLog(data.thought || data.message, "brain");
-            } else if (topic === "incident_updates") {
-                addLog(`Incident ${data.id}: ${data.status}`, "scout");
-            } else if (topic === "remediation_log") {
-                addLog(`Remediation: ${data.action}`, "fixer");
-            } else {
-                addLog(JSON.stringify(data), topic);
+                if (topic === "agent_thoughts") {
+                    addLog(data.thought || data.message, "brain");
+                } else if (topic === "incident_updates") {
+                    addLog(`Incident ${data.id || 'Alert'}: ${data.status} | ${data.message || ''}`, "scout");
+                } else if (topic === "remediation_log") {
+                    addLog(`Remediation: ${data.action}`, "fixer");
+                } else {
+                    addLog(JSON.stringify(data), topic);
+                }
+            } catch (e) {
+                console.error("WS Parse Error", e);
             }
         };
 
         ws.onclose = () => {
-            addLog("WebSocket Stream Disconnected. Retrying...", "network");
+            addLog("Telemetry Stream Disconnected. Retrying...", "network");
         };
 
         return () => ws.close();
     }, []);
 
     const triggerQuote = async (policyType) => {
-        addLog(`Initiating ${policyType} quote...`, "user");
+        addLog(`Initiating ${policyType} quote request...`, "user");
         try {
             const response = await fetch('/api/v1/quote', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: json.stringify({
+                body: JSON.stringify({
                     policy_type: policyType,
                     user_id: "user-" + Math.floor(Math.random() * 1000),
                     timestamp: Date.now()
                 })
             });
             const data = await response.json();
-            addLog(`Quote request broadcasted: ${data.quote_id}`, "system");
+            addLog(`Quote processed by backend: ${data.quote_id}`, "system");
         } catch (error) {
-            addLog(`Failed to initiate quote: ${error.message}`, "error");
+            addLog(`API Connection Error: ${error.message}`, "error");
         }
     };
 
@@ -85,15 +89,15 @@ function App() {
             <header className="w-full max-w-7xl flex justify-between items-center mb-12">
                 <div>
                     <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 mb-2">
-                        Anti-Gravity Control Plane
+                        Insurance Platform
                     </h1>
-                    <p className="text-slate-400 font-mono text-sm">Reactive Insurance Platform // Autonomy Level 5</p>
+                    <p className="text-slate-400 font-mono text-sm tracking-tight">Autonomous Reliability Engine | v1.1</p>
                 </div>
                 <div className="flex items-center gap-6">
                     <div className="flex gap-4">
                         <div className="flex flex-col items-end">
-                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Uptime</span>
-                            <span className="text-sm font-mono text-accent">{stats.uptime}</span>
+                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Health</span>
+                            <span className="text-sm font-mono text-accent">STABLE</span>
                         </div>
                         <div className="flex flex-col items-end">
                             <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Latency</span>
@@ -130,21 +134,21 @@ function App() {
                         </h2>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between text-xs font-mono">
-                                <span className="text-slate-500">Scout (Monitoring)</span>
-                                <span className="text-accent">CONNECTED</span>
+                                <span className="text-slate-400">Monitoring Cluster</span>
+                                <span className="text-accent">READY</span>
                             </div>
                             <div className="flex items-center justify-between text-xs font-mono">
-                                <span className="text-slate-500">Brain (Reasoning)</span>
+                                <span className="text-slate-400">Analysis Engine</span>
                                 <span className="text-purple-400">ACTIVE</span>
                             </div>
                             <div className="flex items-center justify-between text-xs font-mono">
-                                <span className="text-slate-500">Fixer (Remediation)</span>
-                                <span className="text-blue-400">WAITING</span>
+                                <span className="text-slate-400">Remediation Loop</span>
+                                <span className="text-blue-400">IDLE</span>
                             </div>
                         </div>
                     </div>
 
-                    <AgentTerminal logs={logs} />
+                    <AgentTerminal logs={logs} title="Agent Telemetry Feed" />
                 </div>
             </div>
         </div>
