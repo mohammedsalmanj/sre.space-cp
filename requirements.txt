@@ -7,3 +7,6 @@ opentelemetry-sdk
 opentelemetry-exporter-otlp
 requests
 pyyaml
+langgraph
+confluent-kafka
+pydantic

@@ -125,19 +125,8 @@ async def run_brain():
                             })
 
                         # Scenario 2: Detect Recovery (Signal from Fixer via Label)
-                        # Re-fetch issue to get latest labels
-                        issue_res = await session.call_tool("get_issue", arguments={
-                            "owner": "mohammedsalmanj", "repo": "sre.space-cp", "issue_number": number
-                        })
-                        issue_data = json.loads(issue_res.content[0].text)
-                        
-                        labels = [l["name"] for l in issue_data.get("labels", [])]
+                        labels = [l["name"] for l in issue.get("labels", [])]
                         is_fixed = "Status: Fixed" in labels
-                        
-                        # Check comments just to avoid duplicate PMs (using list_events or similar if possible, or just strict label logic)
-                        # Since we can't read comments easily, we assume if Label is Fixed and we haven't closed it as AI-Resolved, we proceed.
-                        # But wait, we change label to "Status: AI-Resolved" at the end.
-                        # So if label is "Status: Fixed", we act.
                         
                         if is_fixed:
                             logger.info(f"🚀 RECOVERY DETECTED for #{number}. Initiating Learning Loop...")
@@ -167,7 +156,7 @@ async def run_brain():
 
                     await asyncio.sleep(30)
                 except Exception as e:
-                    logger.error(f"Brain Error: {e}")
+                    logger.error(f"Brain Error: {e}", exc_info=True)
                     await asyncio.sleep(30)
 
 if __name__ == "__main__":
