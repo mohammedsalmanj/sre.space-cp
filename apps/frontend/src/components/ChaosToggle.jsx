@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch } from '@headlessui/react' // Can implement manual toggle if headlessui not avail, using simple div
+// import { Switch } from '@headlessui/react'
 // Wait, I shouldn't introduce headlessui unless I install it. I'll build a custom one.
 
 const ChaosToggle = ({ enabled, setEnabled }) => {

@@ -5,7 +5,7 @@ COPY package.json package-lock.json* ./
 RUN npm install --legacy-peer-deps
 
 COPY . .
-RUN npm run build
+RUN npm run build -- --debug
 
 # Production Stage
 FROM nginx:alpine
