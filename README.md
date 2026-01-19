@@ -2,47 +2,40 @@
 
 [![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![LangGraph](https://img.shields.io/badge/AI-LangGraph-FF6F00?style=for-the-badge&logo=langchain&logoColor=white)](https://langchain-ai.github.io/langgraph/)
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![OpenAI](https://img.shields.io/badge/LLM-GPT--4o--mini-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
 [![Docker](https://img.shields.io/badge/Infra-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![OpenTelemetry](https://img.shields.io/badge/Tracing-OTel-F46800?style=for-the-badge&logo=opentelemetry&logoColor=white)](https://opentelemetry.io/)
+[![Vercel](https://img.shields.io/badge/Cloud-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 
-**SRE-Space** is an autonomous "Immune System" for microservice architectures. It transforms monitoring from a human-reactive pager hell into a **Cognitive Control Plane** where AI agents detect, diagnose, remediate, and harden incidents using real-world telemetry and Agentic RAG.
+**SRE-Space** is an autonomous, self-healing **Cognitive Control Plane** for mission-critical microservice architectures. It replaces manual firefighting with a coordinated squad of AI agents that detect, diagnose, remediate, and architecturally harden services in real-time.
 
 ---
 
-## 🏛️ Comprehensive Architecture: The "Mind-Body" Duality
+## 🏛️ System Architecture
 
-SRE-Space is built on the principle of **Separation of Concerns between Logic and Infrastructure**. We call this the **Mind-Body Duality**.
-
-### 1. The Mind (Logic Layer & Control Plane) 🧠
-The agents live here. This is a Python-native environment using **FastAPI** for the interface and **LangGraph** for orchestration.
-- **Agent Orchestration**: LangGraph manages the state machine, ensuring agents take turns and share context.
-- **Real-time Streaming**: Uses Server-Sent Events (SSE) to push agent "thoughts" to the Dashboard without the overhead of heavy WebSockets.
-
-### 2. The Body (Infrastructure Layer & Senses) 🐳
-The infrastructure provides the raw data (telemetry) and persistent memory.
-- **Jaeger/OTel**: The "Eyes" of the system. Provides deep-trace observability into every microservice.
-- **Kafka**: The "Nervous System." Moves signals and events across the platform.
-- **ChromaDB**: The "Memory." A vector database where historical failures and their fixes are archived.
+SRE-Space operates on a **Mind-Body Duality**. The **Body** (Infrastructure) provides the senses and memory, while the **Mind** (LangGraph Logic) provides the reasoning and decision-making.
 
 ```mermaid
 graph TD
-    subgraph "Logic Layer (The Mind)"
+    subgraph "The Mind (Logic Layer & Control Plane)"
         Dashboard[SRE Dashboard UI]
         subgraph "Autonomous Squad (LangGraph)"
             Scout[🕵️ Scout Agent]
+            CAG[⚡ CAG Flash Cache]
             Brain[🧠 Brain Agent]
+            Guardrail[🛡️ Guardrail Agent]
             Fixer[🛠️ Fixer Agent]
             Jules[🤖 Jules Agent]
+            Curator[🧹 Memory Curator]
         end
     end
 
-    subgraph "Infrastructure Layer (The Body)"
-        subgraph "Observability Backbone"
-            Jaeger[Jaeger UI]
-            OTel[OTel Collector]
+    subgraph "The Body (Infrastructure Layer)"
+        subgraph "Telemetry & Senses"
+            OTel[OpenTelemetry Collector]
+            Jaeger[Jaeger Trace UI]
         end
-        subgraph "State & Memory"
+        subgraph "Memory & Nervous System"
             Kafka[Kafka Event Bus]
             Chroma[(ChromaDB Vector Memory)]
         end
@@ -50,114 +43,101 @@ graph TD
 
     %% Interactions
     Dashboard -->|User Request/Chaos| Scout
-    Scout -->|Detection Signal| Brain
-    Brain -->|Root Cause & RAG Search| Fixer
-    Fixer -->|Auto-Remediation| Jules
-    Jules -->|Optimization & Hardening| Chroma
+    Scout -->|Detection Signal| CAG
+    CAG -->|Cache Miss| Brain
+    CAG -->|Cache Hit| Guardrail
+    Brain -->|RAG Analysis| Guardrail
+    Guardrail -->|Policy Verification| Fixer
+    Fixer -->|Remediation| Jules
+    Jules -->|Harden & Review| Curator
+    Curator -->|Archive Incidents| Chroma
 
     %% Data Connections
-    Scout -.->|OTLP Span Polling| OTel
-    Brain -.->|Vector Similarity Search| Chroma
+    Scout -.->|Check Spans| OTel
+    Brain -.->|Deep Query| Chroma
     OTel -.->|Trace Export| Jaeger
     
     %% Styling
     style Dashboard fill:#1e1b4b,stroke:#4338ca,color:#fff,stroke-width:2px
     style Scout fill:#064e3b,stroke:#059669,color:#fff
     style Brain fill:#4c1d95,stroke:#7c3aed,color:#fff
+    style Guardrail fill:#991b1b,stroke:#ef4444,color:#fff
     style Fixer fill:#78350f,stroke:#d97706,color:#fff
     style Jules fill:#1e3a8a,stroke:#2563eb,color:#fff
     style Chroma fill:#831843,stroke:#db2777,color:#fff
-    style Jaeger fill:#0f172a,stroke:#334155,color:#fff
 ```
 
 ---
 
-## 🤖 Deep Dive: The Agent Squad (LangGraph Nodes)
+## 🤖 The Squad: Multi-Agent Orchestration
 
-The core logic of SRE-Space is a sequence of **Thinking Steps**. Each agent is a specialized Python node.
+We transitioned from hard-coded logic to a modular **Agent Squad**, where each node has a specialized "System Prompt" and unique technical authority.
 
-| Agent | Module | Functional Logic | Technical Action |
+| Agent | Module | Technical Authority | Role Reflection |
 | :--- | :--- | :--- | :--- |
-| **Scout** | `🕵️ Watchdog` | Anomaly Detection | Scans `opentelemetry` spans for `status_code=INTERNAL_ERROR` or latency > 800ms. |
-| **Brain** | `🧠 Strategist` | Diagnostics | Parses OTel attributes to find the specific microservice and `exception.message`. Queries RAG for history. |
-| **Fixer** | `🛠️ Mechanic` | Remediation | Applies the remediation plan: e.g., scaling up a pod, patching a DB config, or restarting a hung service. |
-| **Jules** | `🤖 Architect` | **Tier-3 Authority** | Architectural authority triggered for systemic failures. Performs deep code refactoing (Circuit Breakers, Query Opts) and runs daily reviews at 09:30 AM GMT+5:30. |
+| **Scout** | `🕵️ Watchdog` | **Detection** | Monitors OTel spans for 5XX errors and latency spikes. |
+| **CAG** | `⚡ Flash Cache` | **Instant Response** | Cache-Augmented Generation for recurring "FAQ" style incidents. |
+| **Brain** | `🧠 Strategist` | **RAG Diagnostics** | Integrates with **OpenAI GPT-4o-mini** and ChromaDB for root cause analysis. |
+| **Guardrail**| `🛡️ Policy` | **Governance** | Blocks dangerous actions; enforces confidence scores > 0.75. |
+| **Fixer** | `🛠️ Mechanic` | **Execution** | Implements code patches, pod restarts, and resource scaling. |
+| **Jules** | `🤖 Architect` | **Tier-3 Authority** | Systemic refactoring (Circuit Breakers) and Daily Reviews at 09:30 AM. |
+| **Curator** | `🧹 Librarian` | **Memory Health** | Cleans, tags, and archives incident lessons into the vector store. |
 
 ---
 
-## 📚 Agentic RAG: How Memory is Handled
+## 🧠 Advanced AIOps Tech Stack
 
-One of the most powerful features of SRE-Space is its **Agentic Memory**. It ensures the system never fixes the same bug twice.
-
-1.  **Incident Archive**: Every time the **Fixer** successfully resolves an issue, it creates a "Knowledge Tuple" containing the trace signature and the fix.
-2.  **Semantic Embedding**: This tuple is converted into a vector and stored in **ChromaDB**.
-3.  **Real-time Retrieval**: When a new incident occurs, the **Brain Agent** grabs the current error string and asks ChromaDB: *"Give me the Top 3 incidents that look like this."*
-4.  **Zero-Guessing**: Instead of "hallucinating" a fix, the agent applies the **Highest-Confidence Historical Remediation**.
-
----
-
-## ⚡ Scalability Matrix: From Lab to Production
-
-SRE-Space is designed to be lean for local development but robust for enterprise deployment.
-
-| Feature | Local (Single-Node) | Enterprise (Distributed) |
+| Layer | Technology | Usage |
 | :--- | :--- | :--- |
-| **Orchestration** | Python / Uvicorn | Kubernetes Control-Plane Pods |
-| **Tracing** | Jaeger (All-in-One) | Distributed Tempo / Honeycomb / Datadog |
-| **Telemetry** | OTel Collector (Container) | OTel Collector (DaemonSets) |
-| **Events** | Kafka (Single Broker) | Managed Confluent Cluster |
-| **Remediation** | Local Docker Simulation | GitOps / ArgoCD / Terraform |
+| **LLM Engine** | **OpenAI GPT-4o-mini** | Powers the Brain's reasoning and Jules' refactoring suggestions. |
+| **Agent Logic** | **LangGraph / LangChain** | Manages the cyclic, state-aware agent workflow. |
+| **Observability**| **OpenTelemetry / Jaeger**| The source of truth for all system traces and performance spans. |
+| **Memory (RAG)** | **ChromaDB** | High-performance vector store for historical remediation lookup. |
+| **Backend** | **FastAPI / Uvicorn** | Lean, high-speed Python server with SSE real-time log streaming. |
+| **Infrastructure**| **Docker / Vercel** | Hybrid deployment model for telemetry (Docker) and Control Plane (Vercel). |
 
 ---
 
-## 🚀 Step-by-Step Startup Guide
+## 🏗️ Architectural Hardening: The Jules Standard
 
-### Prerequisites
-- **Docker Desktop** (or Engine) installed and running.
-- **Python 3.9+** installed.
+**Jules** operates as our **Tier-3 Architectural Authority**. Unlike the Fixer, Jules does not care about MTTR (Recovery); Jules cares about MTBF (Reliability).
+*   **Trigger**: Only chronic, systemic failures.
+*   **Action**: Design flaw elimination (e.g., Query optimization, Adaptive concurrency limits).
+*   **Schedule**: Performs a full-cluster architectural review every morning at **09:30 AM GMT+5:30**.
 
-### 1. Spin up the Infrastructure (The Body)
-This prepares the ecosystem (Kafka, Jaeger, OTel, ChromaDB).
+---
+
+## 📚 Agentic RAG: "The Immune System"
+
+We solve the "Search Space" problem by treating historical incidents as a searchable memory.
+1. **Scoring**: Every RAG result is scored: `(0.4*Sim) + (0.3*Success) + (0.2*Recency) + (0.1*Infra)`.
+2. **Confidence**: Remediation is only allowed if the **Confidence Score > 0.75**.
+3. **Curation**: The **Curator Agent** ensures the memory doesn't get "cluttered," merging and deprecating old runbooks.
+
+---
+
+## 🚀 Deployment & Activation
+
+### 1. The Body (Docker)
+Set up the sensors and memory:
 ```bash
 docker-compose up -d
 ```
-*Note: Allow ~30 seconds for the databases and event bus to fully warm up.*
 
-### 2. Start the Cognitive Engine (The Mind)
-Install the logic dependencies and start the FastAPI server.
+### 2. The Mind (Python)
+Install dependencies and launch the engine:
 ```bash
-# Install dependencies
 pip install -r requirements.txt
-
-# Start the SRE Control Plane
 uvicorn main:app --reload --port 8000
 ```
 
-### 3. Access the Dashboard
-Navigate to `http://localhost:8000` to access the glassmorphic dashboard.
+### 3. The Test (Chaos Lab)
+Click **"Inject Chaos"** on the dashboard and watch the **Squad Terminal** work through the 7-node loop in real-time.
 
 ---
 
-## 🧪 Validating the Autonomous Loop
+## ☁️ Cloud Sync
+The dashboard is synced and deployed continuously to Vercel. 
+**URL**: [https://sre-space-cp.vercel.app/](https://sre-space-cp.vercel.app/)
 
-The best way to see SRE-Space in action is through the **Chaos Laboratory**.
-
-1.  Open the **SRE Dashboard**.
-2.  Click the **"Inject Chaos"** button. This simulates a `HTTP 500: Database connection timeout`.
-3.  Observe the **Agent Squad Terminal**:
-    - `Scout` intercepts the trace from OTel.
-    - `Brain` identifies the DB connection pool saturation.
-    - `Fixer` scales the pool from 20 to 100.
-    - `Jules` archives the fix in the RAG memory for future use.
-
----
-
-## ☁️ Cloud Deployment (Vercel)
-
-The **Mind** layer is fully compatible with Vercel. It uses a `vercel.json` to point the entry point to `main.py` using the `@vercel/python` runtime.
-
-**Live Deployment**: [https://sre-space-cp.vercel.app/](https://sre-space-cp.vercel.app/)
-
----
-
-> "Monitoring is about knowing. SRE-Space is about solving." 🌌
+> "Monitoring tells you that you have a problem. SRE-Space makes sure you don't have it again." 🌌
