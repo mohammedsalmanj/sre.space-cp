@@ -4,3 +4,4 @@ jinja2
 langgraph
 langchain-core
 opentelemetry-api
+chromadb
