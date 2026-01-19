@@ -14,8 +14,7 @@ app = FastAPI(title="Insurance Platform | Autonomous Reliability Engine v3.0")
 # Setup Templates
 templates = Jinja2Templates(directory="templates")
 
-# Mock Agents for Demo (Refactor logic from agents/ folder if needed, 
-# but keeping it simple for single-file deployment reliability)
+# Mock Agent Logic for real-time visuals
 class Agent:
     def __init__(self, name, role, color):
         self.name = name
@@ -37,25 +36,29 @@ fixer = Agent("Fixer", "Mechanic", "#ef4444") # Red
 
 async def generate_telemetry(policy_type: str):
     """Simulates the Agent Squad analyzing a request."""
-    yield f"data: {json.dumps(scout.log(f'Intercepted {policy_type} quote request. Verifying business tiers...'))}\n\n"
-    await asyncio.sleep(0.8)
+    # Step 1: Scout intercepts
+    yield f"data: {json.dumps(scout.log(f'Intercepted {policy_type} quote request from user_session.'))}\n\n"
+    await asyncio.sleep(0.6)
     
-    yield f"data: {json.dumps(brain.log(f'Tracing request ID {random.randint(1000,9999)}. Correlating span latency...'))}\n\n"
-    await asyncio.sleep(1.2)
+    # Step 2: Brain analyzes
+    trace_id = f"trace-{random.randint(10000,99999)}"
+    yield f"data: {json.dumps(brain.log(f'Tracing request ID {trace_id}. Correlating microservice latency...'))}\n\n"
+    await asyncio.sleep(1.0)
     
-    # Simulate a random "incident" or normal flow
-    if random.random() < 0.3:
-        yield f"data: {json.dumps(scout.log('ALERT: Anomaly detected! High latency on policy-service.'))}\n\n"
+    # Step 3: Probabilistic Failure Simulation
+    if random.random() < 0.2:
+        yield f"data: {json.dumps(scout.log('ALERT: High latency detected in policy-service (900ms).'))}\n\n"
         await asyncio.sleep(0.5)
-        yield f"data: {json.dumps(brain.log('Root Cause: Memory saturation in container 8b2f.'))}\n\n"
-        await asyncio.sleep(0.5)
-        yield f"data: {json.dumps(fixer.log('Initiating auto-scale vertically. Applying patch 3.1...'))}\n\n"
+        yield f"data: {json.dumps(brain.log('Root Cause: Memory saturation in container. Recommending vertical scaling.'))}\n\n"
+        await asyncio.sleep(0.8)
+        yield f"data: {json.dumps(fixer.log('Initiating auto-scale. Patching deployment config...'))}\n\n"
         await asyncio.sleep(1.0)
-        yield f"data: {json.dumps(fixer.log('Remediation successful. System health restored.'))}\n\n"
+        yield f"data: {json.dumps(fixer.log('Remediation successful. Health restored.'))}\n\n"
     else:
-        yield f"data: {json.dumps(scout.log('Health check passed. No anomalies.'))}\n\n"
+        yield f"data: {json.dumps(scout.log('Health check passed. No anomalies detected.'))}\n\n"
     
-    yield f"data: {json.dumps(brain.log(f'Quote generated successfully. Premium calculated.'))}\n\n"
+    # Step 4: Conclusion
+    yield f"data: {json.dumps(brain.log(f'Quote calculated for {policy_type}. Serving response.'))}\n\n"
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
