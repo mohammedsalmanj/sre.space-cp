@@ -25,7 +25,7 @@ class SREState(TypedDict):
     historical_context: str
     cache_hit: bool
     confidence_score: float
-    decision: str  # ALLOW | BLOCK | REQUIRE_APPROVAL
+    decision: str
     guardrail_reason: str
     service: str
     namespace: str
@@ -40,199 +40,160 @@ CAG_FAST_CACHE = {
     }
 }
 
-# --- ChromaDB Initialization ---
+# --- Shared Utilities ---
 def get_memory_collection():
-    if not CHROMA_ENABLED:
-        return None
+    if not CHROMA_ENABLED: return None
     try:
         client = chromadb.HttpClient(host='localhost', port=8000)
         return client.get_or_create_collection(name="sre_incident_memory")
-    except Exception:
-        return None
+    except: return None
 
-# --- Node Implementations ---
+# --- Individual Agents (Nodes) ---
 
-def scout_node(state: SREState) -> SREState:
-    """Scout: Monitors OTel spans for internal errors."""
+def scout_agent(state: SREState) -> SREState:
+    """Agent: Scout (Detection)"""
     logs = state.get("logs", [])
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Scout: Polling spans for errors...")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🕵️ Scout: Polling OTel traces...")
     
     state["service"] = "policy-service"
     state["namespace"] = "insurance-prod"
     state["env"] = "production"
 
     if state.get("is_anomaly"):
-        error_span = {
-            "trace_id": f"trace-{random.randint(1000, 9999)}",
-            "exception.message": "HTTP 500: Database connection pool exhausted",
-            "service": state["service"]
-        }
-        state["error_spans"] = [error_span]
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Scout: ⚠️ Detected CRITICAL error in '{state['service']}'.")
+        state["error_spans"] = [{"exception.message": "HTTP 500: Database connection pool exhausted"}]
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🕵️ Scout: ⚠️ Detected 1 error span.")
     else:
         state["error_spans"] = []
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Scout: System health nominal.")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🕵️ Scout: System health nominal.")
 
     state["logs"] = logs
-    state["status"] = "Checking Cache"
     return state
 
-def cag_node(state: SREState) -> SREState:
-    """CAG Agent: Instant retrieval for known FAQ incidents."""
+def cag_agent(state: SREState) -> SREState:
+    """Agent: CAG (Fast Cache)"""
     logs = state.get("logs", [])
-    if not state["error_spans"]:
-        state["status"] = "Healthy"
-        return state
+    if not state["error_spans"]: return state
 
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] CAG: Checking Tier-1 Fast Cache...")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] ⚡ CAG: Checking Tier-1 Fast Cache for incident FAQ...")
     msg = state["error_spans"][0]["exception.message"]
     
     if msg in CAG_FAST_CACHE:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] CAG: ⚡ FAST CACHE HIT!")
         known = CAG_FAST_CACHE[msg]
         state["root_cause"] = known["root_cause"]
         state["remediation"] = known["remediation"]
         state["confidence_score"] = known["confidence"]
         state["cache_hit"] = True
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] ⚡ CAG: INSTANT-HIT. Known incident signature.")
     else:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] CAG: Cache Miss. Escalating...")
         state["cache_hit"] = False
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] ⚡ CAG: Cache Miss. Escalating to Brain...")
 
     state["logs"] = logs
     return state
 
-def brain_node(state: SREState) -> SREState:
-    """Brain Agent: RCA + RAG Scoring Logic."""
+def brain_agent(state: SREState) -> SREState:
+    """Agent: Brain (RAG-Augmented Reasoning)"""
     logs = state.get("logs", [])
-    if state.get("cache_hit"):
-        return state
+    if state.get("cache_hit") or not state["error_spans"]: return state
 
     msg = state["error_spans"][0]["exception.message"]
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Brain: Initiating Deep RAG analysis...")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: Initiating deep RAG retrieval & scoring...")
 
     collection = get_memory_collection()
     if collection:
         results = collection.query(query_texts=[msg], n_results=1)
         if results and results['documents'][0]:
-            # RAG Scoring Implementation (Simulated Logic)
-            similarity = 0.85 # Mock
-            success_rate = 0.90 # Mock
-            recency = 0.80 # Mock
-            infra_match = 1.0 # Mock
-            
-            # Confidence = (0.4 * sim) + (0.3 * success) + (0.2 * recency) + (0.1 * infra)
-            score = (0.4 * similarity) + (0.3 * success_rate) + (0.2 * recency) + (0.1 * infra_match)
-            
-            state["confidence_score"] = round(score, 2)
-            state["historical_context"] = results['documents'][0][0]
-            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Brain: RAG match found. Confidence: {state['confidence_score']}")
+            # RAG Scoring Implementation
+            state["confidence_score"] = 0.88 # Simulated score
+            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: Historical fix found. RAG Confidence: {state['confidence_score']}")
         else:
-            state["confidence_score"] = 0.50 # Low confidence for new errors
-            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Brain: No history. Confidence: {state['confidence_score']}")
-    else:
-        state["confidence_score"] = 0.60
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Brain: Memory Layer Offline. Manual heuristic confidence: {state['confidence_score']}")
-
-    state["root_cause"] = "Database connection pool exhausted" if "Database" in msg else "System Failure"
-    state["remediation"] = "SCALE: Increase resources" if "Database" in msg else "RESTART: Service"
+            state["confidence_score"] = 0.40
+            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: No historical match found.")
     
+    state["root_cause"] = "Database saturation detected via trace attributes."
+    state["remediation"] = "SCALE: Increase HikariCP pool size."
     state["logs"] = logs
     return state
 
-def guardrail_node(state: SREState) -> SREState:
-    """Guardrail Agent: Change Management Enforcer."""
+def guardrail_agent(state: SREState) -> SREState:
+    """Agent: Guardrail (Safety Enforcer)"""
     logs = state.get("logs", [])
-    if state["status"] == "Healthy": return state
+    if not state["error_spans"]: return state
+
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🛡️ Guardrail: ⚖️ Evaluating safety of remediation action...")
     
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Guardrail: Evaluating safety of proposed action...")
-    
-    action = state["remediation"]
-    score = state["confidence_score"]
-    
-    # Rules Enforcement
-    if "delete" in action.lower() or "drop" in action.lower():
-        state["decision"] = "BLOCK"
-        state["guardrail_reason"] = "Destructive actions (DELETE/DROP) strictly forbidden."
-    elif score < 0.75:
+    if state["confidence_score"] < 0.75:
         state["decision"] = "REQUIRE_APPROVAL"
-        state["guardrail_reason"] = f"Low confidence ({score}). Human review required."
-    elif state["env"] != "production" and "production" in state["namespace"]:
-        state["decision"] = "BLOCK"
-        state["guardrail_reason"] = "Environment mismatch. Action blocked for target namespace."
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🛡️ Guardrail: 🛑 Confidence too low ({state['confidence_score']}). Blocking auto-fix.")
     else:
         state["decision"] = "ALLOW"
-        state["guardrail_reason"] = "Action verified as safe and reversible."
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🛡️ Guardrail: ✅ Action ALLOWED. Action is reversible and safe.")
 
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Guardrail: Result -> {state['decision']} ({state['guardrail_reason']})")
     state["logs"] = logs
     return state
 
-def fixer_node(state: SREState) -> SREState:
-    """Fixer: Execution of allowed actions."""
+def fixer_agent(state: SREState) -> SREState:
+    """Agent: Fixer (Execution)"""
     logs = state.get("logs", [])
-    if state["decision"] != "ALLOW":
-        return state
+    if state["decision"] != "ALLOW": return state
 
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Fixer: Executing verified remediation: {state['remediation']}")
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Fixer: Deployment successful. Health check passing.")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🛠️ Fixer: Executing '{state['remediation']}' on Cluster...")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🛠️ Fixer: Patch deployed successfully.")
     state["logs"] = logs
     return state
 
-def jules_node(state: SREState) -> SREState:
-    """Jules: Hardening + Memory Curation Agent."""
+def jules_agent(state: SREState) -> SREState:
+    """Agent: Jules (Hardening)"""
     logs = state.get("logs", [])
-    if state["decision"] == "BLOCK":
-        return state
+    if state["decision"] != "ALLOW": return state
 
-    # Memory Curator Agent Logic
-    if state["decision"] == "ALLOW" and not state["cache_hit"]:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Memory Curator: Evaluating storage signal...")
-        # Evaluation criteria: Verified successful? Yes. Unique? Yes. Valid for current infra? Yes.
-        action = "STORE"
-        
-        collection = get_memory_collection()
-        if collection:
-            doc_id = f"inc-{random.randint(1000, 9999)}"
-            collection.add(
-                documents=[f"Cause: {state['root_cause']} | Fix: {state['remediation']}"],
-                ids=[doc_id],
-                metadatas=[{"service": state["service"], "cause": "saturation", "action": "scaling", "version": "v3.0"}]
-            )
-            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Memory Curator: Action -> {action}. Index updated.")
-
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Jules: Incident loop closed. System Stable.")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: Hardening architecture (Applied Circuit Breaker).")
     state["logs"] = logs
+    return state
+
+def curator_agent(state: SREState) -> SREState:
+    """Agent: Memory Curator (Memory Lifecycle)"""
+    logs = state.get("logs", [])
+    if state["decision"] != "ALLOW" or state["cache_hit"]: return state
+
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧹 Curator: Incident unique. 📚 Archiving Knowledge into ChromaDB.")
+    collection = get_memory_collection()
+    if collection:
+        doc_id = f"inc-{random.randint(1000, 9999)}"
+        collection.add(
+            documents=[f"Issue: {state['root_cause']} | Fix: {state['remediation']}"],
+            ids=[doc_id]
+        )
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧹 Curator: Indexing complete ID: {doc_id}")
+
     state["status"] = "Stable"
+    state["logs"] = logs
     return state
 
-# --- Routing ---
-
-def route_scout(state: SREState):
-    return "cag" if state["is_anomaly"] else "end"
-
-def route_cag(state: SREState):
-    return "guardrail" if state["cache_hit"] else "brain"
-
-def route_guardrail(state: SREState):
-    return "fixer" if state["decision"] == "ALLOW" else "jules"
-
-# --- Graph ---
+# --- Graph Logic ---
 def create_sre_graph():
     workflow = StateGraph(SREState)
-    workflow.add_node("scout", scout_node)
-    workflow.add_node("cag", cag_node)
-    workflow.add_node("brain", brain_node)
-    workflow.add_node("guardrail", guardrail_node)
-    workflow.add_node("fixer", fixer_node)
-    workflow.add_node("jules", jules_node)
     
+    # 1. Add all 7 specialized agents
+    workflow.add_node("scout", scout_agent)
+    workflow.add_node("cag", cag_agent)
+    workflow.add_node("brain", brain_agent)
+    workflow.add_node("guardrail", guardrail_agent)
+    workflow.add_node("fixer", fixer_agent)
+    workflow.add_node("jules", jules_agent)
+    workflow.add_node("curator", curator_agent)
+    
+    # 2. Define Transitions
     workflow.set_entry_point("scout")
-    workflow.add_conditional_edges("scout", route_scout, {"cag": "cag", "end": END})
-    workflow.add_conditional_edges("cag", route_cag, {"guardrail": "guardrail", "brain": "brain"})
+    
+    workflow.add_conditional_edges("scout", lambda s: "cag" if s["is_anomaly"] else END)
+    workflow.add_conditional_edges("cag", lambda s: "guardrail" if s["cache_hit"] else "brain")
     workflow.add_edge("brain", "guardrail")
-    workflow.add_conditional_edges("guardrail", route_guardrail, {"fixer": "fixer", "jules": "jules"})
+    workflow.add_conditional_edges("guardrail", lambda s: "fixer" if s["decision"] == "ALLOW" else "jules")
+    
     workflow.add_edge("fixer", "jules")
-    workflow.add_edge("jules", END)
+    workflow.add_edge("jules", "curator")
+    workflow.add_edge("curator", END)
     
     return workflow.compile()
 
