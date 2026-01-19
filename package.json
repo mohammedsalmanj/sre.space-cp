@@ -1,12 +1,7 @@
 {
-    "name": "sre-space-cp",
-    "version": "1.0.0",
-    "private": true,
-    "description": "Autonomous SRE Platform Control Plane",
+    "name": "sre-space-control-plane",
+    "version": "3.0.0",
     "scripts": {
-        "dev": "docker-compose up",
         "build": "mkdir -p public && cp index.html public/"
-    },
-    "dependencies": {},
-    "devDependencies": {}
+    }
 }

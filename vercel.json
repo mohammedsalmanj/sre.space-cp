@@ -1,6 +1,8 @@
 {
-    "version": 2,
-    "public": true,
-    "cleanUrls": true,
-    "outputDirectory": "public"
+    "rewrites": [
+        {
+            "source": "/api/:match*",
+            "destination": "https://sre-backend-production.vercel.app/api/:match*"
+        }
+    ]
 }

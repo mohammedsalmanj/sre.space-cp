@@ -93,7 +93,9 @@ services:
       - otel-collector
 
   frontend:
-    build: ./apps/frontend
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
     ports:
       - "3001:80"
     depends_on:
