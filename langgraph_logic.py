@@ -10,6 +10,7 @@ from agents.guardrail import guardrail_agent
 from agents.fixer import fixer_agent
 from agents.jules import jules_agent
 from agents.curator import curator_agent
+from agents.human import human_agent
 
 # --- State Definition ---
 class SREState(TypedDict):
@@ -29,6 +30,7 @@ class SREState(TypedDict):
     service: str
     namespace: str
     env: str
+    anomaly_frequency: int
 
 # --- Graph Logic ---
 def create_sre_graph():
@@ -42,15 +44,19 @@ def create_sre_graph():
     workflow.add_node("fixer", fixer_agent)
     workflow.add_node("jules", jules_agent)
     workflow.add_node("curator", curator_agent)
+    workflow.add_node("human", human_agent)
     
     # Define Transitions
     workflow.set_entry_point("scout")
     
-    workflow.add_conditional_edges("scout", lambda s: "cag" if s["is_anomaly"] else END)
+    workflow.add_conditional_edges("scout", 
+        lambda s: "human" if s["anomaly_frequency"] >= 3 else ("cag" if s["is_anomaly"] else END))
+    
     workflow.add_conditional_edges("cag", lambda s: "guardrail" if s["cache_hit"] else "brain")
     workflow.add_edge("brain", "guardrail")
     workflow.add_conditional_edges("guardrail", lambda s: "fixer" if s["decision"] == "ALLOW" else "jules")
     
+    workflow.add_edge("human", "curator")
     workflow.add_edge("fixer", "jules")
     workflow.add_edge("jules", "curator")
     workflow.add_edge("curator", END)
@@ -63,6 +69,11 @@ async def run_sre_loop(is_anomaly: bool = False):
         "error_spans": [], "root_cause": "", "remediation": "", "circuit_breaker_active": False,
         "status": "Starting", "logs": [], "is_anomaly": is_anomaly, "historical_context": "",
         "cache_hit": False, "confidence_score": 0.0, "decision": "", "guardrail_reason": "",
-        "service": "", "namespace": "", "env": ""
+        "service": "", "namespace": "", "env": "", "anomaly_frequency": 0
     }
+    
+    # Simulate a frequency surge for testing if anomaly is true
+    if is_anomaly:
+        initial_state["anomaly_frequency"] = 4 
+
     return await graph.ainvoke(initial_state)

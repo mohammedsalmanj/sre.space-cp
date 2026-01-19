@@ -4,6 +4,11 @@ from fastapi.templating import Jinja2Templates
 import asyncio
 import json
 import uvicorn
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 from langgraph_logic import run_sre_loop
 
 app = FastAPI(title="Insurance Platform | Autonomous Reliability Engine v3.0")

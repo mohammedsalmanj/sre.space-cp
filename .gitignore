@@ -17,3 +17,26 @@ package-lock.json
 
 # Static
 public/
+
+# Environment and Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Data & Databases
+chroma_data/
+*.db
+*.sqlite
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Project Specific
+outputs/
+remediations/*.json
+!remediations/.gitkeep
