@@ -81,7 +81,7 @@ The core logic of SRE-Space is a sequence of **Thinking Steps**. Each agent is a
 | **Scout** | `🕵️ Watchdog` | Anomaly Detection | Scans `opentelemetry` spans for `status_code=INTERNAL_ERROR` or latency > 800ms. |
 | **Brain** | `🧠 Strategist` | Diagnostics | Parses OTel attributes to find the specific microservice and `exception.message`. Queries RAG for history. |
 | **Fixer** | `🛠️ Mechanic` | Remediation | Applies the remediation plan: e.g., scaling up a pod, patching a DB config, or restarting a hung service. |
-| **Jules** | `🤖 Architect` | Hardening | Implements "Permanent Fixes" like Circuit Breaking, Retry Budgets, or updating K8s resource limits. |
+| **Jules** | `🤖 Architect` | **Tier-3 Authority** | Architectural authority triggered for systemic failures. Performs deep code refactoing (Circuit Breakers, Query Opts) and runs daily reviews at 09:30 AM GMT+5:30. |
 
 ---
 
