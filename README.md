@@ -2,112 +2,97 @@
 
 [![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![LangGraph](https://img.shields.io/badge/AI-LangGraph-FF6F00?style=for-the-badge&logo=langchain&logoColor=white)](https://langchain-ai.github.io/langgraph/)
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![OpenTelemetry](https://img.shields.io/badge/Tracing-OTel-F46800?style=for-the-badge&logo=opentelemetry&logoColor=white)](https://opentelemetry.io/)
-[![Vercel](https://img.shields.io/badge/Cloud-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
+[![Docker](https://img.shields.io/badge/Infra-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-**SRE-Space** is an autonomous, self-healing **AIOps Control Plane**. It replaces manual triage with a coordinated squad of AI agents that detect, diagnose, remediate, and harden microservices in real-time.
+**SRE-Space** is an autonomous "Immune System" for microservice architectures. It transforms monitoring from a human-reactive pager hell into a **Cognitive Control Plane** where AI agents detect, diagnose, and remediate incidents using real-world telemetry.
 
 ---
 
-## 🏛️ System Architecture
+## 🏗️ The Execution Model: "Hybrid Autonomy"
 
-The platform consists of a **Protected Infrastructure Layer** monitored by the **Cognitive Control Plane**.
+One of the key nuances of SRE-Space v3.0 is its **Hybrid Execution Model**. Unlike monolithic apps, SRE-Space splits the world into two layers:
 
-```mermaid
-graph TD
-    subgraph "External Traffic"
-        User[User/Chaos Trigger] -->|Quote Request| Dashboard[SRE Dashboard]
-    end
+### 1. The Infrastructure Layer (Docker Engine) 🐳
+The "Body" of the system. We use Docker to run the heavy-duty ecosystem that provides the agents with their "Senses" and "Memory":
+*   **Jaeger**: Provides the Distributed Tracing data (The Senses).
+*   **OTel Collector**: Aggregates telemetry from all microservices.
+*   **Kafka**: Acts as the nervous system for real-time event streaming.
+*   **ChromaDB**: The Long-term Vector Memory (The Brain's RAG layer).
 
-    subgraph "Control Plane (LangGraph)"
-        Dashboard -->|SSE Link| Scout[🕵️ Scout Agent]
-        Scout -->|Detection| Brain[🧠 Brain Agent]
-        Brain -->|RCA| Fixer[🛠️ Fixer Agent]
-        Fixer -->|Remediation| Jules[🤖 Jules Agent]
-        Jules -->|Hardening| END((STABLE))
-    end
-
-    subgraph "Observability & Memory"
-        Scout -.->|Check Spans| OTel[OpenTelemetry SDK]
-        Brain -.->|Retrieve History| RAG[Agentic RAG / Vector DB]
-        Jules -.->|Archive Incident| RAG
-    end
-
-    style Dashboard fill:#1e1b4b,stroke:#4338ca,color:#fff
-    style Scout fill:#064e3b,stroke:#059669,color:#fff
-    style Brain fill:#4c1d95,stroke:#7c3aed,color:#fff
-    style Fixer fill:#78350f,stroke:#d97706,color:#fff
-    style Jules fill:#1e3a8a,stroke:#2563eb,color:#fff
-```
+### 2. The Logic Layer (Python / Uvicorn) 🐍
+The "Mind" of the system. The Agents (Scout, Brain, Fixer, Jules) run as a **LangGraph State Machine** inside the FastAPI application.
+*   **Uvicorn** starts the server.
+*   When a request comes in, the **LangGraph Engine** initiates a "Healing Loop."
+*   Agents call out to the Docker-hosted services (Kafka/OTel) to make decisions.
 
 ---
 
-## 🤖 The Agent Squad (LangGraph Powered)
+## 🕵️ Detailed Agent Nuances (LangGraph Workflow)
 
-Each agent in SRE-Space is a specialized node in a **LangGraph State Machine**, processing incidents through a cyclic reasoning loop.
+The system doesn't just run code; it follows a **Directed Acyclic Graph (DAG)** of reasoning:
 
-| Agent | Icon | Role | Technical Responsibility |
-| :--- | :---: | :--- | :--- |
-| **Scout** | 🕵️ | **Watchdog** | Monitors OTel spans for 5XX errors or latency spikes > 800ms. |
-| **Brain** | 🧠 | **Strategist** | Performs Root Cause Analysis (RCA) using `exception.message` & stack traces. |
-| **Fixer** | 🛠️ | **Mechanic** | Executes remediation logic (Scaling, pod restarts, config patches). |
-| **Jules** | 🤖 | **Architect** | Implements "Architectural Hardening" like Circuit Breakers & Retry policies. |
+1.  **Scout (The Trigger)**: Scout monitors the OTel trace flow. It specifically looks for `error=true` tags in span attributes. When detected, it snapshots the state and passes it to the next node.
+2.  **Brain (The Analysis)**: The Brain agent retrieves the stack trace from the Docker-hosted Jaeger instance. It uses its RAG memory to see if this error has happened before.
+3.  **Fixer (The Action)**: The Fixer is responsible for remediation. Because it runs in the Python environment, it can trigger external commands, update configs, or send signals back to Docker.
+4.  **Jules (The Hardening)**: Jules performs the "Post-Mortem." It updates the vector store in ChromaDB so the system "learns" from the incident.
 
 ---
 
-## 📚 Agentic RAG: "The Immune System"
+## 🚀 How to Run (Step-by-Step Nuances)
 
-Scaling reliability requires a **Global Memory**. SRE-Space uses a Retrieval-Augmented Generation (RAG) architecture to ensure we never fix the same bug twice:
+To get SRE-Space fully operational, you must follow this two-stage startup:
 
-1.  **Incidence Recording**: Every remediation success is flattened into a semantic document.
-2.  **Vector Embedding**: Incidents are stored in a Vector Database (ChromaDB) indexed by trace characteristics.
-3.  **Smart Retrieval**: When the **Brain** sees a new failure mode, it queries: *"How did we fix 'Database connection timeout' in region 'us-east-1' last month?"*
-4.  **Few-Shot Remediation**: The AI uses the retrieved context to verify its current plan, drastically reducing MTTR (Mean Time To Recovery).
-
----
-
-## ⚡ Scalability & Enterprise Ready
-
-*   **Serverless First**: Optimized for Vercel using the `@vercel/python` runtime. No Node.js "Cold Start" bloat.
-*   **Event-Driven**: Agents can be decoupled via **Kafka** or **NATS** for high-throughput environments.
-*   **Distributed Memory**: Shares reliability lessons across global clusters via a centralized Vector DB.
-*   **OTel Native**: Zero vendor lock-in; works with Jaeger, Honeycomb, Datadog, or New Relic.
-
----
-
-## 🚀 Quick Start
-
-### 1. Local Environment
+### Phase 1: Spin up the Infrastructure (Docker)
+Ensure Docker Desktop/Engine is running. This sets up the environment that the agents will monitor.
 ```bash
-# Clone the repository
-git clone https://github.com/mohammedsalmanj/sre.space-cp.git
-cd sre.space-cp
+docker-compose up -d
+```
+*Wait ~30 seconds for Kafka and ChromaDB to initialize.*
 
-# Install Lean Python Stack
+### Phase 2: Start the Cognitive Engine (Python)
+Now that the infra is alive, start the "Mind" of the system.
+```bash
+# 1. Install dependencies
 pip install -r requirements.txt
 
-# Start the Engine
+# 2. Start the FastAPI Control Plane
 uvicorn main:app --reload --port 8000
 ```
 
-### 2. Verify with Chaos Lab
-1.  Open `http://localhost:8000`.
+### Phase 3: Access & Test
+*   **UI Dashboard**: `http://localhost:8000`
+*   **Jaeger Traces**: `http://localhost:16686`
+*   **Vector API**: `http://localhost:8000` (ChromaDB)
+
+---
+
+## 📚 Agentic RAG: How Memory is Handled
+
+RAG (Retrieval-Augmented Generation) is the key to enterprise scaling. 
+
+*   **Storage**: Every time an agent fixes a bug, the resolution and the trace logs are converted into an embedding and stored in **ChromaDB**.
+*   **Retrieval**: During a new incident, the **Brain Agent** sends the current error message to ChromaDB. It retrieves the **Top 3 similar incidents**.
+*   **Benefit**: This reduces the "Search Space" for fixes. The system doesn't "guess"; it remembers.
+
+---
+
+## ⚡ Scaling Nuances
+
+*   **Production OTel**: In a real production environment, your microservices (Java, Go, Node) would send traces to the `otel-collector` hosted in Docker. SRE-Space would then monitor that central collector.
+*   **Agent Parallelism**: LangGraph allows SRE-Space to handle multiple incidents simultaneously without blocking the main event loop.
+*   **Vercel Nuance**: When deploying to Vercel, the "Logic Layer" (FastAPI) is serverless. It connects to your managed Infrastructure Cloud (e.g., Aiven for Kafka, Pinecone for RAG, or a hosted Jaeger instance).
+
+---
+
+## 🧪 Validating the Loop
+1.  Open the Dashboard.
 2.  Click **"Inject Chaos"**.
-3.  Watch the **Agent Console** as its LangGraph nodes transition from **Scout** to **Jules** automatically.
+3.  Observe the logs:
+    *   **Scout** detects the injected trace via Docker.
+    *   **Brain** pulls the error from the OTel infra.
+    *   **Fixer** applies the patch.
+    *   **Jules** archives the lesson.
 
 ---
 
-## ☁️ Cloud Deployment
-
-One-click deployment to Vercel via **GitHub Actions** or the Vercel CLI.
-
-```bash
-vercel --prod
-```
-
-**Dashboard**: [https://sre-space-cp.vercel.app/](https://sre-space-cp.vercel.app/)
-
----
-
-> "Designing for resilience is hard. Let the Agents handle it." 🌌
+> "Monitoring is about knowing. SRE-Space is about solving." 🌌
