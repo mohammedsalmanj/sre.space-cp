@@ -4,148 +4,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Insurance Platform | Autonomous Reliability Engine v3.0</title>
+    <title>Insurance Platform | SRE Control Plane</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap"
         rel="stylesheet">
     <style>
         body {
             font-family: 'Outfit', sans-serif;
-            background-color: #000;
-            background-image:
-                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
-                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
-                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
-            color: #fff;
+            background: #020617;
+            color: #f8fafc;
+            background-image: radial-gradient(circle at 100% 0%, #172554 0%, transparent 40%),
+                radial-gradient(circle at 0% 100%, #1e1b4b 0%, transparent 40%);
             min-height: 100vh;
         }
 
         .glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
         }
 
-        .terminal-text {
+        .terminal {
             font-family: 'JetBrains Mono', monospace;
+            background: #000;
+            border: 1px solid #1e293b;
         }
 
-        .animate-pulse-slow {
-            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% {
+                box-shadow: 0 0 0 0px rgba(34, 197, 94, 0.4);
+            }
+
+            100% {
+                box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+            }
         }
     </style>
 </head>
 
-<body class="p-8 flex flex-col items-center">
+<body class="p-6 md:p-12">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-12">
+            <div>
+                <h1
+                    class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                    Insurance Platform
+                </h1>
+                <p class="text-slate-400 mt-2 text-lg">Autonomous Reliability Engine v3.0 | <span
+                        class="text-blue-400">LangGraph Powered</span></p>
+            </div>
+            <div class="hidden md:flex items-center gap-3 glass px-5 py-2">
+                <div class="w-3 h-3 bg-green-500 rounded-full pulse"></div>
+                <span class="text-sm font-semibold text-green-400 uppercase tracking-widest">System Stable</span>
+            </div>
+        </header>
 
-    <!-- Header -->
-    <header class="w-full max-w-6xl flex justify-between items-center mb-12 border-b border-gray-800 pb-6">
-        <div>
-            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
-                Insurance Platform
-            </h1>
-            <p class="text-gray-400 mt-1">Autonomous Reliability Engine v3.0</p>
-        </div>
-        <div class="glass px-4 py-2 rounded-full flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            <span class="text-sm font-semibold text-green-400">System Online</span>
-        </div>
-    </header>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left: Marketplace -->
+            <div class="lg:col-span-2 space-y-8">
+                <div class="flex justify-between items-end">
+                    <h2 class="text-2xl font-semibold">Policy Marketplace</h2>
+                    <button onclick="triggerChaos()"
+                        class="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 px-4 py-2 rounded-xl text-sm font-bold transition">
+                        🔥 Inject Chaos (HTTP 500)
+                    </button>
+                </div>
 
-    <!-- Main Grid -->
-    <main class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Policy Card -->
+                    <div class="glass p-8 hover:bg-white/5 transition group cursor-pointer"
+                        onclick="processQuote('Life')">
+                        <div class="text-4xl mb-4">❤️</div>
+                        <h3 class="text-xl font-bold mb-2">Life Insurance</h3>
+                        <p class="text-slate-400 mb-6 text-sm">Full coverage for your family's future with autonomous
+                            claim guards.</p>
+                        <button class="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold transition">Get
+                            Quote</button>
+                    </div>
 
-        <!-- Marketplace Section -->
-        <section class="lg:col-span-2 space-y-6">
-            <h2 class="text-2xl font-semibold mb-6">Policy Marketplace</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Life -->
-                <div class="glass p-6 rounded-2xl hover:bg-white/10 transition cursor-pointer group"
-                    onclick="requestQuote('Life')">
-                    <div class="text-3xl mb-3">❤️</div>
-                    <h3 class="text-xl font-bold mb-1">Life Insurance</h3>
-                    <p class="text-sm text-gray-400 mb-4">Complete protection for your family's future.</p>
-                    <button class="w-full py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition">Get
-                        Quote</button>
-                </div>
-                <!-- Vehicle -->
-                <div class="glass p-6 rounded-2xl hover:bg-white/10 transition cursor-pointer group"
-                    onclick="requestQuote('Vehicle')">
-                    <div class="text-3xl mb-3">🚗</div>
-                    <h3 class="text-xl font-bold mb-1">Vehicle</h3>
-                    <p class="text-sm text-gray-400 mb-4">Comprehensive coverage for road safety.</p>
-                    <button class="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition">Get
-                        Quote</button>
-                </div>
-                <!-- Pet -->
-                <div class="glass p-6 rounded-2xl hover:bg-white/10 transition cursor-pointer group"
-                    onclick="requestQuote('Pet')">
-                    <div class="text-3xl mb-3">🐾</div>
-                    <h3 class="text-xl font-bold mb-1">Pet Care</h3>
-                    <p class="text-sm text-gray-400 mb-4">Health coverage for your furry friends.</p>
-                    <button class="w-full py-2 bg-orange-600 hover:bg-orange-700 rounded-lg font-medium transition">Get
-                        Quote</button>
-                </div>
-                <!-- Dental -->
-                <div class="glass p-6 rounded-2xl hover:bg-white/10 transition cursor-pointer group"
-                    onclick="requestQuote('Dental')">
-                    <div class="text-3xl mb-3">🦷</div>
-                    <h3 class="text-xl font-bold mb-1">Dental</h3>
-                    <p class="text-sm text-gray-400 mb-4">Preventative care and surgeries.</p>
-                    <button class="w-full py-2 bg-teal-600 hover:bg-teal-700 rounded-lg font-medium transition">Get
-                        Quote</button>
+                    <div class="glass p-8 hover:bg-white/5 transition group cursor-pointer"
+                        onclick="processQuote('Vehicle')">
+                        <div class="text-4xl mb-4">🚗</div>
+                        <h3 class="text-xl font-bold mb-2">Vehicle</h3>
+                        <p class="text-slate-400 mb-6 text-sm">Smart vehicle protection with real-time risk assessment.
+                        </p>
+                        <button
+                            class="w-full py-3 bg-purple-600 hover:bg-purple-700 rounded-xl font-bold transition">Get
+                            Quote</button>
+                    </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Live Telemetry Section -->
-        <aside class="lg:col-span-1">
-            <div class="glass rounded-2xl h-full flex flex-col overflow-hidden">
-                <div class="p-4 border-b border-gray-800 bg-black/40 flex justify-between items-center">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400">Live Agent Telemetry</h3>
-                    <span class="text-xs text-gray-600 terminal-text">connection: secure</span>
-                </div>
-                <div id="terminal"
-                    class="flex-1 p-4 overflow-y-auto terminal-text text-sm space-y-3 bg-black/80 font-mono h-[500px]">
-                    <div class="text-gray-500">> System initialized. Waiting for events...</div>
+            <!-- Right: Agent Terminal -->
+            <div class="space-y-4">
+                <h2 class="text-2xl font-semibold">Agent Squad Console</h2>
+                <div class="terminal rounded-2xl h-[500px] flex flex-col">
+                    <div
+                        class="bg-slate-900 px-4 py-2 rounded-t-2xl flex justify-between items-center text-xs text-slate-500 font-bold uppercase tracking-widest">
+                        <span>sre-space-control-center</span>
+                        <span>v3.0</span>
+                    </div>
+                    <div id="logs" class="p-6 overflow-y-auto flex-1 space-y-3 scrollbar-hide">
+                        <div class="text-slate-500 font-mono text-sm">> System initialized. Awaiting requests...</div>
+                    </div>
                 </div>
             </div>
-        </aside>
+        </div>
 
-    </main>
-
-    <footer class="mt-12 text-gray-600 text-sm">
-        Insurance Platform v3.0 | Powered by Anti-Gravity Architecture
-    </footer>
+        <footer class="mt-24 text-center text-slate-600 text-sm">
+            <p>SRE.Space | Cognitive Reliability Engine | Designed for Infinite Uptime</p>
+        </footer>
+    </div>
 
     <script>
-        const terminal = document.getElementById('terminal');
+        const logContainer = document.getElementById('logs');
 
-        function log(agent, color, message) {
-            const line = document.createElement('div');
-            line.className = 'flex gap-3 animate-pulse-slow';
-            line.innerHTML = `
-                <span class="font-bold" style="color: ${color}">[${agent}]</span>
-                <span class="text-gray-300">${message}</span>
-            `;
-            terminal.appendChild(line);
-            terminal.scrollTop = terminal.scrollHeight;
+        function addLog(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = "text-sm font-mono leading-relaxed";
+
+            if (msg.includes('Scout')) div.classList.add('text-green-400');
+            else if (msg.includes('Brain')) div.classList.add('text-purple-400');
+            else if (msg.includes('Fixer')) div.classList.add('text-orange-400');
+            else if (msg.includes('Jules')) div.classList.add('text-blue-400');
+            else if (msg.includes('System')) div.classList.add('text-slate-500');
+            else div.classList.add('text-slate-300');
+
+            div.innerText = "> " + msg;
+            logContainer.appendChild(div);
+            logContainer.scrollTop = logContainer.scrollHeight;
         }
 
-        function requestQuote(type) {
-            log('System', '#9ca3af', `Initiating Quote Request: ${type}...`);
+        async function processQuote(policy, isChaos = false) {
+            logContainer.innerHTML = '';
+            addLog(`System: Initiating ${policy} Quote for customer...`);
 
-            const eventSource = new EventSource(`/api/quote-stream?policy_type=${type}`);
+            const eventSource = new EventSource(`/api/sre-loop?anomaly=${isChaos}`);
 
-            eventSource.onmessage = function (event) {
+            eventSource.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                log(data.agent, data.color, data.message);
+                addLog(data.message);
+
+                if (data.final_state) {
+                    eventSource.close();
+                    if (data.final_state === 'Stable') {
+                        addLog("System: Recovery successful. Business as usual.", 'success');
+                    } else {
+                        addLog("System: Quote delivered successfully.", 'success');
+                    }
+                }
             };
 
-            eventSource.onerror = function () {
+            eventSource.onerror = (err) => {
                 eventSource.close();
-                log('System', '#9ca3af', 'Transaction Complete.');
+                console.error("SSE Error:", err);
             };
+        }
+
+        function triggerChaos() {
+            processQuote('Chaos Mode', true);
         }
     </script>
 </body>
