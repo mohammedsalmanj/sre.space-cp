@@ -1,146 +1,109 @@
-# 🌌 SRE-Space: The Cognitive Reliability Engine
+# 🌌 SRE-Space: The Cognitive Reliability Engine v3.0
 
-![Status](https://img.shields.io/badge/Status-Autonomous-brightgreen) ![AI](https://img.shields.io/badge/AI-Agentic-blueviolet) ![Tracing](https://img.shields.io/badge/Observability-OpenTelemetry-orange) ![Escalation](https://img.shields.io/badge/Escalation-Google_Jules-4285F4)
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
+[![LangGraph](https://img.shields.io/badge/AI-LangGraph-orange.svg)](https://langchain-ai.github.io/langgraph/)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-green.svg)](https://fastapi.tiangolo.com/)
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel-black.svg)](https://vercel.com/)
 
-**SRE-Space** is a self-evolving **AIOps Control Plane** that transforms traditional incident response into a cognitive, self-improving lifecycle. It goes beyond simple automation by integrating **Real-Time Distributed Tracing (OTel)**, **Vector Memory (RAG)**, and **Architectural Refactoring** into a single cohesive system.
-
-Instead of manual triage, SRE-Space deploys a coordinated squad of AI Agents that **Detect, Diagnose, Fix, and Learn**. It analyzes failure patterns across the stack and re-architects the microservices in real-time to prevent recurrence.
-
----
-
-## ⚡ The Edge: From Monitoring to Cognition
-
-| Feature | The Human Limit | The SRE-Space Advantage |
-| :--- | :--- | :--- |
-| **Response Time** | 15-30m (Paged) | **< 60s (Autonomous)** |
-| **Root Cause** | Guesses or Wiki-Checks | **Deep Span Trace Analysis (Jaeger)** |
-| **Memory** | Subject to engineer churn | **Persistent Vector Knowledge Base (ChromaDB)** |
-| **System Evolution** | Becomes "Legacy" Code | **Daily Architectural Refactoring (Jules)** |
+**SRE-Space** is an autonomous "Immune System" for microservice architectures. It transforms traditional monitoring—where humans react to alerts—into a **Cognitive Control Plane** where AI agents detect, diagnose, fix, and harden the system in real-time.
 
 ---
 
-## 🏛️ System Architecture
+## 🏛️ System Philosophy: "The True North"
 
-The platform consists of a **Protected Microservices Layer** guarded by the **Cognitive Control Plane**.
+Most SRE tools stop at visibility. SRE-Space completes the loop. By integrating **LangGraph** (agent orchestration) with **OpenTelemetry** (deep visibility), the system doesn't just see a problem; it understands the "Why" and executes the "How."
 
-```mermaid
-graph TD
-    subgraph "Protected Infrastructure"
-        UI[SRE Dashboard] -->|OTLP Traces| OTel[OTel Collector]
-        UI -->|API Calls| MockAPI[Mock Backend API]
-        MockAPI -->|OTLP Traces| OTel
-        MockAPI -->|Events| Kafka[Kafka Event Bus]
-        OTel -->|Export| Jaeger[Jaeger UI]
-    end
-
-    subgraph "Cognitive Control Plane"
-        Scout[🕵️ Scout Agent] -->|Monitors| Kafka
-        Scout -->|Checks| Health[Health Checks]
-        Scout -->|Creates| Issue[GitHub Incident]
-
-        Brain[🧠 Brain Agent] -->|Analyzes| Issue
-        Brain -->|Trace Analysis| Jaeger
-        Brain -->|Instructs| Fixer
-
-        Fixer[🛠️ Fixer Agent] -->|Executes| Cmd[Docker Auto-Heal]
-        Fixer -->|GitOps| PR[Pull Request]
-        
-        Memory[📚 Memory Agent] -->|Indexes| ChromaDB[(Vector DB)]
-        Memory -->|Retrieves| Patterns[Historical Context]
-    end
-
-    subgraph "Strategic Escalation (Tier 3)"
-        Jules[🤖 Google Jules] -->|Refactors| Code[Codebase]
-        Jules -->|Architectural Fix| PR
-    end
-
-    Brain -.->|Writes PM| Issue
-    Fixer -->|Auto-Merge| GitHub[GitHub Main]
-    GitHub -->|Deploy| Vercel[Vercel Cloud]
-```
+### The 4 Pillars of Autonomy:
+1.  **Observability-Driven**: No action is taken without OTel trace evidence.
+2.  **Cyclic Reasoning**: Agents iterate through a LangGraph state machine.
+3.  **Self-Healing**: Automated remediation without human pagers.
+4.  **Persistent Memory**: Using RAG to learn from every historical incident.
 
 ---
 
-## 🤖 The Agent Squad
+## 🧠 How LangGraph Works (The Agent Squad)
 
-For the full detailed roster and SOPs, read **[AGENTS.md](./AGENTS.md)**.
+The system uses a directed cyclic graph (LangGraph) to manage the lifecycle of an incident. Each agent is a node in this graph.
 
-### 🟢 Tactical Response (Real-Time)
-*   **🕵️ Scout (The Watchdog)**: Correlates Business Yield (Conversion Rate) with Service Health via Kafka.
-*   **🧠 Brain (The Strategist)**: Uses distributed traces (Jaeger/OTel) to perform "X-Ray" diagnostics.
-*   **🛠️ Fixer (The Mechanic)**: Safely applies remediations via Docker or GitOps PRs.
-*   **📚 Memory (The Historian)**: A RAG-enabled librarian that ensures the system never repeats a mistake.
+### 1. 🕵️ Scout Agent (Detection)
+Scout is the "Watchman." It continuously polls **OpenTelemetry Spans**.
+*   **Trigger**: High latency or HTTP 5XX spikes.
+*   **Logic**: If Scout finds an error span, it snapshots the trace-id and transitions the state to the **Brain**.
 
-### 🔴 Strategic Escalation (Architectural)
-*   **🤖 Google Jules (The Architect)**: Performs deep refactoring to implement circuit breakers, caching, and query optimizations.
+### 2. 🧠 Brain Agent (Diagnostics)
+The Brain is the "Strategist." It performs **Root Cause Analysis (RCA)**.
+*   **Logic**: It extracts `exception.message` and `stacktrace` from OTel.
+*   **Inference**: It determines if the failure is code-level (logic bug), infra-level (OOM/CPU), or data-level (DB timeout).
 
----
+### 3. 🛠️ Fixer Agent (Remediation)
+The Mechanic. It executes the suggested fix.
+*   **Actions**: Restarts services, increases connection pools, or rolls back bad deployments.
+*   **Verification**: It loops back to Scout to ensure the state has returned to "Nominal."
 
-## 🛠️ Tech Stack
-
-- **Frontend**: Vanilla JS, CSS3 (Glassmorphic), OpenTelemetry SDK.
-- **Backend**: Node.js, Express, Python (FastAPI).
-- **Observability**: OpenTelemetry, Jaeger, OTLP.
-- **Data/Events**: Kafka, ChromaDB (Vector Storage).
-- **Core AI**: Google Agentic SDK, RAG.
-- **Infrastructure**: Docker, Vercel, GitHub Actions.
-
----
-
-## 🚀 Getting Started (Local Development)
-
-### 1. Prerequisites
-- Docker & Docker Compose
-- Node.js (v18+)
-
-### 2. Installation
-```bash
-# Clone the repository
-git clone https://github.com/mohammedsalmanj/sre.space-cp.git
-cd sre.space-cp
-
-# Start the entire local stack
-docker-compose up -d --build
-```
-
-### 3. Live Consoles & Observability
-| Console | URL | Description |
-| :--- | :--- | :--- |
-| **SRE Dashboard** | [http://localhost:3001](http://localhost:3001) | Real-time SLIs & AI Audit Log |
-| **Jaeger Traces** | [http://localhost:16686](http://localhost:16686) | Deep Bottleneck Identification |
-| **Mock API** | [http://localhost:8080/api/quote](http://localhost:8080/api/quote) | Backend logic for traces |
-| **Knowledge Base** | [http://localhost:8000/docs](http://localhost:8000/docs) | Search the AI's "Memory" |
+### 4. 🤖 Jules Agent (Hardening/Refactoring)
+The Architect. Jules looks at the incident retrospectively.
+*   **Logic**: It applies **Robustness Patterns** (Circuit Breakers, Retries, Hedged Requests) to prevent the same failure mode tomorrow.
 
 ---
 
-## ☁️ Cloud Deployment (Vercel)
+## 📚 Memory Handling (Agentic RAG)
 
-The **SRE Dashboard UI** is optimized for Vercel deployment. Every push to the `main` branch triggers an autonomous build and deploy.
+Scaling reliability requires remembering the past. SRE-Space handles knowledge via **Retrieval-Augmented Generation (RAG)**:
 
-### ⚙️ Vercel Configuration
-- **Output Directory**: `public` (Generated during build).
-- **API Rewrites**: Automatically routes `/api/*` requests to the distributed backend services.
-- **Auto-Alignment**: The root `package.json` includes a specialized build script: `"mkdir -p public && cp index.html public/"` to ensure zero-config static hosting.
-
-| Deployment | URL |
-| :--- | :--- |
-| **Live Dashboard** | [https://sre-space-cp.vercel.app/](https://sre-space-cp.vercel.app/) |
+1.  **Knowledge Ingestion**: Every successful fixation is stored as a **"Post-Mortem Document"** in a vector database (e.g., ChromaDB).
+2.  **Semantic Search**: When the Brain sees a new error, it queries the database for "Similar historical traces."
+3.  **Few-Shot Remediation**: The Brain uses these historical results to verify its current remediation plan, ensuring that if a fix worked in 2024, it is utilized in 2026.
 
 ---
 
+## ⚡ Scaling to the Enterprise
+
+While this repository is a unified control plane, SRE-Space is designed to scale:
+
+*   **Vertical Scaling**: The FastAPI backend is lightweight and stateless, allowing it to run in Kubernetes Sidecars or specialized Control-Plane pods.
+*   **Horizontal Scaling**: In high-traffic environments, the **Scout** can be decoupled using **Kafka**. Real microservices emit traces to Kafka, which SRE-Space consumes as an event stream.
+*   **Distributed Memory**: The RAG layer can be backed by a distributed Vector Cluster, allowing multiple SRE-Space instances across global regions to share "Reliability Lessons."
+
 ---
 
-## 🧪 Chaos Lab (Validation)
-Test the AI's intelligence:
-- `python trigger_chaos.py oom`: Test the **Fixer's** auto-healing capability.
-- `python trigger_chaos.py saturation`: Verify the **Brain's** diagnostics via Jaeger.
-- `./mission-control.sh verify-jules-pr`: Validate the **Architect's** refactoring loop.
+## 🛠️ Tech Stack & Setup
+
+### Core Stack:
+- **Language**: Python 3.9+
+- **Agent Framework**: LangGraph (LangChain)
+- **Backend**: FastAPI / Uvicorn / Jinja2
+- **Observability**: OpenTelemetry SDK
+- **Design**: Vanilla CSS / Tailwind (Glassmorphic)
+
+### Local Development:
+1.  **Clone & Install**:
+    ```bash
+    git clone https://github.com/mohammedsalmanj/sre.space-cp.git
+    cd sre.space-cp
+    pip install -r requirements.txt
+    ```
+2.  **Run the Control Plane**:
+    ```bash
+    uvicorn main:app --reload --port 8000
+    ```
+3.  **Access Dashboard**: Open `http://localhost:8000`
 
 ---
 
-## 🛡️ Core Ethics & Design
-- **Observability First**: No decision is made without telemetry evidence.
-- **Safe-Fail**: Every automated change is version-controlled, isolated, and reversible.
-- **Transparency**: Every AI thought process is logged to the dashboard audit log.
+## 🧪 Chaos Lab (Testing)
 
-**Designing a more resilient future, autonomously.** 🌌
+Test the engine's intelligence by using the **"Inject Chaos"** button on the UI.
+*   It forces a `HTTP 500: Database connection timeout` into the telemetry stream.
+*   Watch the **Agent Squad Console** as Scout detects it and the subsequent agents restore the "Stable" state.
+
+---
+
+## ☁️ Deployment
+
+The project is optimized for **Vercel** via `vercel.json`. It uses the `@vercel/python` runtime to serve the FastAPI app and LangGraph engine as serverless functions.
+
+**Dashboard URL**: [https://sre-space-cp.vercel.app/](https://sre-space-cp.vercel.app/)
+
+---
+
+> "Monitoring tells you something is wrong. SRE-Space makes it right." 🌌
