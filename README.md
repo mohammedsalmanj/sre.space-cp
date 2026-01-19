@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="assets/hero_logo.png" width="200" alt="SRE-Space Logo">
   <h1>🌌 SRE-Space: The Cognitive Reliability Engine v3.5</h1>
   <p><i>"Self-Healing Infrastructure through Multi-Agent Cognitive Cycles"</i></p>
 
@@ -50,8 +49,6 @@ graph TD
     Logic -->|GitOps Action| Apps
 ```
 
-<img src="assets/agent_cluster.png" width="100%" alt="Agent Cluster Visualization">
-
 ---
 
 ## 🤖 The 8-Agent High-Availability Squad
@@ -91,13 +88,8 @@ Autonomous systems require trust. SRE-Space implements three layers of protectio
 
 ## ⚡ Getting Started (Pro Mode)
 
-### 1. The Environment
-Create your `.env` file (see `.env.example`):
-```bash
-GITHUB_PERSONAL_ACCESS_TOKEN=your_token
-OPENAI_API_KEY=your_key
-NEW_RELIC_LICENSE_KEY=your_key
-```
+### 1. Simple Configuration
+Create your `.env` file based on `.env.example` and add your essential credentials (GitHub Token, OpenAI Key, etc.) as required.
 
 ### 2. Launch Infrastructure
 Start the sensors, event bus, and memory:
