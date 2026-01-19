@@ -1,5 +1,7 @@
 from datetime import datetime
 import json
+import random
+from shared.git_utils import generate_sre_pr_title
 
 def jules_agent(state):
     """
@@ -31,10 +33,11 @@ def jules_agent(state):
     
     # Choose 2 optimizations
     selected = random.sample(refactors, 2)
-    for action in selected:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: FIXING DESIGN FLAW -> {action}")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: Design integrity restored.")
     
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: Design integrity restored. PR raised for Daily Architectural Review (Scheduled 09:30 AM).")
+    pr_title = generate_sre_pr_title(state.get('service', 'system'), "architectural-refactor")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: PR Created -> {pr_title}")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: Daily Architectural Review (Scheduled 09:30 AM).")
     
     state["logs"] = logs
     return state
