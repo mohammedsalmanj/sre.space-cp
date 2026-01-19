@@ -1,7 +1,0 @@
-{
-    "name": "sre-space-control-plane",
-    "version": "3.0.0",
-    "scripts": {
-        "build": "mkdir -p public && cp index.html public/"
-    }
-}
