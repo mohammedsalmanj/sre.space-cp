@@ -17,9 +17,11 @@ async def get_dashboard(request: Request):
 async def sre_loop_stream(anomaly: bool = False):
     async def event_generator():
         result = await run_sre_loop(is_anomaly=anomaly)
+        # Bolt ⚡: Removed 400ms artificial delay to make log streaming instant.
+        # This improves the perceived performance of the dashboard significantly.
         for log in result["logs"]:
             yield f"data: {json.dumps({'message': log})}\n\n"
-            await asyncio.sleep(0.4)
+            await asyncio.sleep(0.01) # Small sleep to prevent blocking the event loop entirely
         yield f"data: {json.dumps({'message': '--- END OF LOOP ---', 'final_state': result['status']})}\n\n"
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
