@@ -3,141 +3,165 @@
 [![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![LangGraph](https://img.shields.io/badge/AI-LangGraph-FF6F00?style=for-the-badge&logo=langchain&logoColor=white)](https://langchain-ai.github.io/langgraph/)
 [![OpenAI](https://img.shields.io/badge/LLM-GPT--4o--mini-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
-[![Docker](https://img.shields.io/badge/Infra-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![ChromaDB](https://img.shields.io/badge/Memory-ChromaDB-white?style=for-the-badge&logo=googlechrome&logoColor=black)](https://www.trychroma.com/)
 [![OpenTelemetry](https://img.shields.io/badge/Tracing-OTel-F46800?style=for-the-badge&logo=opentelemetry&logoColor=white)](https://opentelemetry.io/)
 [![Vercel](https://img.shields.io/badge/Cloud-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 
-**SRE-Space** is an autonomous, self-healing **Cognitive Control Plane** for mission-critical microservice architectures. It replaces manual firefighting with a coordinated squad of AI agents that detect, diagnose, remediate, and architecturally harden services in real-time.
+**SRE-Space** is an autonomous, self-healing **Cognitive Control Plane** designed for high-availability microservice ecosystems. It moves beyond simple alerts by orchestrating a modular squad of AI agents that detect anomalies, reason through root causes, enforce safety guardrails, and architecturally harden the system—all without human intervention.
 
 ---
 
-## 🏛️ System Architecture
+## 🏛️ Diagram 1: System Topology (Mind & Body)
 
-SRE-Space operates on a **Mind-Body Duality**. The **Body** (Infrastructure) provides the senses and memory, while the **Mind** (LangGraph Logic) provides the reasoning and decision-making.
+SRE-Space is architected as a **Hybrid Control Plane**. The **Body** handles sensory data and persistence, while the **Mind** executes the agentic reasoning loop.
 
 ```mermaid
 graph TD
-    subgraph "The Mind (Logic Layer & Control Plane)"
-        Dashboard[SRE Dashboard UI]
-        subgraph "Autonomous Squad (LangGraph)"
-            Scout[🕵️ Scout Agent]
-            CAG[⚡ CAG Flash Cache]
-            Brain[🧠 Brain Agent]
-            Guardrail[🛡️ Guardrail Agent]
-            Fixer[🛠️ Fixer Agent]
-            Jules[🤖 Jules Agent]
-            Curator[🧹 Memory Curator]
-        end
+    subgraph "Control Plane (The Mind - Python/LangGraph)"
+        UI[Glassmorphic Dashboard]
+        Logic[LangGraph Squad Engine]
+        UI <-->|SSE Streaming| Logic
     end
 
-    subgraph "The Body (Infrastructure Layer)"
-        subgraph "Telemetry & Senses"
-            OTel[OpenTelemetry Collector]
-            Jaeger[Jaeger Trace UI]
+    subgraph "Infrastructure (The Body - Docker/K8s)"
+        subgraph "Sensory Organs (OTel Stack)"
+            Collector[OTel Collector]
+            Jaeger[Jaeger UI]
         end
-        subgraph "Memory & Nervous System"
+        subgraph "Nervous System (Events & Memory)"
             Kafka[Kafka Event Bus]
-            Chroma[(ChromaDB Vector Memory)]
+            Chroma[(ChromaDB Vector Store)]
         end
     end
 
-    %% Interactions
-    Dashboard -->|User Request/Chaos| Scout
-    Scout -->|Detection Signal| CAG
-    CAG -->|Cache Miss| Brain
-    CAG -->|Cache Hit| Guardrail
-    Brain -->|RAG Analysis| Guardrail
-    Guardrail -->|Policy Verification| Fixer
-    Fixer -->|Remediation| Jules
-    Jules -->|Harden & Review| Curator
-    Curator -->|Archive Incidents| Chroma
-
-    %% Data Connections
-    Scout -.->|Check Spans| OTel
-    Brain -.->|Deep Query| Chroma
-    OTel -.->|Trace Export| Jaeger
+    %% Connections
+    Logic -.->|Poll Spans| Collector
+    Logic -.->|Query/Archive| Chroma
+    Collector -->|Export| Jaeger
     
-    %% Styling
-    style Dashboard fill:#1e1b4b,stroke:#4338ca,color:#fff,stroke-width:2px
-    style Scout fill:#064e3b,stroke:#059669,color:#fff
-    style Brain fill:#4c1d95,stroke:#7c3aed,color:#fff
-    style Guardrail fill:#991b1b,stroke:#ef4444,color:#fff
-    style Fixer fill:#78350f,stroke:#d97706,color:#fff
-    style Jules fill:#1e3a8a,stroke:#2563eb,color:#fff
+    style Logic fill:#1e1b4b,stroke:#4338ca,color:#fff,stroke-width:3px
+    style Collector fill:#064e3b,stroke:#059669,color:#fff
     style Chroma fill:#831843,stroke:#db2777,color:#fff
 ```
 
 ---
 
-## 🤖 The Squad: Multi-Agent Orchestration
+## 🤖 Diagram 2: The 7-Agent Squad Workflow
 
-We transitioned from hard-coded logic to a modular **Agent Squad**, where each node has a specialized "System Prompt" and unique technical authority.
+We have modularized our intelligence into a **Directed Acyclic Graph (DAG)** of specialized agents. Each node handles a specific stage of the incident lifecycle.
 
-| Agent | Module | Technical Authority | Role Reflection |
-| :--- | :--- | :--- | :--- |
-| **Scout** | `🕵️ Watchdog` | **Detection** | Monitors OTel spans for 5XX errors and latency spikes. |
-| **CAG** | `⚡ Flash Cache` | **Instant Response** | Cache-Augmented Generation for recurring "FAQ" style incidents. |
-| **Brain** | `🧠 Strategist` | **RAG Diagnostics** | Integrates with **OpenAI GPT-4o-mini** and ChromaDB for root cause analysis. |
-| **Guardrail**| `🛡️ Policy` | **Governance** | Blocks dangerous actions; enforces confidence scores > 0.75. |
-| **Fixer** | `🛠️ Mechanic` | **Execution** | Implements code patches, pod restarts, and resource scaling. |
-| **Jules** | `🤖 Architect` | **Tier-3 Authority** | Systemic refactoring (Circuit Breakers) and Daily Reviews at 09:30 AM. |
-| **Curator** | `🧹 Librarian` | **Memory Health** | Cleans, tags, and archives incident lessons into the vector store. |
+```mermaid
+graph LR
+    A[🕵️ Scout] --> B[⚡ CAG]
+    B -- Cache Hit --> D[🛡️ Guardrail]
+    B -- Cache Miss --> C[🧠 Brain]
+    C --> D
+    D -- ALLOW --> E[🛠️ Fixer]
+    D -- BLOCK --> F[🤖 Jules]
+    E --> F
+    F --> G[🧹 Curator]
+    G --> END((STABLE))
 
----
-
-## 🧠 Advanced AIOps Tech Stack
-
-| Layer | Technology | Usage |
-| :--- | :--- | :--- |
-| **LLM Engine** | **OpenAI GPT-4o-mini** | Powers the Brain's reasoning and Jules' refactoring suggestions. |
-| **Agent Logic** | **LangGraph / LangChain** | Manages the cyclic, state-aware agent workflow. |
-| **Observability**| **OpenTelemetry / Jaeger**| The source of truth for all system traces and performance spans. |
-| **Memory (RAG)** | **ChromaDB** | High-performance vector store for historical remediation lookup. |
-| **Backend** | **FastAPI / Uvicorn** | Lean, high-speed Python server with SSE real-time log streaming. |
-| **Infrastructure**| **Docker / Vercel** | Hybrid deployment model for telemetry (Docker) and Control Plane (Vercel). |
+    style B fill:#f59e0b,color:#000
+    style D fill:#ef4444,color:#fff
+    style G fill:#06b6d4,color:#fff
+```
 
 ---
 
-## 🏗️ Architectural Hardening: The Jules Standard
+## 🧠 Diagram 3: Agentic RAG & Memory Curation
 
-**Jules** operates as our **Tier-3 Architectural Authority**. Unlike the Fixer, Jules does not care about MTTR (Recovery); Jules cares about MTBF (Reliability).
-*   **Trigger**: Only chronic, systemic failures.
-*   **Action**: Design flaw elimination (e.g., Query optimization, Adaptive concurrency limits).
-*   **Schedule**: Performs a full-cluster architectural review every morning at **09:30 AM GMT+5:30**.
+SRE-Space implements a **Tiered Memory Layer** to ensure the system never fixes the same bug twice. We use semantic similarity to bridge the gap between "Raw Logs" and "Actionable Knowledge."
+
+```mermaid
+sequenceDiagram
+    participant B as Brain Agent
+    participant C as ChromaDB (Memory)
+    participant J as Jules Agent
+    participant MC as Memory Curator
+
+    Note over B,C: Incident Occurs
+    B->>C: Query for similar Error Signatures
+    C-->>B: Return Top 3 Remediation Plans
+    Note over B: Score Confidence (Sim + Success + Recency)
+    
+    Note over J,MC: Post-Fix Hardening
+    J->>MC: Evaluation: Was the fix successful?
+    MC->>C: Archive: Merge/Store High-Signal Lesson
+```
 
 ---
 
-## 📚 Agentic RAG: "The Immune System"
+## 🏛️ Diagram 4: Jules Tier-3 Architectural Authority
 
-We solve the "Search Space" problem by treating historical incidents as a searchable memory.
-1. **Scoring**: Every RAG result is scored: `(0.4*Sim) + (0.3*Success) + (0.2*Recency) + (0.1*Infra)`.
-2. **Confidence**: Remediation is only allowed if the **Confidence Score > 0.75**.
-3. **Curation**: The **Curator Agent** ensures the memory doesn't get "cluttered," merging and deprecating old runbooks.
+**Jules** operates as the "Senior Architect" of the squad. While other agents fight fires, Jules eliminates the arsonist by redesigning the system architecture.
+
+```mermaid
+graph TD
+    Trigger{Systemic Failure?}
+    Trigger -- No --> Idle[Nominal Monitoring]
+    Trigger -- Yes --> Analyze[Deep Code Refactor]
+    
+    subgraph "Architectural Optimization"
+        Analyze --> CB[Circuit Breaker Injection]
+        Analyze --> QO[Query Optimization]
+        Analyze --> ACL[Adaptive Concurrency Limits]
+    end
+
+    CB & QO & ACL --> Review[Daily Review @ 09:30 AM]
+```
 
 ---
 
-## 🚀 Deployment & Activation
+## 🤖 The Squad: Technical Authority Matrix
 
-### 1. The Body (Docker)
-Set up the sensors and memory:
+| Agent | Icon | Module | Mission | Authority |
+| :--- | :---: | :--- | :--- | :--- |
+| **Scout** | 🕵️ | `scout.py` | Detection | Monitors OTel spans for failures/latency. |
+| **CAG** | ⚡ | `cag.py` | Latency | Tier-1 Flash Cache for FAQ-style incidents. |
+| **Brain** | 🧠 | `brain.py` | Diagnosis | RCA using OpenAI GPT-4o-mini & ChromaDB. |
+| **Guardrail**| 🛡️ | `guardrail.py` | Safety | Enforces policy & confidence scores > 0.75. |
+| **Fixer** | 🛠️ | `fixer.py` | Recovery | Executes code patches and resource scaling. |
+| **Jules** | 🤖 | `jules.py` | Hardening | Tier-3 authority for deep system refactors. |
+| **Curator** | 🧹 | `curator.py` | Memory | Cleans and tags Knowledge into Vector store. |
+
+---
+
+## ⚡ Technical Stack & Tooling
+
+*   **Logic Engine**: LangGraph (Stateful, Multi-Agent Orchestration).
+*   **LLM Power**: OpenAI GPT-4o-mini (Reasoning & Refactoring).
+*   **Observability**: OpenTelemetry (OTLP) + Jaeger (Distributed Tracing).
+*   **Vector Database**: ChromaDB (Incident Signature Memory).
+*   **Nervous System**: Kafka (Real-time Event Streaming).
+*   **Web Framework**: FastAPI (Asynchronous logic with SSE streaming).
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisite: The Body (Docker)
+Initialize the infrastructure that provides the sensors and memory:
 ```bash
 docker-compose up -d
 ```
 
-### 2. The Mind (Python)
-Install dependencies and launch the engine:
+### 2. Prerequisite: The Mind (Python)
+Install the logic dependencies and start the Control Plane:
 ```bash
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 
-### 3. The Test (Chaos Lab)
-Click **"Inject Chaos"** on the dashboard and watch the **Squad Terminal** work through the 7-node loop in real-time.
+### 3. Verification: The Chaos Lab
+Click **"Inject Chaos"** on the [Dashboard](http://localhost:8000). Monitor the **7-Agent Console** to see the system traverse from detection via Scout to long-term memory archiving via Curator.
 
 ---
 
-## ☁️ Cloud Sync
-The dashboard is synced and deployed continuously to Vercel. 
-**URL**: [https://sre-space-cp.vercel.app/](https://sre-space-cp.vercel.app/)
+## ☁️ Deployment
+The Control Plane is continuously deployed via Vercel.
+**Live Hub**: [https://sre-space-cp.vercel.app/](https://sre-space-cp.vercel.app/)
+
+---
 
 > "Monitoring tells you that you have a problem. SRE-Space makes sure you don't have it again." 🌌
