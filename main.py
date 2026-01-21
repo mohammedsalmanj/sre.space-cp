@@ -22,9 +22,9 @@ async def get_dashboard(request: Request):
 async def sre_loop_stream(anomaly: bool = False):
     async def event_generator():
         result = await run_sre_loop(is_anomaly=anomaly)
+        # OPTIMIZATION: Removed artificial 0.4s delay to stream results faster
         for log in result["logs"]:
             yield f"data: {json.dumps({'message': log})}\n\n"
-            await asyncio.sleep(0.4)
         yield f"data: {json.dumps({'message': '--- END OF LOOP ---', 'final_state': result['status']})}\n\n"
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
