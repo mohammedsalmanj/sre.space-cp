@@ -1,6 +1,11 @@
 from typing import TypedDict, List, Dict, Any, Literal
 from langgraph.graph import StateGraph, END
 import os
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Import Agents from the Agents package
 from agents.scout import scout_agent
@@ -63,8 +68,12 @@ def create_sre_graph():
     
     return workflow.compile()
 
+# Compile the graph once when the module is loaded, avoiding redundant compilations.
+logger.info("⚡ Bolt: Compiling SRE graph once at startup...")
+SRE_GRAPH_APP = create_sre_graph()
+
 async def run_sre_loop(is_anomaly: bool = False):
-    graph = create_sre_graph()
+    graph = SRE_GRAPH_APP # Use the cached graph, not create_sre_graph()
     initial_state = {
         "error_spans": [], "root_cause": "", "remediation": "", "circuit_breaker_active": False,
         "status": "Starting", "logs": [], "is_anomaly": is_anomaly, "historical_context": "",
