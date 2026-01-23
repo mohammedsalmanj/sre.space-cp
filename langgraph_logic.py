@@ -1,6 +1,10 @@
 from typing import TypedDict, List, Dict, Any, Literal
 from langgraph.graph import StateGraph, END
 import os
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 # Import Agents from the Agents package
 from agents.scout import scout_agent
@@ -11,6 +15,9 @@ from agents.fixer import fixer_agent
 from agents.jules import jules_agent
 from agents.curator import curator_agent
 from agents.human import human_agent
+
+# --- Global cache for the compiled graph ---
+_sre_graph_compiled = None
 
 # --- State Definition ---
 class SREState(TypedDict):
@@ -34,6 +41,11 @@ class SREState(TypedDict):
 
 # --- Graph Logic ---
 def create_sre_graph():
+    global _sre_graph_compiled
+    if _sre_graph_compiled:
+        return _sre_graph_compiled
+
+    logging.info("--- Compiling SRE Graph (one-time operation) ---")
     workflow = StateGraph(SREState)
     
     # Add Nodes from Imported Agents
@@ -61,7 +73,8 @@ def create_sre_graph():
     workflow.add_edge("jules", "curator")
     workflow.add_edge("curator", END)
     
-    return workflow.compile()
+    _sre_graph_compiled = workflow.compile()
+    return _sre_graph_compiled
 
 async def run_sre_loop(is_anomaly: bool = False):
     graph = create_sre_graph()
