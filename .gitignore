@@ -40,3 +40,4 @@ Thumbs.db
 outputs/
 remediations/*.json
 !remediations/.gitkeep
+*.log
