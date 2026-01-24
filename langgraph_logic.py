@@ -2,6 +2,9 @@ from typing import TypedDict, List, Dict, Any, Literal
 from langgraph.graph import StateGraph, END
 import os
 
+# --- Compiled Graph Cache ---
+_sre_graph_compiled = None
+
 # Import Agents from the Agents package
 from agents.scout import scout_agent
 from agents.cag import cag_agent
@@ -63,8 +66,15 @@ def create_sre_graph():
     
     return workflow.compile()
 
+def get_sre_graph():
+    """Returns a compiled instance of the SRE graph, cached for performance."""
+    global _sre_graph_compiled
+    if _sre_graph_compiled is None:
+        _sre_graph_compiled = create_sre_graph()
+    return _sre_graph_compiled
+
 async def run_sre_loop(is_anomaly: bool = False):
-    graph = create_sre_graph()
+    graph = get_sre_graph()
     initial_state = {
         "error_spans": [], "root_cause": "", "remediation": "", "circuit_breaker_active": False,
         "status": "Starting", "logs": [], "is_anomaly": is_anomaly, "historical_context": "",
