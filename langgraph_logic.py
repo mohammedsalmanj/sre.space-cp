@@ -63,8 +63,16 @@ def create_sre_graph():
     
     return workflow.compile()
 
+# --- Cached Graph Instance ---
+_cached_sre_graph = None
+
 async def run_sre_loop(is_anomaly: bool = False):
-    graph = create_sre_graph()
+    global _cached_sre_graph
+    if _cached_sre_graph is None:
+        print("⚡ Compiling SRE graph for the first time. This should only happen once.")
+        _cached_sre_graph = create_sre_graph()
+
+    graph = _cached_sre_graph
     initial_state = {
         "error_spans": [], "root_cause": "", "remediation": "", "circuit_breaker_active": False,
         "status": "Starting", "logs": [], "is_anomaly": is_anomaly, "historical_context": "",
