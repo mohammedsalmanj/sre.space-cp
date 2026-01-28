@@ -63,8 +63,12 @@ def create_sre_graph():
     
     return workflow.compile()
 
+# --- Cached Graph ---
+# Compile the graph once at module load time to avoid re-compilation on every request.
+# This is a significant performance optimization.
+sre_graph = create_sre_graph()
+
 async def run_sre_loop(is_anomaly: bool = False):
-    graph = create_sre_graph()
     initial_state = {
         "error_spans": [], "root_cause": "", "remediation": "", "circuit_breaker_active": False,
         "status": "Starting", "logs": [], "is_anomaly": is_anomaly, "historical_context": "",
@@ -76,4 +80,4 @@ async def run_sre_loop(is_anomaly: bool = False):
     if is_anomaly:
         initial_state["anomaly_frequency"] = 4 
 
-    return await graph.ainvoke(initial_state)
+    return await sre_graph.ainvoke(initial_state)
