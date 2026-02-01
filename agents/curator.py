@@ -1,17 +1,17 @@
 from datetime import datetime
 import random
-import chromadb
+from agents.brain import get_memory_collection
 
 def curator_agent(state):
     """Agent: Memory Curator (Memory Lifecycle)"""
     logs = state.get("logs", [])
-    if state["decision"] != "ALLOW" or state["cache_hit"]: return state
+    if state["decision"] != "ALLOW" or state["cache_hit"]:
+        return state
 
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧹 Curator: Incident unique. 📚 Archiving Knowledge into ChromaDB.")
     
     try:
-        client = chromadb.HttpClient(host='localhost', port=8000)
-        collection = client.get_or_create_collection(name="sre_incident_memory")
+        collection = get_memory_collection()
         if collection:
             doc_id = f"inc-{random.randint(1000, 9999)}"
             collection.add(
@@ -19,7 +19,7 @@ def curator_agent(state):
                 ids=[doc_id]
             )
             logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧹 Curator: Indexing complete ID: {doc_id}")
-    except:
+    except Exception:
         logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧹 Curator: Memory Layer unreachable.")
 
     state["status"] = "Stable"
