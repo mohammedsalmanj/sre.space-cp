@@ -3,19 +3,34 @@ import chromadb
 import os
 from openai import OpenAI
 
+# --- Shared ChromaDB Resources ---
+# Optimization: Reuse the HttpClient and Collection instance to avoid redundant connection overhead (~44ms).
+_CHROMA_CLIENT = None
+_MEMORY_COLLECTION = None
+
 def get_memory_collection():
+    global _CHROMA_CLIENT, _MEMORY_COLLECTION
     try:
-        host = os.getenv('CHROMA_DB_HOST', 'localhost')
-        port = int(os.getenv('CHROMA_DB_PORT', 8000))
-        client = chromadb.HttpClient(host=host, port=port)
-        return client.get_or_create_collection(name="sre_incident_memory")
-    except Exception as e:
+        if _CHROMA_CLIENT is None:
+            host = os.getenv('CHROMA_DB_HOST', 'localhost')
+            port = int(os.getenv('CHROMA_DB_PORT', 8000))
+            _CHROMA_CLIENT = chromadb.HttpClient(host=host, port=port)
+
+        if _MEMORY_COLLECTION is None:
+            _MEMORY_COLLECTION = _CHROMA_CLIENT.get_or_create_collection(name="sre_incident_memory")
+
+        return _MEMORY_COLLECTION
+    except Exception:
+        # Reset on failure to allow retry next time
+        _CHROMA_CLIENT = None
+        _MEMORY_COLLECTION = None
         return None
 
 def brain_agent(state):
     """Agent: Brain (RAG + OpenAI Reasoning)"""
     logs = state.get("logs", [])
-    if state.get("cache_hit") or not state["error_spans"]: return state
+    if state.get("cache_hit") or not state["error_spans"]:
+        return state
 
     msg = state["error_spans"][0]["exception.message"]
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: Consulting RAG Memory for '{msg}'")
@@ -32,7 +47,7 @@ def brain_agent(state):
                 state["remediation"] = results['metadatas'][0][0].get('solution', "Apply standard patch.")
                 logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: RAG match found (Conf: 0.88)")
                 rag_hit = True
-        except:
+        except Exception:
             logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: RAG query failed, escalating to LLM.")
 
     # 2. Use OpenAI Wisely (only if RAG fails or confidence is low)
