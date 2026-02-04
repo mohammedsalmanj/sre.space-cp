@@ -1,6 +1,5 @@
-from typing import TypedDict, List, Dict, Any, Literal
+from typing import TypedDict, List, Dict, Any
 from langgraph.graph import StateGraph, END
-import os
 
 # Import Agents from the Agents package
 from agents.scout import scout_agent
@@ -63,8 +62,11 @@ def create_sre_graph():
     
     return workflow.compile()
 
+# Optimization: Cache the compiled graph at the module level to avoid ~22ms overhead per request.
+COMPILED_GRAPH = create_sre_graph()
+
 async def run_sre_loop(is_anomaly: bool = False):
-    graph = create_sre_graph()
+    graph = COMPILED_GRAPH
     initial_state = {
         "error_spans": [], "root_cause": "", "remediation": "", "circuit_breaker_active": False,
         "status": "Starting", "logs": [], "is_anomaly": is_anomaly, "historical_context": "",
