@@ -1,1 +1,0 @@
-# SRE-Space Shared Package

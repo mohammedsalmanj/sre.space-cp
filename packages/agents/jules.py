@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 import random
-from shared.git_utils import generate_sre_pr_title
+from packages.shared.git_utils import generate_sre_pr_title
 
 def jules_agent(state):
     """
@@ -36,7 +36,7 @@ def jules_agent(state):
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: Design integrity restored.")
     
     # Real GitHub Integration
-    from shared.github_service import GitHubService
+    from packages.shared.github_service import GitHubService
     gh = GitHubService()
     
     pr_title = generate_sre_pr_title(state.get('service', 'system'), "architectural-refactor")
@@ -66,5 +66,4 @@ def jules_agent(state):
     state["logs"] = logs
     return state
 
-# Helper for random selection (simulated)
-import random
+# Helper logic complete.

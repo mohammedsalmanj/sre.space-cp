@@ -1,5 +1,5 @@
 from datetime import datetime
-from shared.git_utils import generate_sre_commit_message
+from packages.shared.git_utils import generate_sre_commit_message
 
 def fixer_agent(state):
     """Agent: Fixer (Execution)"""
@@ -17,7 +17,7 @@ def fixer_agent(state):
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🛠️ Fixer: Commit Prepared -> {commit_msg.splitlines()[0]}")
     
     # Real GitHub Integration
-    from shared.github_service import GitHubService
+    from packages.shared.github_service import GitHubService
     gh = GitHubService()
     issue_title = f"🛠️ [PATCH-DEPLOYED] {state.get('service', 'System')} - {state.get('remediation', 'Standard Patch')}"
     issue_body = f"""

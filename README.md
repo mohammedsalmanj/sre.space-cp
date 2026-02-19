@@ -57,14 +57,14 @@ We have modularized intelligence into specialized roles, each with a specific te
 
 | Agent | Module | Mission | Authority |
 | :--- | :--- | :--- | :--- |
-| **🕵️ Scout** | `scout.py` | Detection | Polls OTel traces for latency spikes and 5xx errors. |
-| **⚡ CAG** | `cag.py` | Tier-1 Fix | Checks "Fast Cache" for instant FAQ-style remediations. |
-| **🧠 Brain** | `brain.py` | RCA | Deep reasoning via RAG + OpenAI for complex failures. |
-| **🛡️ Guardrail**| `guardrail.py`| Safety | Blocks non-compliant or low-confidence actions. |
-| **🛠️ Fixer** | `fixer.py` | Execution | Standardized GitOps commits & Docker patch deployment. |
-| **🤖 Jules** | `jules.py` | Hardening | Tier-3 Arch Authority for code-level design refactors. |
-| **🧹 Curator** | `curator.py` | Memory | Tags and compresses postmortems into ChromaDB. |
-| **🚨 Human** | `human.py` | HITL | Triggers email alerts if an issue repeats > 3 times. |
+| **🕵️ Scout** | `packages/agents/scout.py` | Detection | Polls OTel traces for latency spikes and 5xx errors. |
+| **⚡ CAG** | `packages/agents/cag.py` | Tier-1 Fix | Checks "Fast Cache" for instant FAQ-style remediations. |
+| **🧠 Brain** | `packages/agents/brain.py` | RCA | Deep reasoning via RAG + OpenAI for complex failures. |
+| **🛡️ Guardrail**| `packages/agents/guardrail.py`| Safety | Blocks non-compliant or low-confidence actions. |
+| **🛠️ Fixer** | `packages/agents/fixer.py` | Execution | Standardized GitOps commits & Docker patch deployment. |
+| **🤖 Jules** | `packages/agents/jules.py` | Hardening | Tier-3 Arch Authority for code-level design refactors. |
+| **🧹 Curator** | `packages/agents/curator.py` | Memory | Tags and compresses postmortems into ChromaDB. |
+| **🚨 Human** | `packages/agents/human.py` | HITL | Triggers email alerts if an issue repeats > 3 times. |
 
 ---
 
@@ -86,22 +86,40 @@ Autonomous systems require trust. SRE-Space implements three layers of protectio
 
 ---
 
+## 🏛️ Monorepo Architecture
+SRE-Space is organized as a unified monorepo for maximum traceability and component reuse.
+
+- **`apps/`**: Deployable services.
+  - `control-plane/`: The LangGraph squad engine and core API.
+  - `dashboard/`: Frontend visualization for SRE operations.
+  - `websocket-bridge/`: Real-time telemetry stream handler.
+- **`packages/`**: Shared logic and libraries.
+  - `agents/`: The 8-agent squad logic.
+  - `shared/`: Common GitOps and connectivity utilities.
+- **`infra/`**: Infrastructure-as-Code (Docker Compose, OTel configuration).
+- **`scripts/`**: Automation, verification, and chaos testing utilities.
+
+---
+
 ## ⚡ Getting Started (Pro Mode)
 
-### 1. Simple Configuration
-Create your `.env` file based on `.env.example` and add your essential credentials (GitHub Token, OpenAI Key, etc.) as required.
-
-### 2. Launch Infrastructure
+### 1. Launch Infrastructure
 Start the sensors, event bus, and memory:
 ```bash
 docker-compose up -d
 ```
 
-### 3. Start the Brain
-Run the Control Plane:
+### 2. Start the Control Plane
 ```bash
 pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
+python apps/control-plane/main.py
+```
+
+### 3. Verify & Try Chaos
+Confirm the stack is healthy and trigger a self-healing loop:
+```bash
+python scripts/verify_sre_stack.py
+python scripts/verify_loop.py
 ```
 
 ---

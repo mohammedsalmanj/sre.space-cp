@@ -5,10 +5,14 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy everything from root
 COPY . .
 
-# Expose all potential ports
-EXPOSE 8001 8002 8003
+# Set PYTHONPATH to include the root for packages
+ENV PYTHONPATH=/app
 
-# Default command (can be overridden)
-CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+# Expose ports
+EXPOSE 8001
+
+# Default command
+CMD ["python", "apps/control-plane/main.py"]

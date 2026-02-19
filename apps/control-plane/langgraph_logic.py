@@ -2,15 +2,20 @@ from typing import TypedDict, List, Dict, Any, Literal
 from langgraph.graph import StateGraph, END
 import os
 
-# Import Agents from the Agents package
-from agents.scout import scout_agent
-from agents.cag import cag_agent
-from agents.brain import brain_agent
-from agents.guardrail import guardrail_agent
-from agents.fixer import fixer_agent
-from agents.jules import jules_agent
-from agents.curator import curator_agent
-from agents.human import human_agent
+import sys
+import os
+# Add project root to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
+
+# Import Agents from the packages/agents
+from packages.agents.scout import scout_agent
+from packages.agents.cag import cag_agent
+from packages.agents.brain import brain_agent
+from packages.agents.guardrail import guardrail_agent
+from packages.agents.fixer import fixer_agent
+from packages.agents.jules import jules_agent
+from packages.agents.curator import curator_agent
+from packages.agents.human import human_agent
 
 # --- State Definition ---
 class SREState(TypedDict):

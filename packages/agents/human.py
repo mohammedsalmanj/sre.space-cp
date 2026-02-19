@@ -14,8 +14,8 @@ def human_agent(state):
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🚨 Reason: Issue detected {frequency} times in the last hour.")
     
     # Send Email Notification
-    from shared.notifications import send_sre_alert
-    from shared.github_service import GitHubService
+    from packages.shared.notifications import send_sre_alert
+    from packages.shared.github_service import GitHubService
     
     gh = GitHubService()
     issue_title = f"🚨 [HUMAN-REQUIRED] {state.get('service', 'System')} - Repeated Anomaly Detected"

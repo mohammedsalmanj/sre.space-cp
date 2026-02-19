@@ -4,7 +4,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import requests
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), "../.env"))
 
 def verify_stack():
     results = {}
