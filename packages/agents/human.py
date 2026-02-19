@@ -16,19 +16,11 @@ def human_agent(state):
     # Send Email Notification
     from packages.shared.notifications import send_sre_alert
     from packages.shared.github_service import GitHubService
+    from packages.shared.reporting import format_human_escalation
     
     gh = GitHubService()
     issue_title = f"🚨 [HUMAN-REQUIRED] {state.get('service', 'System')} - Repeated Anomaly Detected"
-    issue_body = f"""
-### 🚨 SRE Engine Escalatation
-**Reason:** Issue detected {frequency} times in the last hour.
-**Service:** {state.get('service')}
-**Namespace:** {state.get('namespace')}
-**Root Cause:** {state.get('root_cause')}
-**Status:** AUTO-REMEDIATION PAUSED.
-
-*This issue was automatically created by the SRE-Space Engine.*
-"""
+    issue_body = format_human_escalation(state)
     gh_res = gh.create_issue(title=issue_title, body=issue_body, labels=["critical", "human-needed"])
     
     if "number" in gh_res:
