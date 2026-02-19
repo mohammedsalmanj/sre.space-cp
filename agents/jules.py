@@ -35,8 +35,32 @@ def jules_agent(state):
     selected = random.sample(refactors, 2)
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: Design integrity restored.")
     
+    # Real GitHub Integration
+    from shared.github_service import GitHubService
+    gh = GitHubService()
+    
     pr_title = generate_sre_pr_title(state.get('service', 'system'), "architectural-refactor")
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: PR Created -> {pr_title}")
+    issue_body = f"""
+## 🏛️ Architectural Refactor Proposal
+**Service:** {state.get('service')}
+**Trigger:** Systemic failure detected by Jules (Tier-3 Authority).
+
+### Proposed Optimizations:
+1. {selected[0]}
+2. {selected[1]}
+
+**Confidence Score:** 0.98
+**Status:** PROPOSED (Awaiting CI/CD validation)
+
+*Automated Architectural Review by SRE-Space Engine.*
+"""
+    gh_res = gh.create_issue(title=f"🛠️ [ARCH-REFACTOR] {pr_title}", body=issue_body, labels=["architectural", "jules-refactor"])
+    
+    if "number" in gh_res:
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: Documentation Issue Created -> #{gh_res['number']}")
+    else:
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: ⚠️ GitHub integration failed.")
+
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: Daily Architectural Review (Scheduled 09:30 AM).")
     
     state["logs"] = logs

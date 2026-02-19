@@ -18,6 +18,16 @@ templates = Jinja2Templates(directory="templates")
 async def get_dashboard(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+@app.get("/quote")
+async def get_quote(user_id: str = "unknown"):
+    """Mock Quote Service endpoint for chaos testing."""
+    import random
+    # Simulate random failure
+    if random.random() < 0.2 or user_id == "attacker":
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail="Database connection pool exhausted")
+    return {"quote_id": f"Q-{random.randint(1000, 9999)}", "price": random.randint(100, 500), "status": "success"}
+
 @app.get("/api/sre-loop")
 async def sre_loop_stream(anomaly: bool = False):
     async def event_generator():
@@ -42,4 +52,4 @@ async def startup_event():
     asyncio.create_task(schedule_jules_daily_scan())
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

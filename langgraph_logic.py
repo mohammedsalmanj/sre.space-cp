@@ -74,6 +74,6 @@ async def run_sre_loop(is_anomaly: bool = False):
     
     # Simulate a frequency surge for testing if anomaly is true
     if is_anomaly:
-        initial_state["anomaly_frequency"] = 4 
+        initial_state["anomaly_frequency"] = 1 # Lowered for full loop testing
 
     return await graph.ainvoke(initial_state)
