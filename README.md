@@ -90,9 +90,9 @@ Autonomous systems require trust. SRE-Space implements three layers of protectio
 SRE-Space is organized as a unified monorepo for maximum traceability and component reuse.
 
 - **`apps/`**: Deployable services.
-  - `control-plane/`: The LangGraph squad engine and core API.
+  - `control_plane/`: The LangGraph squad engine and core API.
   - `dashboard/`: Frontend visualization for SRE operations.
-  - `websocket-bridge/`: Real-time telemetry stream handler.
+  - `websocket_bridge/`: Real-time telemetry stream handler.
 - **`packages/`**: Shared logic and libraries.
   - `agents/`: The 8-agent squad logic.
   - `shared/`: Common GitOps and connectivity utilities.
@@ -112,7 +112,7 @@ docker-compose up -d
 ### 2. Start the Control Plane
 ```bash
 pip install -r requirements.txt
-python apps/control-plane/main.py
+python apps/control_plane/main.py
 ```
 
 ### 3. Verify & Try Chaos
