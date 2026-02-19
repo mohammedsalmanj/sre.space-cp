@@ -13,7 +13,6 @@ from packages.agents.cag import cag_agent
 from packages.agents.brain import brain_agent
 from packages.agents.guardrail import guardrail_agent
 from packages.agents.fixer import fixer_agent
-from packages.agents.jules import jules_agent
 from packages.agents.curator import curator_agent
 from packages.agents.human import human_agent
 
@@ -48,7 +47,6 @@ def create_sre_graph():
     workflow.add_node("brain", brain_agent)
     workflow.add_node("guardrail", guardrail_agent)
     workflow.add_node("fixer", fixer_agent)
-    workflow.add_node("jules", jules_agent)
     workflow.add_node("curator", curator_agent)
     workflow.add_node("human", human_agent)
     
@@ -60,11 +58,11 @@ def create_sre_graph():
     
     workflow.add_conditional_edges("cag", lambda s: "guardrail" if s["cache_hit"] else "brain")
     workflow.add_edge("brain", "guardrail")
-    workflow.add_conditional_edges("guardrail", lambda s: "fixer" if s["decision"] == "ALLOW" else "jules")
+    workflow.add_conditional_edges("guardrail", lambda s: "fixer" if s["decision"] == "ALLOW" else "human")
     
     workflow.add_edge("human", "curator")
-    workflow.add_edge("fixer", "jules")
-    workflow.add_edge("jules", "curator")
+    workflow.add_edge("fixer", "curator")
+    # workflow.add_edge("jules", "curator") # Removed jules edge
     workflow.add_edge("curator", END)
     
     return workflow.compile()

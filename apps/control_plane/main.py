@@ -15,6 +15,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 from apps.control_plane.langgraph_logic import run_sre_loop
+from packages.agents.jules import jules_agent
 
 app = FastAPI(title="Insurance Platform | Autonomous Reliability Engine v3.0")
 # Update templates path to be relative to the file location
@@ -48,10 +49,16 @@ async def sre_loop_stream(anomaly: bool = False):
 async def schedule_jules_daily_scan():
     """Simulates Jules running at 09:30 AM GMT+5:30"""
     while True:
-        # In a real app, use a proper scheduler like APScheduler
-        # Here we just log the presence of the Tier-3 Authority
-        print(f"[SYSTEM] Jules Tier-3 Review Service: Waiting for 09:30 AM GMT+5:30 window...")
-        await asyncio.sleep(3600) # Check every hour
+        # In a real app, use a proper scheduler like APScheduler or check datetime
+        print(f"[SYSTEM] Jules Tier-3 Review Service: Initiating scheduled job...")
+        try:
+            jules_agent() # Run the daily architect job
+        except Exception as e:
+            print(f"[SYSTEM] Jules Job Failed: {str(e)}")
+        
+        # Wait for the next 24h window (simulated as 1 hour for testing or just long sleep)
+        print(f"[SYSTEM] Jules Tier-3 Review Service: Task complete. Sleeping for next window...")
+        await asyncio.sleep(3600) 
 
 @app.on_event("startup")
 async def startup_event():
