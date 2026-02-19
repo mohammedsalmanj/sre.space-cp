@@ -14,9 +14,9 @@ class GitHubService:
         }
 
     def create_issue(self, title, body, labels=None):
-        print(f"🚀 [GitHubService] Creating issue: {title}")
+        print(f"[GitHubService] Creating issue: {title}")
         if not self.token:
-            print("❌ [GitHubService] No token found")
+            print("[GitHubService] No token found")
             return {"error": "No token found"}
         
         url = f"{self.base_url}/repos/{self.owner}/{self.repo}/issues"
@@ -27,14 +27,14 @@ class GitHubService:
         }
         try:
             response = requests.post(url, headers=self.headers, json=data, timeout=30)
-            print(f"📡 [GitHubService] Response: {response.status_code}")
+            print(f"[GitHubService] Response: {response.status_code}")
             return response.json()
         except Exception as e:
-            print(f"❌ [GitHubService] Request failed: {str(e)}")
+            print(f"[GitHubService] Request failed: {str(e)}")
             return {"error": str(e)}
 
     def create_pr(self, title, head, base="main", body=""):
-        print(f"🚀 [GitHubService] Creating PR: {title}")
+        print(f"[GitHubService] Creating PR: {title}")
         if not self.token:
             return {"error": "No token found"}
         

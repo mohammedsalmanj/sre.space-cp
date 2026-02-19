@@ -1,23 +1,25 @@
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
-import asyncio
 import os
-import json
+import requests
+from dotenv import load_dotenv
 
-async def main():
+load_dotenv()
+
+def list_recent_issues():
     token = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN")
-    server_params = StdioServerParameters(
-        command='mcp-server-github', 
-        args=[], 
-        env={**os.environ, 'GITHUB_PERSONAL_ACCESS_TOKEN': token}
-    )
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            res = await session.call_tool('list_issues', arguments={'owner': 'mohammedsalmanj', 'repo': 'sre.space-cp', 'state': 'all'})
-            issues = json.loads(res.content[0].text)
-            for iss in issues:
-                print(f"#{iss['number']} - {iss['state']} - {iss['title']}")
+    owner = "mohammedsalmanj"
+    repo = "sre.space-cp"
+    url = f"https://api.github.com/repos/{owner}/{repo}/issues"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    res = requests.get(url, headers=headers, params={"state": "open", "per_page": 5})
+    if res.status_code == 200:
+        issues = res.json()
+        for issue in issues:
+            print(f"#{issue['number']}: {issue['title']}")
+    else:
+        print(f"Failed: {res.status_code} - {res.text}")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    list_recent_issues()
