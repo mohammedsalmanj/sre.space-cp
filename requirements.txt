@@ -6,3 +6,5 @@ langchain-core
 opentelemetry-api
 chromadb
 python-dotenv
+openai
+requests
