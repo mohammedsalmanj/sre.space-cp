@@ -10,8 +10,8 @@ def human_agent(state):
     logs = state.get("logs", [])
     frequency = state.get("anomaly_frequency", 0)
     
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🚨 HUMAN INTERVENTION TRIGGERED!")
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🚨 Reason: Issue detected {frequency} times in the last hour.")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] HUMAN INTERVENTION TRIGGERED!")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] Reason: Issue detected {frequency} times in the last hour.")
     
     # Send Email Notification
     from packages.shared.notifications import send_sre_alert
@@ -19,14 +19,14 @@ def human_agent(state):
     from packages.shared.reporting import format_human_escalation
     
     gh = GitHubService()
-    issue_title = f"🚨 [HUMAN-REQUIRED] {state.get('service', 'System')} - Repeated Anomaly Detected"
+    issue_title = f"[HUMAN-REQUIRED] {state.get('service', 'System')} - Repeated Anomaly Detected"
     issue_body = format_human_escalation(state)
     gh_res = gh.create_issue(title=issue_title, body=issue_body, labels=["critical", "human-needed"])
     
     if "number" in gh_res:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🐙 GitHub Issue Created: #{gh_res['number']}")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] GitHub Issue Created: #{gh_res['number']}")
     else:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] ⚠️ Failed to create GitHub Issue.")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] Warning: Failed to create GitHub Issue.")
 
     success = send_sre_alert(
         subject=f"CRITICAL: Repeated SRE Anomaly in {state.get('service', 'Unknown Service')}",
@@ -34,7 +34,7 @@ def human_agent(state):
     )
     
     if success:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 📧 Alert triggered for mohammedsalmanj@outlook.com")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] Alert triggered for mohammedsalmanj@outlook.com")
     
     state["logs"] = logs
     state["status"] = "Awaiting Human"

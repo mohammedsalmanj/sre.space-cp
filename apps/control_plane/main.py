@@ -14,11 +14,11 @@ import os
 # Add project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-from langgraph_logic import run_sre_loop
+from apps.control_plane.langgraph_logic import run_sre_loop
 
 app = FastAPI(title="Insurance Platform | Autonomous Reliability Engine v3.0")
 # Update templates path to be relative to the file location
-templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
+templates = Jinja2Templates(directory=os.path.dirname(__file__))
 
 @app.get("/", response_class=HTMLResponse)
 async def get_dashboard(request: Request):

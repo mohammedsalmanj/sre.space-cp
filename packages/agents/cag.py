@@ -13,7 +13,7 @@ def cag_agent(state):
     logs = state.get("logs", [])
     if not state["error_spans"]: return state
 
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] ⚡ CAG: Checking Tier-1 Fast Cache for incident FAQ...")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] Checking Tier-1 Fast Cache for incident FAQ...")
     msg = state["error_spans"][0]["exception.message"]
     
     if msg in CAG_FAST_CACHE:
@@ -22,10 +22,10 @@ def cag_agent(state):
         state["remediation"] = known["remediation"]
         state["confidence_score"] = known["confidence"]
         state["cache_hit"] = True
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] ⚡ CAG: INSTANT-HIT. Known incident signature.")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] INSTANT-HIT. Known incident signature.")
     else:
         state["cache_hit"] = False
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] ⚡ CAG: Cache Miss. Escalating to Brain...")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] Cache Miss. Escalating to Brain...")
 
     state["logs"] = logs
     return state

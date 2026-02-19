@@ -7,7 +7,7 @@ def curator_agent(state):
     logs = state.get("logs", [])
     if state["decision"] != "ALLOW" or state["cache_hit"]: return state
 
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧹 Curator: Incident unique. 📚 Archiving Knowledge into ChromaDB.")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] Incident unique. Archiving Knowledge into ChromaDB.")
     
     try:
         client = chromadb.HttpClient(host='localhost', port=8000)
@@ -18,9 +18,9 @@ def curator_agent(state):
                 documents=[f"Issue: {state['root_cause']} | Fix: {state['remediation']}"],
                 ids=[doc_id]
             )
-            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧹 Curator: Indexing complete ID: {doc_id}")
+            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] Indexing complete ID: {doc_id}")
     except:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧹 Curator: Memory Layer unreachable.")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] Memory Layer unreachable.")
 
     state["status"] = "Stable"
     state["logs"] = logs

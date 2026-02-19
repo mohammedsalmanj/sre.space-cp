@@ -15,4 +15,4 @@ ENV PYTHONPATH=/app
 EXPOSE 8001
 
 # Default command
-CMD ["python", "apps/control-plane/main.py"]
+CMD ["python", "apps/control_plane/main.py"]

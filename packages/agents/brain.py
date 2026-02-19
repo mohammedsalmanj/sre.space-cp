@@ -18,7 +18,7 @@ def brain_agent(state):
     if state.get("cache_hit") or not state["error_spans"]: return state
 
     msg = state["error_spans"][0]["exception.message"]
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: Consulting RAG Memory for '{msg}'")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] Consulting RAG Memory for '{msg}'")
 
     # 1. Try RAG first (Fast/Cheap)
     collection = get_memory_collection()
@@ -30,17 +30,17 @@ def brain_agent(state):
                 state["confidence_score"] = 0.88 
                 state["root_cause"] = "Identified via historical match."
                 state["remediation"] = results['metadatas'][0][0].get('solution', "Apply standard patch.")
-                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: RAG match found (Conf: 0.88)")
+                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] RAG match found (Conf: 0.88)")
                 rag_hit = True
         except:
-            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: RAG query failed, escalating to LLM.")
+            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] RAG query failed, escalating to LLM.")
 
     # 2. Use OpenAI Wisely (only if RAG fails or confidence is low)
     if not rag_hit:
         api_key = os.getenv("OPENAI_API_KEY")
         if api_key and not api_key.startswith("your_"):
             try:
-                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: Escalating to OpenAI GPT-4o-mini for deep reasoning...")
+                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] Escalating to OpenAI GPT-4o-mini for deep reasoning...")
                 client = OpenAI(api_key=api_key)
                 response = client.chat.completions.create(
                     model="gpt-4o-mini",
@@ -56,13 +56,13 @@ def brain_agent(state):
                 # Split analysis into RCA and Remediation if possible, or just store the whole thing
                 state["root_cause"] = analysis
                 state["remediation"] = "Apply the recommended fix derived from LLM analysis."
-                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: OpenAI Analysis Complete.")
+                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] OpenAI Analysis Complete.")
             except Exception as e:
-                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: OpenAI escalation failed: {str(e)}")
+                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] OpenAI escalation failed: {str(e)}")
                 state["root_cause"] = "Manual investigation required due to API Failure."
                 state["remediation"] = "Manual check required."
         else:
-            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: No OpenAI Key available for escalation.")
+            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] No OpenAI Key available for escalation.")
             state["root_cause"] = "The system has detected a potential database connection pool exhaustion. This usually happens when high traffic saturates the available connections or when connections are not being properly returned to the pool."
             state["remediation"] = "SCALE: Increase the database connection pool size and check for connection leaks in the application code."
 
@@ -72,15 +72,15 @@ def brain_agent(state):
             from packages.shared.github_service import GitHubService
             from packages.shared.reporting import format_rca_postmortem
             gh = GitHubService()
-            issue_title = f"🚨 [INCIDENT] {state.get('service', 'System')} - {state['root_cause'][:50]}..."
+            issue_title = f"[INCIDENT] {state.get('service', 'System')} - {state['root_cause'][:50]}..."
             issue_body = format_rca_postmortem(state)
             gh_res = gh.create_issue(title=issue_title, body=issue_body, labels=["incident", "brain-diag"])
             if "number" in gh_res:
-                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: Incident Raised Early -> #{gh_res['number']}")
+                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] Incident Raised Early -> #{gh_res['number']}")
             else:
-                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: ⚠️ GitHub reporting failed.")
+                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] Warning: GitHub reporting failed.")
         except Exception as e:
-            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: Reporting Error: {str(e)}")
+            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] Reporting Error: {str(e)}")
 
     state["logs"] = logs
     return state

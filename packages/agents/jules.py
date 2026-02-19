@@ -16,12 +16,12 @@ def jules_agent(state):
     is_systemic = state.get("is_anomaly", False) and random.random() > 0.3 # Simulated systemic check
     
     if not is_systemic:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: Metric review complete. No systemic design flaws detected in this trace.")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [JULES] Metric review complete. No systemic design flaws detected in this trace.")
         state["logs"] = logs
         return state
 
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: 🏛️ TIER-3 INTERVENTION: Systemic failure detected.")
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: Initiating architectural refactor...")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [JULES] TIER-3 INTERVENTION: Systemic failure detected.")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [JULES] Initiating architectural refactor...")
     
     # Architectural Refactoring Decisions
     refactors = [
@@ -33,7 +33,7 @@ def jules_agent(state):
     
     # Choose 2 optimizations
     selected = random.sample(refactors, 2)
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: Design integrity restored.")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [JULES] Design integrity restored.")
     
     # Real GitHub Integration
     from packages.shared.github_service import GitHubService
@@ -54,14 +54,14 @@ def jules_agent(state):
 
 *Automated Architectural Review by SRE-Space Engine.*
 """
-    gh_res = gh.create_issue(title=f"🛠️ [ARCH-REFACTOR] {pr_title}", body=issue_body, labels=["architectural", "jules-refactor"])
+    gh_res = gh.create_issue(title=f"[ARCH-REFACTOR] {pr_title}", body=issue_body, labels=["architectural", "jules-refactor"])
     
     if "number" in gh_res:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: Documentation Issue Created -> #{gh_res['number']}")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [JULES] Documentation Issue Created -> #{gh_res['number']}")
     else:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: ⚠️ GitHub integration failed.")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [JULES] Warning: GitHub integration failed.")
 
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🤖 Jules: Daily Architectural Review (Scheduled 09:30 AM).")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [JULES] Daily Architectural Review (Scheduled 09:30 AM).")
     
     state["logs"] = logs
     return state
