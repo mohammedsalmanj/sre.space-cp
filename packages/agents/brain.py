@@ -45,24 +45,42 @@ def brain_agent(state):
                 response = client.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=[
-                        {"role": "system", "content": "You are a specialized SRE diagnosis engine. Analyze the error and suggest a root cause and remediation."},
-                        {"role": "user", "content": f"Error Message: {msg}\nService: {state.get('service')}"}
+                        {"role": "system", "content": "You are a specialized SRE diagnosis engine. Analyze the error and provide a detailed Root Cause Analysis (RCA) and a specific Recommended Fix. Be professional and technical."},
+                        {"role": "user", "content": f"Error Message: {msg}\nService: {state.get('service')}\nNamespace: {state.get('namespace')}"}
                     ],
-                    max_tokens=150
+                    max_tokens=300
                 )
                 analysis = response.choices[0].message.content
                 state["confidence_score"] = 0.95
-                state["root_cause"] = f"LLM Analysis: {analysis[:100]}..."
-                state["remediation"] = "Follow LLM suggested patch (documented in logs)."
+                
+                # Split analysis into RCA and Remediation if possible, or just store the whole thing
+                state["root_cause"] = analysis
+                state["remediation"] = "Apply the recommended fix derived from LLM analysis."
                 logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: OpenAI Analysis Complete.")
             except Exception as e:
                 logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: OpenAI escalation failed: {str(e)}")
-                state["root_cause"] = "Manual investigation required (API Failure)."
-                state["remediation"] = "Manual check."
+                state["root_cause"] = "Manual investigation required due to API Failure."
+                state["remediation"] = "Manual check required."
         else:
             logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: No OpenAI Key available for escalation.")
-            state["root_cause"] = "Simulated: Database saturation."
-            state["remediation"] = "SCALE: Increase pool size."
+            state["root_cause"] = "The system has detected a potential database connection pool exhaustion. This usually happens when high traffic saturates the available connections or when connections are not being properly returned to the pool."
+            state["remediation"] = "SCALE: Increase the database connection pool size and check for connection leaks in the application code."
+
+    # 3. Post Incident to GitHub (Raise Earlier)
+    if state.get("confidence_score", 0) > 0.9:
+        try:
+            from packages.shared.github_service import GitHubService
+            from packages.shared.reporting import format_rca_postmortem
+            gh = GitHubService()
+            issue_title = f"🚨 [INCIDENT] {state.get('service', 'System')} - {state['root_cause'][:50]}..."
+            issue_body = format_rca_postmortem(state)
+            gh_res = gh.create_issue(title=issue_title, body=issue_body, labels=["incident", "brain-diag"])
+            if "number" in gh_res:
+                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: Incident Raised Early -> #{gh_res['number']}")
+            else:
+                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: ⚠️ GitHub reporting failed.")
+        except Exception as e:
+            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🧠 Brain: Reporting Error: {str(e)}")
 
     state["logs"] = logs
     return state
