@@ -70,12 +70,13 @@ def brain_agent(state):
     if state.get("confidence_score", 0) > 0.9:
         try:
             from packages.shared.github_service import GitHubService
-            from packages.shared.reporting import format_rca_postmortem
+            from packages.shared.reporting import format_full_incident_report
             gh = GitHubService()
             issue_title = f"[INCIDENT] {state.get('service', 'System')} - {state['root_cause'][:50]}..."
-            issue_body = format_rca_postmortem(state)
+            issue_body = format_full_incident_report(state)
             gh_res = gh.create_issue(title=issue_title, body=issue_body, labels=["incident", "brain-diag"])
             if "number" in gh_res:
+                state["incident_number"] = gh_res["number"]
                 logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] Incident Raised Early -> #{gh_res['number']}")
             else:
                 logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] Warning: GitHub reporting failed.")

@@ -15,6 +15,7 @@ def cag_agent(state):
 
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] Checking Tier-1 Fast Cache for incident FAQ...")
     msg = state["error_spans"][0]["exception.message"]
+    print(f"DEBUG: CAG msg='{msg}'")
     
     if msg in CAG_FAST_CACHE:
         known = CAG_FAST_CACHE[msg]
@@ -23,6 +24,20 @@ def cag_agent(state):
         state["confidence_score"] = known["confidence"]
         state["cache_hit"] = True
         logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] INSTANT-HIT. Known incident signature.")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] Attempting to raise incident via GitHub...")
+        # Raise incident immediately on CAG hit
+        try:
+            from packages.shared.github_service import GitHubService
+            from packages.shared.reporting import format_full_incident_report
+            gh = GitHubService()
+            issue_title = f"[INCIDENT] {state.get('service', 'System')} - {state['root_cause'][:50]}..."
+            issue_body = format_full_incident_report(state)
+            gh_res = gh.create_issue(title=issue_title, body=issue_body, labels=["incident", "cag-hit"])
+            if "number" in gh_res:
+                state["incident_number"] = gh_res["number"]
+                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] Incident Raised (Cache Hit) -> #{gh_res['number']}")
+        except Exception as e:
+            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] Warning: GitHub reporting failed: {str(e)}")
     else:
         state["cache_hit"] = False
         logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] Cache Miss. Escalating to Brain...")

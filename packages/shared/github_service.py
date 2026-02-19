@@ -33,6 +33,19 @@ class GitHubService:
             print(f"[GitHubService] Request failed: {str(e)}")
             return {"error": str(e)}
 
+    def create_comment(self, issue_number, body):
+        print(f"[GitHubService] Adding comment to issue #{issue_number}")
+        if not self.token:
+            return {"error": "No token found"}
+        
+        url = f"{self.base_url}/repos/{self.owner}/{self.repo}/issues/{issue_number}/comments"
+        data = {"body": body}
+        try:
+            response = requests.post(url, headers=self.headers, json=data, timeout=30)
+            return response.json()
+        except Exception as e:
+            return {"error": str(e)}
+
     def create_pr(self, title, head, base="main", body=""):
         print(f"[GitHubService] Creating PR: {title}")
         if not self.token:

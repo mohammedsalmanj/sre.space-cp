@@ -36,6 +36,7 @@ class SREState(TypedDict):
     namespace: str
     env: str
     anomaly_frequency: int
+    incident_number: int
 
 # --- Graph Logic ---
 def create_sre_graph():
@@ -74,7 +75,7 @@ async def run_sre_loop(is_anomaly: bool = False):
         "error_spans": [], "root_cause": "", "remediation": "", "circuit_breaker_active": False,
         "status": "Starting", "logs": [], "is_anomaly": is_anomaly, "historical_context": "",
         "cache_hit": False, "confidence_score": 0.0, "decision": "", "guardrail_reason": "",
-        "service": "", "namespace": "", "env": "", "anomaly_frequency": 0
+        "service": "", "namespace": "", "env": "", "anomaly_frequency": 0, "incident_number": 0
     }
     
     # Simulate a frequency surge for testing if anomaly is true
