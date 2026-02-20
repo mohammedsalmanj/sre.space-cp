@@ -32,15 +32,17 @@ def scout_agent(state):
         anomaly_msg = f"LATENCY_BREACH: Average p95 latency reached {round(avg_latency)}ms."
         state["anomaly_type"] = "latency"
     
-    # 3. Handle injected failure
-    if state.get("is_anomaly") and not is_detected:
+    # 3. Handle injected failure (Prioritize signals from Engineering Controls)
+    if state.get("is_anomaly"):
         is_detected = True
-        anomaly_msg = f"INJECTED_FAULT_SIGNAL: {state.get('anomaly_type').upper()} anomaly reported by Engineering Controls."
+        a_type = state.get('anomaly_type', 'infra').upper()
+        anomaly_msg = f"SIGNAL_INTERCEPT: {a_type} breach detected via high-fidelity control probe."
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] [OBSERVE] 🛰️ Uplink signal matching active injection profile: {a_type}")
 
     if is_detected:
         state["is_anomaly"] = True
         state["error_spans"] = [{"message": anomaly_msg, "error_rate": error_rate, "latency": avg_latency}]
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] [OBSERVE] 🚨 Anomalous condition identified: {anomaly_msg}")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] [OBSERVE] 🚨 CRITICAL_ALERT: {anomaly_msg}")
         
         # 4. Event Bus Signaling
         logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] [OBSERVE] Persistence signal emitted to event bus.")

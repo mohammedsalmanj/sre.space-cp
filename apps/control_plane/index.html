@@ -4,28 +4,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRE-Space | Insurance Marketplace</title>
+    <title>SRE-Space | Ultimate Intelligence Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono&display=swap"
         rel="stylesheet">
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #fcfcfd;
-            color: #1e293b;
+        :root {
+            --glass: rgba(255, 255, 255, 0.85);
+            --accent: #2563eb;
         }
 
-        .hero-gradient {
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #ffffff;
+            color: #0f172a;
+            overflow-x: hidden;
+        }
+
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 0% 0%, #f1f5f9 0%, #ffffff 100%);
+            opacity: 0.5;
         }
 
         .liquid-glass {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.04);
+        }
+
+        .liquid-glass:hover {
+            border-color: rgba(37, 99, 235, 0.3);
+            box-shadow: 0 15px 50px -10px rgba(37, 99, 235, 0.1);
+        }
+
+        .terminal {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            background: #0f172a;
             border-radius: 1rem;
-            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .ooda-pill {
+            height: 6px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            flex: 1;
+            transition: all 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ooda-active {
+            background: #2563eb;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .ooda-active::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: sweep 2s infinite;
+        }
+
+        @keyframes sweep {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
         }
 
         .btn-primary {
@@ -33,254 +95,393 @@
             color: white;
             transition: all 0.2s;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            border-radius: 1rem;
         }
 
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
         }
 
-        .intel-panel {
-            background: #0f172a;
-            border-radius: 1rem;
-            border-top: 4px solid #3b82f6;
-        }
-
-        .mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .dot {
-            height: 8px;
+        .indicator {
             width: 8px;
+            height: 8px;
             border-radius: 50%;
             display: inline-block;
         }
 
-        @keyframes pulse {
+        .pulse {
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse-ring {
             0% {
-                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
             }
 
-            50% {
-                opacity: 0.3;
+            70% {
+                box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
             }
         }
 
-        .pulse {
-            animation: pulse 2s infinite;
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
         }
     </style>
 </head>
 
-<body class="pb-20">
-    <!-- Clean Header -->
-    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 h-20 flex items-center">
-        <div class="max-w-7xl mx-auto px-6 w-full flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <div
-                    class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg">
-                    S</div>
-                <span class="text-xl font-extrabold tracking-tighter text-slate-900 italic">SRE-SPACE</span>
+<body class="p-4 md:p-8 lg:p-12">
+    <div class="bg-mesh"></div>
+
+    <div class="max-w-[1500px] mx-auto space-y-12">
+        <!-- Unified Header -->
+        <header class="flex justify-between items-end border-b border-slate-100 pb-8">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="h-4 w-4 rounded-sm bg-blue-600"></div>
+                    <h1 class="text-2xl font-black italic tracking-tighter uppercase whitespace-nowrap text-slate-900">
+                        SRE-Space Portal <span class="text-slate-300 font-light not-italic ml-2">v5.5</span></h1>
+                </div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em]">Global Reliability
+                    Orchestration Control Plane</p>
             </div>
             <div class="flex items-center gap-6">
-                <a href="{{ monitor_url }}" target="_blank"
-                    class="px-5 py-2.5 bg-blue-50 text-blue-600 rounded-xl font-bold text-sm hover:bg-blue-100 transition border border-blue-100/50">
-                    🛰️ Orbital Monitor
-                </a>
+                <div class="flex flex-col items-end">
+                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">System
+                        Integrity</span>
+                    <div class="flex items-center gap-2">
+                        <span id="sys-status-text" class="text-[10px] font-extrabold text-blue-600 uppercase">Nominal
+                            Uplink</span>
+                        <div id="sys-status-dot" class="indicator bg-blue-500 shadow-lg shadow-blue-100"></div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </nav>
+        </header>
 
-    <!-- Professional Hero -->
-    <header class="py-20 hero-gradient text-white text-center">
-        <div class="max-w-4xl mx-auto px-6">
-            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">Insurance Marketplace <br><span
-                    class="opacity-70 font-light">Reliability Powered Backend</span></h1>
-            <p class="text-lg opacity-80 max-w-2xl mx-auto">Instant coverage for your enterprise, secured by an
-                autonomous multi-agent SRE control loop.</p>
-        </div>
-    </header>
+        <!-- Main Content Core -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
-    <main class="max-w-7xl mx-auto px-6 -mt-12">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Left: App Content -->
-            <div class="lg:col-span-8">
-                <div class="liquid-glass p-10 min-h-[500px]">
-                    <h2 class="text-2xl font-black mb-10 text-slate-900">Request Policy Quote</h2>
+            <!-- LEFT: The Insurance App (User Interaction) -->
+            <div class="lg:col-span-4 space-y-8">
+                <div class="liquid-glass p-8 space-y-10">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-lg font-black tracking-tight text-slate-800">Policy Underwriting</h2>
+                        <span class="text-[8px] font-bold text-slate-400 uppercase bg-slate-50 px-2 py-1 rounded">Live
+                            Node: Alpha</span>
+                    </div>
+
                     <form onsubmit="event.preventDefault(); triggerQuote();" class="space-y-8">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div class="space-y-3">
-                                <label
-                                    class="text-[10px] uppercase font-black text-slate-400 tracking-widest">Enterprise
-                                    Sector</label>
-                                <select
-                                    class="w-full p-4 bg-slate-50 border-0 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold">
-                                    <option>FinTech Infrastructure</option>
-                                    <option>Cloud Logistics</option>
-                                    <option>Healthcare Systems</option>
-                                </select>
-                            </div>
-                            <div class="space-y-3">
-                                <label class="text-[10px] uppercase font-black text-slate-400 tracking-widest">Coverage
-                                    Target</label>
-                                <input type="text" value="$1,000,000"
-                                    class="w-full p-4 bg-slate-50 border-0 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold" />
-                            </div>
+                        <div class="space-y-3">
+                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Enterprise
+                                Sector</label>
+                            <select id="sector"
+                                class="w-full p-4 bg-slate-50 border-0 rounded-xl font-bold text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                                <option>Infrastructure & Logistics</option>
+                                <option>FinTech Core Banking</option>
+                                <option>Health Systems Management</option>
+                            </select>
                         </div>
-                        <button type="submit" id="quote-btn"
-                            class="w-full py-5 btn-primary rounded-xl font-black text-sm uppercase tracking-[0.2em]">
-                            Calculate Premium Flow
-                        </button>
+                        <div class="space-y-3">
+                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Liability
+                                Limit</label>
+                            <input type="text" value="$2,000,000"
+                                class="w-full p-4 bg-slate-50 border-0 rounded-xl font-bold text-sm outline-none"
+                                readonly />
+                        </div>
+                        <button id="quote-btn"
+                            class="w-full py-5 btn-primary font-black uppercase text-xs tracking-[0.2em]">Generate
+                            Coverage Flow</button>
                     </form>
 
-                    <!-- Feedback Areas -->
-                    <div id="status-box"
-                        class="mt-12 hidden p-8 rounded-2xl bg-blue-50/50 border border-blue-100 animate-in fade-in duration-300">
+                    <!-- Quote Result Display -->
+                    <div id="quote-res"
+                        class="hidden p-8 bg-slate-900 rounded-3xl text-white transform transition-all duration-500 hover:scale-[1.02]">
                         <div class="flex justify-between items-end">
                             <div>
-                                <span
-                                    class="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-2">Quote
-                                    Generated Successfully</span>
-                                <h3 id="quote-id" class="text-3xl font-black text-slate-900 tracking-tighter">#---</h3>
+                                <div class="text-[8px] font-black text-blue-400 uppercase tracking-widest mb-1">
+                                    Reference ID</div>
+                                <div id="id-val" class="text-2xl font-black italic tracking-tighter">Q-882910</div>
                             </div>
                             <div class="text-right">
-                                <span
-                                    class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Monthly
-                                    Premium</span>
-                                <span id="premium-val"
-                                    class="text-3xl font-black text-blue-600 tracking-tighter">---</span>
+                                <div class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Yearly
+                                    Premium</div>
+                                <div id="prem-val" class="text-2xl font-black text-blue-400 tracking-tighter">$---</div>
                             </div>
                         </div>
                     </div>
 
-                    <div id="error-box"
-                        class="mt-12 hidden p-8 rounded-2xl bg-red-50/50 border border-red-100 animate-in slide-in-from-top-2 duration-300">
-                        <div class="flex items-center gap-3 mb-4">
-                            <span class="w-3 h-3 rounded-full bg-red-600 pulse"></span>
-                            <h3 class="text-red-700 font-bold">Operational Fault Detected</h3>
+                    <!-- Visual Error Notification -->
+                    <div id="quote-err"
+                        class="hidden p-6 bg-red-50 border border-red-100 rounded-3xl flex items-start gap-4 animate-in slide-in-from-top-2">
+                        <div class="w-2 h-2 rounded-full bg-red-600 mt-1 pulse shadow-lg shadow-red-200"></div>
+                        <div>
+                            <div class="text-[10px] font-black uppercase text-red-600 mb-1">Infrastructure Breach</div>
+                            <div id="err-text" class="text-xs text-red-500 font-medium leading-relaxed italic">Upstream
+                                dependency timeout detected. Remediation loop initiated.</div>
                         </div>
-                        <p id="error-msg" class="text-sm text-red-600 font-medium italic">---</p>
+                    </div>
+                </div>
+
+                <!-- Chaos Injection (Management Station) -->
+                <div class="liquid-glass p-8">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Fault Injection
+                        Console</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="injectChaos('500')"
+                            class="p-5 border border-slate-100 rounded-2xl hover:bg-red-50 hover:border-red-200 transition text-left group">
+                            <div class="text-[11px] font-bold group-hover:text-red-700">Trigger 500</div>
+                            <div class="text-[8px] text-slate-400 uppercase mt-1">Pool Exhaustion</div>
+                        </button>
+                        <button onclick="injectChaos('latency')"
+                            class="p-5 border border-slate-100 rounded-2xl hover:bg-orange-50 hover:border-orange-200 transition text-left group">
+                            <div class="text-[11px] font-bold group-hover:text-orange-700">Latency spike</div>
+                            <div class="text-[8px] text-slate-400 uppercase mt-1">P99 Signal Drift</div>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Right: SRE Interface (The Bridge) -->
-            <div class="lg:col-span-4 space-y-6">
-                <!-- Fault Injection Area -->
-                <div class="liquid-glass p-6 border-t-4 border-red-500">
-                    <h3 class="text-xs font-black text-slate-900 uppercase tracking-widest mb-6">Engineering Triage</h3>
-                    <div class="grid grid-cols-1 gap-2">
-                        <button onclick="injectFault('500')"
-                            class="w-full p-4 text-left border border-slate-100 rounded-xl hover:bg-red-50 hover:border-red-200 transition group">
-                            <div class="text-xs font-bold group-hover:text-red-700">Database Saturation</div>
-                            <div class="text-[10px] text-slate-400 mt-1">Force 500 Network Errors</div>
-                        </button>
-                        <button onclick="injectFault('latency')"
-                            class="w-full p-4 text-left border border-slate-100 rounded-xl hover:bg-orange-50 hover:border-orange-200 transition group">
-                            <div class="text-xs font-bold group-hover:text-orange-700">p99 Latency Spike</div>
-                            <div class="text-[10px] text-slate-400 mt-1">Inject 2.5s simulated lag</div>
-                        </button>
+            <!-- RIGHT: The SRE Control Station (Intelligence Plane) -->
+            <div class="lg:col-span-8 space-y-8">
+
+                <!-- Cognitive OODA Loop Visualization -->
+                <div class="liquid-glass p-8">
+                    <div class="flex justify-between items-center mb-8">
+                        <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Agentic Control
+                            Loop</h2>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-black text-blue-600 uppercase" id="loop-id">Idle
+                                Standby</span>
+                            <div class="w-1.5 h-1.5 rounded-full bg-slate-300" id="loop-dot"></div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div id="step-O1" class="ooda-pill"></div>
+                        <div id="step-O2" class="ooda-pill"></div>
+                        <div id="step-D" class="ooda-pill"></div>
+                        <div id="step-A" class="ooda-pill"></div>
+                    </div>
+                    <div
+                        class="grid grid-cols-4 mt-4 text-[9px] font-black uppercase text-slate-400 tracking-widest text-center">
+                        <span>Observe</span>
+                        <span>Orient</span>
+                        <span>Decide</span>
+                        <span>Act</span>
                     </div>
                 </div>
 
-                <!-- Mini SRE Monitor -->
-                <div class="intel-panel p-6 shadow-2xl">
-                    <div class="flex justify-between items-center mb-6">
-                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">SRE Intelligence
-                            Feed</span>
-                        <span id="loop-dot" class="dot bg-slate-700"></span>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                    <!-- The Terminal -->
+                    <div class="md:col-span-8 terminal h-[550px] flex flex-col overflow-hidden shadow-2xl">
+                        <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-white/5">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Intelligence
+                                Stream</span>
+                            <span id="term-stats" class="text-[8px] font-mono text-slate-500 uppercase">Uplink:
+                                Active</span>
+                        </div>
+                        <div id="logs" class="p-6 md:p-8 overflow-y-auto space-y-3 flex-grow text-slate-400">
+                            <div class="text-slate-600 italic">// Awaiting telemetry pulse or heartbeat...</div>
+                        </div>
+                        <div class="p-4 grid grid-cols-3 gap-2 bg-slate-900 border-t border-white/5">
+                            <div class="px-3 py-2 bg-white/5 rounded-lg text-center">
+                                <span class="text-[8px] font-black text-slate-500 uppercase block mb-1">Heap Use</span>
+                                <span id="stat-mem" class="text-[10px] font-mono text-white">--%</span>
+                            </div>
+                            <div class="px-3 py-2 bg-white/5 rounded-lg text-center">
+                                <span class="text-[8px] font-black text-slate-500 uppercase block mb-1">Loop Freq</span>
+                                <span id="stat-freq" class="text-[10px] font-mono text-white">0 events</span>
+                            </div>
+                            <div class="px-3 py-2 bg-white/5 rounded-lg text-center">
+                                <span class="text-[8px] font-black text-slate-500 uppercase block mb-1">Fault
+                                    State</span>
+                                <span id="stat-chaos" class="text-[10px] font-mono text-slate-400">OFF</span>
+                            </div>
+                        </div>
                     </div>
-                    <div id="intel-logs" class="space-y-3 h-[250px] overflow-y-auto pr-2 scrollbar-hide">
-                        <div class="text-[11px] mono text-slate-600 italic">// Awaiting telemetry pulse...</div>
-                    </div>
-                    <div
-                        class="mt-6 pt-4 border-t border-slate-800 flex justify-between text-[10px] font-bold text-slate-500">
-                        <span id="agent-hint">UPLINK: ACTIVE</span>
-                        <span class="text-blue-500">v5.5-SECURE</span>
+
+                    <!-- Git Activity + Action -->
+                    <div class="md:col-span-4 space-y-8">
+                        <div class="liquid-glass p-6 space-y-6">
+                            <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Real-Time GitOps
+                            </h3>
+                            <div id="git-feed" class="space-y-4 h-[250px] overflow-y-auto">
+                                <div class="py-10 text-center opacity-30 text-[9px] font-bold italic">Polling repo
+                                    payloads...</div>
+                            </div>
+                        </div>
+
+                        <button onclick="startLoop()"
+                            class="w-full py-6 liquid-glass border-2 border-blue-50 hover:border-blue-500 group transition-all text-center">
+                            <div class="text-blue-500 group-hover:scale-110 transition mb-2">⚡</div>
+                            <div class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Manual Sync
+                            </div>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 
     <script>
         let eventSource = null;
-        const monitorUrl = "{{ monitor_url }}";
+        let logCounter = 0;
 
         async function triggerQuote() {
             const btn = document.getElementById('quote-btn');
-            const sBox = document.getElementById('status-box');
-            const eBox = document.getElementById('error-box');
+            const res = document.getElementById('quote-res');
+            const err = document.getElementById('quote-err');
 
             btn.disabled = true;
-            btn.innerText = "EXECUTING BACKEND LOGIC...";
-            sBox.classList.add('hidden');
-            eBox.classList.add('hidden');
+            btn.innerText = "AUTHENTICATING...";
+            res.classList.add('hidden');
+            err.classList.add('hidden');
 
             try {
-                const res = await fetch('/quote');
-                const data = await res.json();
+                const response = await fetch('/quote');
+                const data = await response.json();
 
-                if (res.ok) {
-                    document.getElementById('quote-id').innerText = data.quote_id;
-                    document.getElementById('premium-val').innerText = `$${data.premium}`;
-                    sBox.classList.remove('hidden');
-                } else {
-                    throw new Error(data.detail || "System Error");
-                }
-            } catch (err) {
-                document.getElementById('error-msg').innerText = err.message;
-                eBox.classList.remove('hidden');
-                // Auto-connect to loop monitoring when error happens
-                if (!eventSource) connectSRELoop();
+                if (!response.ok) throw new Error(data.detail || "Connection Dropped");
+
+                document.getElementById('id-val').innerText = data.quote_id;
+                document.getElementById('prem-val').innerText = `$${data.premium.toLocaleString()}`;
+                res.classList.remove('hidden');
+            } catch (e) {
+                document.getElementById('err-text').innerText = e.message;
+                err.classList.remove('hidden');
+                // Auto-trigger the SRE loop to investigate the failure
+                startLoop(true);
             } finally {
                 btn.disabled = false;
-                btn.innerText = "Calculate Premium Flow";
+                btn.innerText = "Generate Coverage Flow";
             }
         }
 
-        async function injectFault(type) {
+        async function injectChaos(type) {
+            addLog(`⚡ Engineering Control Triggered: ${type.toUpperCase()} injection initialized.`);
             await fetch(`/demo/inject-failure?type=${type}`, { method: 'POST' });
-            addIntelLog(`⚠️ Engineering Control: ${type.toUpperCase()} injection triggered.`);
-            connectSRELoop();
+            startLoop(true);
         }
 
-        function addIntelLog(msg) {
-            const logs = document.getElementById('intel-logs');
+        function addLog(msg) {
+            const logs = document.getElementById('logs');
             const div = document.createElement('div');
-            div.className = "text-[11px] mono animate-in fade-in duration-300 border-l border-slate-800 pl-3 py-0.5";
+            div.className = "text-[11px] leading-relaxed border-l-2 border-white/5 pl-4 py-0.5 animate-in slide-in-from-left-2 duration-300";
 
             let color = "text-slate-500";
-            if (msg.includes('[SCOUT]')) color = "text-green-500";
-            else if (msg.includes('[BRAIN]')) color = "text-purple-500";
-            else if (msg.includes('[FIXER]')) color = "text-blue-400";
-            else if (msg.includes('SUCCESS')) color = "text-green-400 font-bold";
+            if (msg.includes("[SCOUT]")) { color = "text-green-500"; activateStep('step-O1'); }
+            else if (msg.includes("[BRAIN]")) { color = "text-purple-400"; activateStep('step-O2'); }
+            else if (msg.includes("[GUARDRAIL]")) { color = "text-orange-400"; activateStep('step-D'); }
+            else if (msg.includes("[FIXER]")) { color = "text-blue-400"; activateStep('step-A'); }
+            else if (msg.includes("SUCCESS")) { color = "text-green-400 font-bold"; }
 
-            div.innerHTML = `<span class="${color}">${msg}</span>`;
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            div.innerHTML = `<span class="opacity-20 mr-2 text-[9px] font-mono">${time}</span><span class="${color}">${msg}</span>`;
             logs.appendChild(div);
             logs.scrollTop = logs.scrollHeight;
+            logCounter++;
+            document.getElementById('stat-freq').innerText = `${logCounter} events`;
         }
 
-        function connectSRELoop() {
-            if (eventSource) eventSource.close();
-            document.getElementById('loop-dot').className = 'dot bg-blue-500 pulse';
-            document.getElementById('agent-hint').innerText = "ENGINE: RUNNING";
+        function activateStep(id) {
+            const steps = ['step-O1', 'step-O2', 'step-D', 'step-A'];
+            steps.forEach(s => {
+                const el = document.getElementById(s);
+                if (s === id) {
+                    el.classList.add('ooda-active');
+                    el.style.opacity = '1';
+                } else if (steps.indexOf(s) < steps.indexOf(id)) {
+                    el.classList.add('ooda-active');
+                    el.style.opacity = '0.4';
+                }
+            });
+        }
 
-            eventSource = new EventSource('/api/sre-loop?anomaly=false');
+        function startLoop(isAnomaly = false) {
+            if (eventSource) eventSource.close();
+            document.getElementById('logs').innerHTML = '<div class="text-blue-500 mono italic">// Initializing neural bridge sequence...</div>';
+            document.getElementById('loop-id').innerText = 'Loop Running';
+            document.getElementById('loop-dot').className = 'w-1.5 h-1.5 rounded-full bg-blue-500 shadow-lg shadow-blue-200 pulse';
+            logCounter = 0;
+
+            // Reset OODA visual
+            ['step-O1', 'step-O2', 'step-D', 'step-A'].forEach(s => {
+                const el = document.getElementById(s);
+                el.classList.remove('ooda-active');
+                el.style.opacity = '1';
+            });
+
+            eventSource = new EventSource(`/api/sre-loop?anomaly=${isAnomaly}`);
             eventSource.onmessage = (e) => {
                 const data = JSON.parse(e.data);
-                if (data.message) addIntelLog(data.message);
+                if (data.message) addLog(data.message);
                 if (data.final_state) {
-                    document.getElementById('loop-dot').className = 'dot bg-green-500';
-                    document.getElementById('agent-hint').innerText = "SYSTEM: RECOVERED";
-                    setTimeout(() => {
-                        document.getElementById('loop-dot').className = 'dot bg-slate-700';
-                        document.getElementById('agent-hint').innerText = "UPLINK: ACTIVE";
-                    }, 5000);
+                    addLog("--- SRE RECOVERY CYCLE COMPLETE ---");
+                    document.getElementById('loop-id').innerText = 'Idle Standby';
+                    document.getElementById('loop-dot').className = 'w-1.5 h-1.5 rounded-full bg-green-500';
+                    setTimeout(updateGit, 5000);
+                    updateHealth();
                 }
             };
         }
+
+        async function updateHealth() {
+            try {
+                const res = await fetch('/system/health');
+                const data = await res.json();
+                document.getElementById('stat-mem').innerText = `${data.memory.memory_percent}%`;
+                document.getElementById('stat-chaos').innerText = data.chaos_active ? 'ACTIVE' : 'OFF';
+                document.getElementById('stat-chaos').className = data.chaos_active ? 'text-[10px] font-mono text-orange-500' : 'text-[10px] font-mono text-slate-500';
+
+                if (data.chaos_active) {
+                    document.getElementById('sys-status-dot').className = 'indicator bg-orange-500 pulse';
+                    document.getElementById('sys-status-text').innerText = 'Anomaly Breach';
+                    document.getElementById('sys-status-text').className = 'text-[10px] font-extrabold text-orange-600 uppercase';
+                } else {
+                    document.getElementById('sys-status-dot').className = 'indicator bg-blue-500 shadow-lg shadow-blue-100';
+                    document.getElementById('sys-status-text').innerText = 'Nominal Uplink';
+                    document.getElementById('sys-status-text').className = 'text-[10px] font-extrabold text-blue-600 uppercase';
+                }
+            } catch (err) { }
+        }
+
+        async function updateGit() {
+            try {
+                const res = await fetch('/api/git-activity');
+                const data = await res.json();
+                const feed = document.getElementById('git-feed');
+                feed.innerHTML = '';
+                if (data.length === 0) {
+                    feed.innerHTML = '<div class="py-20 text-center opacity-20 text-[9px] font-black italic uppercase">System is clean</div>';
+                    return;
+                }
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = "p-4 bg-slate-50 rounded-2xl border border-slate-100 text-[10px] transform transition hover:scale-[1.02] cursor-default";
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center mb-1">
+                             <span class="font-black text-slate-400">#${item.number}</span>
+                             <span class="${item.state === 'open' ? 'text-green-600' : 'text-slate-400'} font-black uppercase text-[8px]">${item.state}</span>
+                        </div>
+                        <div class="font-bold text-slate-800 line-clamp-2 leading-tight">${item.title}</div>
+                    `;
+                    feed.appendChild(div);
+                });
+            } catch (err) { }
+        }
+
+        setInterval(updateHealth, 3000);
+        setInterval(updateGit, 10000);
+        updateHealth();
+        updateGit();
     </script>
 </body>
 

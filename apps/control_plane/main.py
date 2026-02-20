@@ -48,16 +48,17 @@ SRE_MONITOR_URL = os.getenv("SRE_MONITOR_URL", "/monitor")
 
 @app.get("/", response_class=HTMLResponse)
 async def get_index(request: Request):
-    """Main Insurance Application (Marketplace)."""
+    """The Ultimate SRE-Space Master Portal."""
     return templates.TemplateResponse("index.html", {
         "request": request, 
         "monitor_url": SRE_MONITOR_URL
     })
 
-@app.get("/monitor", response_class=HTMLResponse)
-async def get_monitor(request: Request):
-    """SRE Orbital Monitor Dashboard (For Vercel/Monitoring)."""
-    return templates.TemplateResponse("monitor.html", {"request": request})
+@app.get("/monitor")
+async def monitor_redirect():
+    """Redirect legacy monitor URL to the Master Portal."""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/")
 
 @app.get("/system/health")
 async def health_check():
