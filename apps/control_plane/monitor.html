@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE-Space | Reliability Monitor v3.7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #010409;
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .glass {
+            background: rgba(13, 17, 23, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(48, 54, 61, 0.8);
+            border-radius: 1rem;
+        }
+
+        .terminal {
+            font-family: 'JetBrains Mono', monospace;
+            background: #000;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0px rgba(34, 197, 94, 0.4);
+            }
+
+            100% {
+                box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+            }
+        }
+
+        .git-item {
+            border-left: 3px solid #8b5cf6;
+            transition: all 0.2s;
+        }
+
+        .git-item:hover {
+            transform: scale(1.02);
+            background: rgba(255, 255, 255, 0.03);
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-8">
+    <div class="max-w-[1440px] mx-auto">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 px-2">
+            <div>
+                <h1 class="text-2xl font-black tracking-tighter text-blue-400">SRE.SPACE <span
+                        class="text-slate-500 font-light">| ORBITAL MONITOR</span></h1>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] mt-1">Real-time Autonomous
+                    Observability</p>
+            </div>
+            <div class="flex gap-3">
+                <div class="glass px-4 py-2 border-l-2 border-blue-500">
+                    <span class="text-[8px] block text-slate-500 font-bold uppercase">Env</span>
+                    <span id="stat-mode" class="text-xs font-black text-blue-400">LOADING</span>
+                </div>
+                <div class="glass px-4 py-2 border-l-2 border-green-500">
+                    <span class="text-[8px] block text-slate-500 font-bold uppercase">Memory</span>
+                    <span id="stat-mem" class="text-xs font-black text-green-400">--%</span>
+                </div>
+                <div class="glass px-4 py-2 border-l-2 border-purple-500">
+                    <span class="text-[8px] block text-slate-500 font-bold uppercase">Event Bus</span>
+                    <span id="stat-bus" class="text-xs font-black text-purple-400">---</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left: Terminal (OODA Loop) -->
+            <div class="lg:col-span-8 space-y-4">
+                <div class="terminal rounded-xl h-[600px] border border-slate-800 flex flex-col shadow-2xl relative">
+                    <div class="bg-slate-900/80 px-4 py-2 flex justify-between items-center border-b border-slate-800">
+                        <div class="flex gap-1.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-red-500/30"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/30"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-green-500/30"></div>
+                        </div>
+                        <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Autonomous
+                            Cognitive Stream</span>
+                        <div id="loader" class="hidden w-1 h-3 bg-blue-500 animate-bounce"></div>
+                    </div>
+                    <div id="logs" class="p-6 overflow-y-auto flex-1 space-y-3 scroll-smooth">
+                        <div class="text-slate-700 italic text-xs font-mono">// Ready for telemetry uplink...</div>
+                    </div>
+                    <div id="empty-hint"
+                        class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-10">
+                        <span class="text-4xl font-black uppercase tracking-[1em] text-slate-500 rotate-12">Monitor
+                            Only</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Live Activity -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- System Health Card -->
+                <div class="glass p-5 border-l-4 border-green-500">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">System Vitality</h3>
+                        <div id="status-dot" class="w-2 h-2 rounded-full bg-green-500 pulse"></div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-300">Autonomy Status:</span>
+                        <span id="stat-status"
+                            class="text-xs font-black text-green-400 uppercase tracking-wider">Passive Watch</span>
+                    </div>
+                </div>
+
+                <!-- GitHub Feed -->
+                <div class="space-y-4">
+                    <h3 class="text-[10px] font-black uppercase text-slate-500 tracking-widest px-1">GitOps Activity
+                        (Real-time)</h3>
+                    <div id="git-feed" class="space-y-3">
+                        <div class="text-center py-8 text-slate-700 text-[10px] font-bold uppercase tracking-widest">
+                            Polling GitHub...</div>
+                    </div>
+                </div>
+
+                <!-- Specialist Check -->
+                <div class="glass p-5 bg-blue-500/5 border border-blue-500/10">
+                    <h3 class="text-[10px] font-black uppercase text-blue-400 tracking-widest mb-3">Specialist Squad
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        <div
+                            class="px-2 py-1 bg-slate-900 border border-slate-800 rounded text-[9px] font-bold text-slate-400">
+                            SCOUT: ACTIVE</div>
+                        <div
+                            class="px-2 py-1 bg-slate-900 border border-slate-800 rounded text-[9px] font-bold text-slate-400">
+                            BRAIN: READY</div>
+                        <div
+                            class="px-2 py-1 bg-slate-900 border border-slate-800 rounded text-[9px] font-bold text-slate-400">
+                            FIXER: READY</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIG: When hosted on Vercel, this should point to your Render URL:
+        const API_BASE = "https://sre-space-cp.onrender.com";
+
+        async function fetchAPI(endpoint) {
+            try {
+                const res = await fetch(`${API_BASE}${endpoint}`);
+                return await res.json();
+            } catch (err) {
+                console.error(`Api Error (${endpoint}):`, err);
+                return null;
+            }
+        }
+
+        async function updateHealth() {
+            const data = await fetchAPI('/system/health');
+            if (!data) return;
+
+            document.getElementById('stat-mode').innerText = data.mode.toUpperCase();
+            document.getElementById('stat-mem').innerText = data.memory.memory_percent + '%';
+            document.getElementById('stat-bus').innerText = data.event_bus.toUpperCase();
+
+            const stats = document.getElementById('stat-status');
+            const dot = document.getElementById('status-dot');
+
+            if (data.status === 'degraded') {
+                stats.innerText = "DEGRADED MODE";
+                stats.className = "text-xs font-black text-amber-500 uppercase";
+                dot.className = "w-2 h-2 rounded-full bg-amber-500 pulse";
+            } else {
+                stats.innerText = "SYSTEM NOMINAL";
+                stats.className = "text-xs font-black text-green-400 uppercase";
+                dot.className = "w-2 h-2 rounded-full bg-green-500 pulse";
+            }
+        }
+
+        async function updateGitFeed() {
+            const data = await fetchAPI('/api/git-activity');
+            if (!data || data.error) return;
+
+            const feed = document.getElementById('git-feed');
+            feed.innerHTML = '';
+            data.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'glass p-4 git-item bg-slate-800/20';
+                const color = item.state === 'open' ? 'indigo-400' : 'green-400';
+                const icon = item.type === 'pull_request' ? '⚔️' : '🚨';
+
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="text-[9px] font-black text-${color}">#${item.number}</span>
+                        <span class="text-[8px] font-black uppercase text-slate-500">${item.state}</span>
+                    </div>
+                    <div class="text-[11px] font-bold text-slate-200 line-clamp-1">${icon} ${item.title}</div>
+                    <div class="text-[8px] text-slate-600 mt-1 font-mono">${new Date(item.created_at).toLocaleTimeString()}</div>
+                `;
+                feed.appendChild(div);
+            });
+        }
+
+        // SSE Listener for real-time logs from Render
+        let eventSource = null;
+        function connectLogs() {
+            if (eventSource) eventSource.close();
+
+            // Note: In a real Vercel situation, you might need a button to start monitoring
+            // because EventSource to a different domain needs specific CORS.
+            // But for this demo, we'll try to connect at start.
+            eventSource = new EventSource(`${API_BASE}/api/sre-loop?anomaly=false`);
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.message) addLog(data.message);
+                if (data.final_state) {
+                    // Just keep connection alive or restart for passive monitoring
+                }
+            };
+        }
+
+        function addLog(msg) {
+            const logs = document.getElementById('logs');
+            const hint = document.getElementById('empty-hint');
+            hint.style.display = 'none';
+
+            const div = document.createElement('div');
+            div.className = "text-[12px] font-mono leading-relaxed border-l-2 border-slate-800 pl-4 py-0.5";
+
+            let color = "text-slate-400";
+            if (msg.includes('Scout')) color = "text-green-400";
+            else if (msg.includes('Brain')) color = "text-purple-400";
+            else if (msg.includes('Fixer')) color = "text-orange-400";
+
+            div.innerHTML = `<span class="opacity-20 mr-2">»</span><span class="${color}">${msg}</span>`;
+            logs.appendChild(div);
+            logs.scrollTop = logs.scrollHeight;
+            if (logs.children.length > 50) logs.removeChild(logs.firstChild);
+        }
+
+        setInterval(updateHealth, 5000);
+        setInterval(updateGitFeed, 15000);
+        updateHealth();
+        updateGitFeed();
+        // connectLogs(); // This would be the "Start Monitoring" action
+    </script>
+</body>
+
+</html>

@@ -27,12 +27,18 @@ templates = Jinja2Templates(directory=os.path.dirname(__file__))
 github = GitHubService()
 
 @app.get("/", response_class=HTMLResponse)
-async def get_dashboard(request: Request):
+async def get_index(request: Request):
+    """Main Insurance Application (Marketplace)."""
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/monitor", response_class=HTMLResponse)
+async def get_monitor(request: Request):
+    """SRE Orbital Monitor Dashboard (For Vercel/Monitoring)."""
+    return templates.TemplateResponse("monitor.html", {"request": request})
 
 @app.get("/system/health")
 async def health_check():
-    """Returns system health, memory usage, and mode (Lightweight)."""
+    """Returns actual system health, memory usage, and mode."""
     stats = get_system_stats()
     return {
         "status": "healthy" if not stats["degraded"] else "degraded",
@@ -41,9 +47,7 @@ async def health_check():
         "active_agents": 8,
         "memory": stats,
         "log_level": LOG_LEVEL,
-        "circuit_breaker_active": False,
-        "last_incident": "INC-457", 
-        "remediation_status": "Merged & Deployed"
+        "circuit_breaker_active": False
     }
 
 @app.get("/api/git-activity")
