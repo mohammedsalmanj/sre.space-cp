@@ -8,3 +8,6 @@ chromadb
 python-dotenv
 openai
 requests
+redis
+psutil
+confluent-kafka

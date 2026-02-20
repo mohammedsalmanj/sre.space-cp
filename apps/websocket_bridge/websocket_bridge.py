@@ -3,16 +3,19 @@ import json
 import os
 import logging
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from confluent_kafka import Consumer, KafkaError
 import uvicorn
+import sys
+
+# Add project root to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
+
+from packages.shared.event_bus.factory import get_event_bus
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("websocket-bridge")
 
 app = FastAPI()
 
-# Kafka Config
-KAFKA_BROKER = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
 TOPICS = ["agent_thoughts", "incident_updates", "insurance_events", "remediation_log"]
 
 class ConnectionManager:
@@ -44,46 +47,22 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
-async def kafka_consumer_loop():
-    conf = {
-        'bootstrap.servers': KAFKA_BROKER,
-        'group.id': 'websocket-bridge-group',
-        'auto.offset.reset': 'latest'
+async def event_callback(topic, payload):
+    logger.info(f"Received message from {topic}")
+    broadcast_data = {
+        "topic": topic,
+        "data": payload
     }
-    consumer = Consumer(conf)
-    consumer.subscribe(TOPICS)
+    await manager.broadcast(json.dumps(broadcast_data))
 
-    logger.info(f"Subscribed to topics: {TOPICS}")
-
-    try:
-        while True:
-            msg = consumer.poll(1.0)
-            if msg is None:
-                continue
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    continue
-                else:
-                    logger.error(f"Kafka error: {msg.error()}")
-                    break
-
-            payload = msg.value().decode('utf-8')
-            topic = msg.topic()
-            
-            logger.info(f"Received message from {topic}")
-            
-            broadcast_data = {
-                "topic": topic,
-                "data": json.loads(payload)
-            }
-            await manager.broadcast(json.dumps(broadcast_data))
-            await asyncio.sleep(0) # Yield for other tasks
-    finally:
-        consumer.close()
+async def bridge_loop():
+    bus = get_event_bus()
+    logger.info(f"Starting event bus bridge with {type(bus).__name__}")
+    await bus.subscribe(TOPICS, event_callback)
 
 @app.on_event("startup")
 async def startup_event():
-    asyncio.create_task(kafka_consumer_loop())
+    asyncio.create_task(bridge_loop())
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8005)

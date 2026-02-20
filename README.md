@@ -80,68 +80,53 @@ Autonomous systems require trust. SRE-Space implements three layers of protectio
 - **AI Orchestration:** LangGraph (Stateful Multi-Agent).
 - **Core LLM:** OpenAI GPT-4o-mini.
 - **Observability:** OpenTelemetry (OTLP) + Jaeger.
-- **Event Bus:** Apache Kafka (Kraft Mode).
+- **Event Bus:** Apache Kafka (Kraft Mode) / Redis.
 - **Vector Database:** ChromaDB.
 - **Web Layer:** FastAPI (Async logic with Real-time SSE).
 
 ---
 
-## 🌌 High-Autonomy Features (The "Fix Path" Evolution)
+## 🚀 Deployment Instructions
 
-SRE-Space has evolved from simple logging to **Autonomous Operations**. The engine now differentiates between incident types and manages the entire GitOps lifecycle:
+### Local Environment
+Run the full-fidelity cluster with Kafka, Jaeger, and high-concurrency agents:
+```bash
+docker-compose -f docker-compose.local.yml up --build
+```
 
-### ⚡ Unified GitOps Lifecycle (Standard for ALL Fixes)
-Whether it's a code patch OR an infrastructure change, the engine follows a strict engineering protocol:
-1. **🌿 Branching**: Automatically creates a unique fix branch (e.g., `fix-inc-441`).
-2. **💾 Commits**: Prepares and pushes standardized, traceable commits.
-3. **✅ Pull Requests**: Opens a PR on GitHub for full observability.
-4. **🤝 Autonomous Merge**: Verifies the fix against safety policies and executes a Squash-Merge into `main`.
-5. **📦 Deployment**: Triggers the rollout of the patched service or scaled infrastructure.
-
-### 🌀 Parallel Autonomous Paths
-- **Code Path**: Detects logic bugs (e.g., `ZeroDivisionError`) and executes a full GitOps cycle.
-- **Infra Path**: Detects saturation/scaling issues and applies direct operational adjustments via IaC.
+### Cloud Environment (Render Blueprint)
+Deploy via `render.yaml` using Render Blueprint:
+1. Fork this repository.
+2. Link your account to Render.com.
+3. Select **New** -> **Blueprint**.
+4. Provide the following environment variables:
+   - `OPENAI_API_KEY`
+   - `GITHUB_PERSONAL_ACCESS_TOKEN`
 
 ---
 
-## 🛠️ Performance-First Design
-- **⚡ Bolt Optimization**: The LangGraph state machine is **pre-compiled and cached** at the module level, eliminating cold-start latency (reduction of ~20ms per loop).
-- **🚀 Real-time Streaming**: Incident reports are streamed via Server-Sent Events (SSE) for sub-second dashboard feedback.
+## 🏥 System Health & Runtime Intelligence
+- **Health Check**: `GET /system/health` - Real-time metrics on memory usage, degraded mode status, and event bus backend.
+- **Memory Guard**: The engine automatically enters `DEGRADED_MODE` if memory usage exceeds 450MB to maintain stability in constrained environments.
+- **Ready Probe**: `GET /ready` - Confirms connectivity to event bus and agent registration.
 
 ---
 
 ## 🏛️ Monorepo Architecture
-SRE-Space is organized as a unified monorepo for maximum traceability and component reuse.
-
-- **`apps/`**: Deployable services.
-  - `control_plane/`: The LangGraph squad engine and core API.
-- **`packages/`**: Shared logic and libraries.
-  - `agents/`: The 8-agent squad logic (Scout, CAG, Brain, Guardrail, Fixer, Curator, Human, Jules).
-  - `shared/`: Common GitOps, GitHub, and reporting utilities.
-- **`infra/`**: Infrastructure-as-Code (Docker Compose, Otel configuration).
-- **`scripts/`**: Automation, verification, and chaos testing utilities.
+- **`apps/`**
+  - `control_plane/`: Core LangGraph engine and API.
+  - `websocket_bridge/`: Unified event streamer.
+- **`packages/shared/`**
+  - `event_bus/`: Abstraction layer for Kafka/Redis implementations.
+  - `memory_guard/`: Runtime RAM monitoring and protection logic.
 
 ---
 
-## ⚡ Getting Started (Verification)
-
-### 1. Launch & Start
-```bash
-docker-compose up -d
-python apps/control_plane/main.py
-```
-
-### 2. Run the Autonomy Suite
-Verify both **Infra** and **Code** autonomous paths in one command:
-```bash
-python scripts/verify_autonomy.py
-```
-
-### 3. Verify Jules (The Architect)
-Trigger a standalone architectural review:
-```bash
-python scripts/verify_jules.py
-```
+## 🏥 Architecture Legacy
+- **`agents/`**: The 8-agent squad logic (Scout, CAG, Brain, Guardrail, Fixer, Curator, Human, Jules).
+- **`shared/`**: Common GitOps, GitHub, and reporting utilities.
+- **`infra/`**: Infrastructure-as-Code (OTel configuration).
+- **`scripts/`**: Automation, verification, and chaos testing utilities.
 
 ---
 

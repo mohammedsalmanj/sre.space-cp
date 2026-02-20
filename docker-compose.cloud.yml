@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  control-plane:
+    build: .
+    ports:
+      - "8001:8001"
+    environment:
+      - SRE_ENV=cloud
+      - EVENT_BUS=redis
+      - REDIS_URL=redis://redis:6379
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+      - LOG_LEVEL=WARNING
+    depends_on:
+      - redis
+      - chromadb
+
+  redis:
+    image: redis:alpine
+    # No ports exposed to public for security in cloud mode default
+
+  chromadb:
+    image: chromadb/chroma:latest
+    environment:
+      - IS_PERSISTENT=TRUE
+    volumes:
+      - ./chroma_data:/chroma/data

@@ -115,4 +115,13 @@ async def run_sre_loop(is_anomaly: bool = False, anomaly_type: str = "infra"):
     if is_anomaly:
         initial_state["anomaly_frequency"] = 1
 
-    return await graph.ainvoke(initial_state)
+    # Future-ready: Emit loop start event
+    from packages.shared.event_bus.emit_helper import emit_agent_thought
+    await emit_agent_thought("SYSTEM", f"SRE Loop initiated. Anomaly: {is_anomaly}, Type: {anomaly_type}", initial_state)
+
+    result = await graph.ainvoke(initial_state)
+
+    # Future-ready: Emit loop completion
+    await emit_agent_thought("SYSTEM", f"SRE Loop completed with status: {result['status']}", result)
+    
+    return result
