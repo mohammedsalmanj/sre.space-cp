@@ -65,6 +65,23 @@ class GitHubService:
             print(f"❌ [GitHubService] Request failed: {str(e)}")
             return {"error": str(e)}
 
+    def merge_pr(self, pull_number, commit_title=None):
+        print(f"[GitHubService] Merging PR #{pull_number}")
+        if not self.token:
+            return {"error": "No token found"}
+        
+        url = f"{self.base_url}/repos/{self.owner}/{self.repo}/pulls/{pull_number}/merge"
+        data = {
+            "commit_title": commit_title or f"Merging SRE Autonomous PR #{pull_number}",
+            "merge_method": "squash"
+        }
+        try:
+            response = requests.put(url, headers=self.headers, json=data, timeout=30)
+            return response.json()
+        except Exception as e:
+            print(f"❌ [GitHubService] Merge failed: {str(e)}")
+            return {"error": str(e)}
+
     def get_repo_info(self):
         url = f"{self.base_url}/repos/{self.owner}/{self.repo}"
         response = requests.get(url, headers=self.headers, timeout=10)

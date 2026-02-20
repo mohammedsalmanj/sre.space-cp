@@ -13,14 +13,25 @@ def get_memory_collection():
         return None
 
 def brain_agent(state):
-    """Agent: Brain (RAG + OpenAI Reasoning)"""
+    """
+    Agent: Brain (Root Cause Analysis)
+    
+    The Brain agent uses Retrieval-Augmented Generation (RAG) and LLM reasoning 
+    to diagnose the root cause of an incident and suggest a remediation.
+    
+    Logic Flow:
+    1. Check ChromaDB (RAG) for historical matches of similar incidents.
+    2. If no high-confidence historical match is found, escalate to GPT-4o-mini.
+    3. Generate an RCA and a remediation plan.
+    4. Proactively raise a GitHub incident if confidence is high.
+    """
     logs = state.get("logs", [])
     if state.get("cache_hit") or not state["error_spans"]: return state
 
     msg = state["error_spans"][0]["exception.message"]
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] Consulting RAG Memory for '{msg}'")
 
-    # 1. Try RAG first (Fast/Cheap)
+    # PHASE 1: Try RAG first (Fast/Cheap/Consistent)
     collection = get_memory_collection()
     rag_hit = False
     if collection:
@@ -30,12 +41,13 @@ def brain_agent(state):
                 state["confidence_score"] = 0.88 
                 state["root_cause"] = "Identified via historical match."
                 state["remediation"] = results['metadatas'][0][0].get('solution', "Apply standard patch.")
+                state["remediation_type"] = results['metadatas'][0][0].get('type', "code")
                 logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] RAG match found (Conf: 0.88)")
                 rag_hit = True
         except:
             logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] RAG query failed, escalating to LLM.")
 
-    # 2. Use OpenAI Wisely (only if RAG fails or confidence is low)
+    # PHASE 2: Use OpenAI for Deep Reasoning (only if RAG fails or confidence is low)
     if not rag_hit:
         api_key = os.getenv("OPENAI_API_KEY")
         if api_key and not api_key.startswith("your_"):
@@ -53,20 +65,25 @@ def brain_agent(state):
                 analysis = response.choices[0].message.content
                 state["confidence_score"] = 0.95
                 
-                # Split analysis into RCA and Remediation if possible, or just store the whole thing
+                # Store the analysis results in the state
                 state["root_cause"] = analysis
                 state["remediation"] = "Apply the recommended fix derived from LLM analysis."
+                state["remediation_type"] = "code" if "patch" in analysis.lower() or "code" in analysis.lower() else "infra"
                 logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] OpenAI Analysis Complete.")
             except Exception as e:
                 logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] OpenAI escalation failed: {str(e)}")
                 state["root_cause"] = "Manual investigation required due to API Failure."
                 state["remediation"] = "Manual check required."
+                state["remediation_type"] = "other"
         else:
+            # Fallback for when no API key is present (Development/Demo Mode)
             logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] No OpenAI Key available for escalation.")
             state["root_cause"] = "The system has detected a potential database connection pool exhaustion. This usually happens when high traffic saturates the available connections or when connections are not being properly returned to the pool."
             state["remediation"] = "SCALE: Increase the database connection pool size and check for connection leaks in the application code."
+            state["remediation_type"] = "infra"
 
-    # 3. Post Incident to GitHub (Raise Earlier)
+    # PHASE 3: Proactive GitHub Reporting
+    # If we are highly confident, we raise the incident early to notify stakeholders.
     if state.get("confidence_score", 0) > 0.9:
         try:
             from packages.shared.github_service import GitHubService
@@ -74,6 +91,8 @@ def brain_agent(state):
             gh = GitHubService()
             issue_title = f"[INCIDENT] {state.get('service', 'System')} - {state['root_cause'][:50]}..."
             issue_body = format_full_incident_report(state)
+            
+            # Create a tracked incident on GitHub
             gh_res = gh.create_issue(title=issue_title, body=issue_body, labels=["incident", "brain-diag"])
             if "number" in gh_res:
                 state["incident_number"] = gh_res["number"]
