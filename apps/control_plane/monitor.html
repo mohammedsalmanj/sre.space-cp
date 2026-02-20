@@ -109,7 +109,8 @@
                 <div class="flex items-center gap-3 mb-2">
                     <div class="h-3 w-3 rounded-full bg-blue-500 stream-active"></div>
                     <h1 class="text-2xl font-black italic tracking-tighter uppercase whitespace-nowrap">Control Plane
-                        <span class="text-slate-500 font-light not-italic">SRE-Orbital v5.0</span></h1>
+                        <span class="text-slate-500 font-light not-italic">SRE-Orbital v5.0</span>
+                    </h1>
                 </div>
                 <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.5em]">Global Reliability
                     Orchestration & Telemetry</p>
@@ -239,7 +240,9 @@
     </div>
 
     <script>
-        const API_BASE = window.location.origin;
+        // Cross-Origin Logic: Check if we are on Vercel connecting to Render
+        const urlParams = new URLSearchParams(window.location.search);
+        const API_BASE = urlParams.get('server') || window.location.origin;
         let eventSource = null;
 
         async function updateHealth() {

@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 import json
 import uvicorn
@@ -28,13 +29,30 @@ from packages.shared.github_service import GitHubService
 from packages.shared.telemetry import track_request
 
 app = FastAPI(title=f"SRE-Space | {ENV.upper()} Mode")
+
+# Enable CORS for Control Plane (Vercel)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # In production, replace with your specific Vercel URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 templates = Jinja2Templates(directory=os.path.dirname(__file__))
 github = GitHubService()
+
+# Configuration for the Control Plane (Vercel)
+# If deployed, set SRE_MONITOR_URL in your Render environment variables.
+SRE_MONITOR_URL = os.getenv("SRE_MONITOR_URL", "/monitor")
 
 @app.get("/", response_class=HTMLResponse)
 async def get_index(request: Request):
     """Main Insurance Application (Marketplace)."""
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("index.html", {
+        "request": request, 
+        "monitor_url": SRE_MONITOR_URL
+    })
 
 @app.get("/monitor", response_class=HTMLResponse)
 async def get_monitor(request: Request):
