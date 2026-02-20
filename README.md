@@ -1,212 +1,130 @@
-# SRE-Space: The Cognitive Reliability Engine
+# SRE-Space: The Autonomous Cognitive Engine
 
-### Autonomous Multi-Agent SRE Control Plane Powered by LangGraph
-
-![Render](https://img.shields.io/badge/Render-Deployed-46E3B7?style=flat-square&logo=render&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-Monitoring-000000?style=flat-square&logo=vercel&logoColor=white)
-![LangGraph](https://img.shields.io/badge/AI-LangGraph-FF6F00?style=flat-square&logo=langchain&logoColor=white)
-![OpenAI](https://img.shields.io/badge/LLM-OpenAI-41ADFF?style=flat-square&logo=openai&logoColor=white)
-![Redis](https://img.shields.io/badge/Event--Bus-Redis-DC382D?style=flat-square&logo=redis&logoColor=white)
-![Kafka](https://img.shields.io/badge/Event--Bus-Kafka-231F20?style=flat-square&logo=apachekafka&logoColor=white)
-![OpenTelemetry](https://img.shields.io/badge/Observability-OTel-F46800?style=flat-square&logo=opentelemetry&logoColor=white)
-![FastAPI](https://img.shields.io/badge/API-FastAPI-05998B?style=flat-square&logo=fastapi&logoColor=white)
-![Docker](https://img.shields.io/badge/Container-Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
-![GitOps](https://img.shields.io/badge/Continuous--Delivery-GitOps-F05032?style=flat-square&logo=git&logoColor=white)
+### Self-Healing Control Plane for Modern Cloud Infrastructure
+[![Architecture: User vs Control Plane](https://img.shields.io/badge/Architecture-Distributed_Plane-blue?style=for-the-badge)](https://github.com/your-repo/sre-space)
+[![Reliability: Autonomous GitOps](https://img.shields.io/badge/Reliability-Autonomous_GitOps-green?style=for-the-badge)](https://github.com/your-repo/sre-space)
 
 ---
 
-## 2. Problem Statement
+## 🛰️ Project Overview
 
-Modern distributed systems suffer from a critical "Autonomy Gap" in reliability engineering:
+**SRE-Space** is a production-grade, autonomous reliability engine that bridges the gap between passive observability and active remediation. By implementing a high-level **OODA Loop (Observe, Orient, Decide, Act)** via a multi-agent cognitive squad, the system detects anomalies, performs deep-reasoning RCA, executes GitOps code fixes, and merges them—all without human intervention.
 
-*   **Alert Fatigue**: Monitoring systems generate thousands of signals that require manual triaging, leading to delayed response times.
-*   **Manual RCA Bottlenecks**: Root Cause Analysis (RCA) often relies on human correlation of metrics, traces, and logs, a process that is slow and error-prone.
-*   **Delayed Remediation**: The time from detection to code-fix (MTTR) is gated by human availability and PR review cycles.
-*   **Infrastructure Sensitivity**: Reliability tools are often tightly coupled to specific infrastructure, failing to operate effectively in resource-constrained or heterogeneous cloud environments.
-*   **OOM Vulnerability**: Autonomous agents can be resource-intensive, risking system crashes (Out-Of-Memory) during high-load incident cycles.
+### 🎯 The "Autonomy Gap" We Solve
+Modern SRE teams are overwhelmed by "High-Signal, No-Action" environments. 
+1.  **Alert Fatigue**: Systems signal failures but don't explain why.
+2.  **MTTR Lag**: Mean Time To Repair is gated by human context-switching and manual PR reviews.
+3.  **Context Loss**: Knowledge of past incidents is often buried in Slack threads rather than codified in a RAG-accessible memory.
 
-**SRE-Space solves these challenges** by implementing a cognitive reasoning loop that abstracts infrastructure complexity, enforces adaptive runtime protection, and executes self-healing GitOps cycles without human intervention.
+**SRE-Space closes this gap by transforming telemetry into physical repository state changes.**
 
 ---
 
-## 3. Solution Architecture
+## 🏗️ High-Level Architecture
 
-SRE-Space utilizes a distributed control plane architecture to separate the **Intelligence Layer** from the **Observability Layer**.
+The system demonstrates a clear **Separation of Planes**, a pattern critical for large-scale engineering platforms.
+
+### 1. The User Plane (Marketplace)
+*   **Infrastructure**: Deployed on Render.
+*   **Role**: The "Frontline" application (Insurance Marketplace).
+*   **Engineering Controls**: Built-in fault injection (Real 500s, Latency, Memory) to test the engine's resilience.
+*   **Telemetry**: Emits real-time OpenTelemetry spans for every user transaction.
+
+### 2. The Control Plane (Orbital Monitor)
+*   **Infrastructure**: Deployed on Vercel (or high-concurrency Node edge).
+*   **Role**: The "Command Center" for SREs.
+*   **Visual Style**: Premium "Liquid Glass" design for elite situational awareness.
+*   **Intelligence**: Real-time SSE stream of the internal "Agent Thoughts" and GitHub activity sync.
 
 ```mermaid
 graph TD
-    subgraph "🛸 Vercel Control Station (Monitor)"
-        UI[Orbital Dashboard]
-        UI -->|Telemetry Scrape| RC
+    subgraph "🛸 Control Plane (Vercel)"
+        UI[Orbital Monitor Dashboard]
+        SSE[SSE Telemetry Stream]
+        GitSync[GitHub API Sync]
     end
 
-    subgraph "🏢 Render Cloud (Production Hub)"
-        RC[FastAPI Control Plane]
-        DB[(ChromaDB RAG Memory)]
-        Bus[(Redis/Kafka Event Bus)]
-        Agents[8-Agent Cognitive Squad]
-        Guard[Runtime Governor]
-    end
-
-    subgraph "🤖 Cognitive Repair Loop"
-        Scout[🕵️ Scout] -->|OTel Signals| Brain[🧠 Brain]
-        Brain -->|RAG Correlation| GuardRail[🛡️ Guardrail]
-        GuardRail -->|Safety Approval| Fixer[🛠️ Fixer]
-        Fixer -->|GitOps Commit| GitHub[🐙 GitHub Repository]
-    end
-
-    subgraph "🌐 Production Environment"
+    subgraph "🏢 User Plane (Render)"
         App[Insurance Marketplace]
-        App -->|Trace Export| Scout
+        OTel[OTel Span Exporter]
+        Faults[Engineering Controls]
     end
 
-    GitHub -->|CI/CD Sync| App
+    subgraph "🧠 Cognitive Engine (LangGraph)"
+        Scout[Scout Agent] --> Brain[Brain Agent]
+        Brain --> Guard[Guardrail Agent]
+        Guard --> Fixer[Fixer Agent]
+        Fixer --> GitHub[GitHub GitOps]
+    end
+
+    App -->|Telemetry| Scout
+    Faults -->|Trigger| App
+    GitHub -->|PR/Merge| App
 ```
 
 ---
 
-## 4. Dual Runtime Modes
+## 🤖 The Cognitive Agent Squad (OODA)
 
-SRE-Space is engineered for binary compatibility across distinct environments via its abstraction layer.
+We orchestrate specialized agents via **LangGraph** to maintain system equilibrium. No mocks, no fake state.
 
-### Local Mode (Performance Profile)
-Optimized for high-fidelity development and stress testing.
-*   **Event Bus**: Apache Kafka for high-throughput stream processing.
-*   **Concurrency**: Uncapped LLM execution and high-frequency sensor polling.
-*   **Observability**: Full Jaeger/OTel integration with 1.0 sampling.
-*   **Requirement**: Dedicated infrastructure via `docker-compose.local.yml`.
-
-### Cloud Mode (Adaptive Profile - Render)
-Optimized for stability and operational efficiency in managed cloud environments.
-*   **Event Bus**: Managed Redis for low-latency asynchronous signaling.
-*   **Runtime Guard**: Adaptive Memory Governor active (triggers at 450MB).
-*   **Concurrency**: Throttled execution to prevent race conditions and credit exhaustion.
-*   **Observability**: Selective trace sampling (0.1) and optimized JSON logging.
-
----
-
-## 5. The 8-Agent Cognitive Squad
-
-The engine orchestrates 8 specialized agents via LangGraph to maintain system equilibrium.
-
-| Agent | Mission | Trigger | Authority |
+| Phase | Agent | Role | Capability |
 | :--- | :--- | :--- | :--- |
-| **🕵️ Scout** | Anomaly Detection | OTel Traces | Read-only access to metrics/traces. |
-| **🧠 Brain** | Root Cause Analysis | Scout Signal | Neural reasoning over logs + RAG memory. |
-| **🛠️ Fixer** | Remediation Execution | Approved RCA | Write access to GitHub (Commits/PRs). |
-| **🛡️ Guardrail**| Policy Enforcement | Fixer Proposal | Veto power over unsafe/low-confidence actions. |
-| **⚡ CAG** | Tier-1 Remediation | Known Pattern | Instant resolution for cached incidents. |
-| **🤖 Jules** | Arch Hardening | Cron / Interval | Audits system design for cost/stability. |
-| **🧹 Curator**| Long-term Memory | Post-mortem | Writes to ChromaDB vector store. |
-| **🚨 Human** | Escalation | Loop Threshold | Final arbiter for persistent anomalies. |
+| **OBSERVE** | 🕵️ **Scout** | Telemetry Analyst | Samples real OTel traces and error rates. Identifies breaches. |
+| **ORIENT** | 🧠 **Brain** | RCA Synthesis | Combines ChromaDB RAG memory with GPT-4 deep reasoning. |
+| **DECIDE** | 🛡️ **Guardrail** | Safety Enforcer | Vetoes unsafe remediation or low-confidence fixes. |
+| **ACT** | 🛠️ **Fixer** | GitOps Executor | 100% Real Branch Creation -> File Update -> PR -> Merge. |
 
 ---
 
-## 6. End-to-End Operational Flow
+## 💎 Key Features
 
-The system follows a strict OODA (Observe, Orient, Decide, Act) cycle implemented as a state machine.
-
-```mermaid
-sequenceDiagram
-    participant App as Production App
-    participant Scout as Scout Agent
-    participant Bus as Event Bus
-    participant Brain as Brain (RAG)
-    participant Fixer as Fixer Agent
-    participant GitHub as GitOps Repo
-
-    App->>Scout: Trace Latency/5xx Spike
-    Scout->>Bus: Emit AnomalyEvent
-    Bus->>Brain: Trigger RCA Loop
-    Brain->>Brain: Query ChromaDB (Context)
-    Brain->>Fixer: Propose Patch (JSON)
-    Fixer->>GitHub: Create Issue & Pull Request
-    GitHub-->>App: Auto-Deploy / Merge
-    Note over App,GitHub: System Recovery Verified
-```
+*   **Real-Time OODA Loop**: Watch the system move from Anomaly Detection to GitHub Merge in 30 seconds.
+*   **Liquid Glass Dashboard**: Professional-grade observability UI with real-time SSE log streaming.
+*   **GitOps Enforcement**: The system doesn't just "fix things"—it follows your engineering standards by creating audited PRs and issues.
+*   **Memory Guard (Render-Hardened)**: Active `psutil` governor that throttles LLM usage when approaching the 512MB RAM limit.
+*   **Dual-Event Bus Support**: Adaptive fallback between **Apache Kafka** (Local High-Performance) and **Redis** (Cloud Managed).
 
 ---
 
-## 7. Deployment Guide
+## 🚀 Getting Started
 
-### Deployment to Render (Core Engine)
-The core engine is deployed as a Dockerized web service with an integrated blueprint.
-1. Fork the repository and connect to Render.
-2. The `render.yaml` will automatically provision the **Web Service** and **Managed Redis**.
-3. **Required Environment Variables**:
-   * `OPENAI_API_KEY`: LLM reasoning provider.
-   * `GITHUB_PERSONAL_ACCESS_TOKEN`: Repository management.
-   * `ENV`: Set to `cloud`.
-   * `MEMORY_THRESHOLD_MB`: Set to `450` (Adaptive Protection).
-   * `MAX_LLM_CONCURRENCY`: Set to `1` (Cloud stability).
-
-### Deployment to Vercel (Orbital Monitor)
-Vercel serves the **Orbital Monitor Dashboard**, providing cross-cloud observability.
-1. Deploy `apps/control_plane/index.html` as a standalone monitoring site.
-2. The dashboard polls the Render API and GitHub API simultaneously to provide a unified reliability view.
-
----
-
-## 8. Local Development & Testing
-
-For local validation and architectural testing:
-
+### 1. Environment Configuration
+Create a `.env` file in the root:
 ```bash
-# 1. Initialize Performance Stack
-docker-compose -f docker-compose.local.yml up --build
+GITHUB_PERSONAL_ACCESS_TOKEN=your_pat_here
+OPENAI_API_KEY=your_key_here
+ENV=cloud # Use 'local' for Kafka mode
+EVENT_BUS=local # Use 'redis' for managed cloud
+```
 
-# 2. Inject Chaos via API
-curl -X POST "http://localhost:8001/demo/inject-failure?type=infra"
+### 2. Local Launch
+```bash
+# 1. Start the Backend Hub
+python apps/control_plane/main.py
 
-# 3. Verify System Recovery
-curl "http://localhost:8001/system/health"
+# 2. Access the Planes
+# User Plane: http://localhost:8001
+# Control Plane: http://localhost:8001/monitor
 ```
 
 ---
 
-## 9. Runtime Governor & Memory Guard
+## 🧪 Testing and Validation
 
-To ensure high availability in memory-constrained environments (e.g., 512MB RAM), SRE-Space implements active **Memory Guarding**:
-*   **Monitoring**: Continuous tracking using `psutil` within the control plane.
-*   **Degraded Mode**: Automatically activated when memory exceeds the threshold.
-*   **Remediation**:
-    *   Throttles LLM concurrency to 1.
-    *   Increases agent loop intervals (from 60s to 120s+).
-    *   Reduces OTel trace sampling rate.
-*   **Auto-Recovery**: Returns to full performance profile once memory normalizes.
+For a complete walkthrough of injecting faults and watching the system heal itself, please refer to the **[End-to-End Validation Guide (DEMO.md)](./DEMO.md)**.
 
 ---
 
-## 10. Reliability Metrics
+## 📜 Technical Specifications
 
-The system measures its own performance across four key dimensions:
-*   **MTTR (Mean Time To Repair)**: Interval from anomaly detection to PR creation.
-*   **Autonomous Success Rate**: Percentage of incidents resolved without Human escalation.
-*   **Cognitive Accuracy**: Correlation between Brain RCA and the actual root cause.
-*   **Resource Efficiency**: Ratio of CPU/RAM used per incident resolution cycle.
-
----
-
-## 11. Tech Stack Summary
-
-| Layer | Technology |
-| :--- | :--- |
-| **Orchestration** | LangGraph (Stateful Multi-Agent Loops) |
-| **Intelligence** | OpenAI (GPT-4o / GPT-4o-mini) |
-| **API Framework** | FastAPI |
-| **Vector Store** | ChromaDB |
-| **Event Bus** | Apache Kafka / Redis |
-| **Observability** | OpenTelemetry |
-| **Infrastructure** | Render (Core), Vercel (Monitor) |
-| **Deployment** | Docker & GitOps |
-
----
-
-## 12. Closing Statement
-
-SRE-Space represents a shift from **passive observability** to **autonomous reliability**. By combining multi-agent cognitive reasoning with strict GitOps enforcement, it creates a self-healing infrastructure layer that scales with system complexity. Whether deployed in local performance clusters or adaptive cloud environments, SRE-Space ensures that the "Human-in-the-Loop" remains a strategy, not a necessity.
+*   **Logic Framework**: LangGraph (Stateful Dataflow)
+*   **API Layer**: FastAPI / Uvicorn
+*   **Memory Layer**: ChromaDB (Vector Store), Redis/Kafka (Message Bus)
+*   **Design Language**: Vanilla CSS + Tailwind + Liquid Glass Backdrop
+*   **Observability**: OpenTelemetry compliant
 
 ---
 <div align="center">
-  <b>Designed for Infinite Uptime. Driven by Cognitive Intelligence.</b>
+  <b>Designed for Infinite Uptime. Driven by Autonomous Intelligence.</b>
 </div>

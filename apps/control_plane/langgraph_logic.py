@@ -66,9 +66,15 @@ def create_sre_graph():
     workflow.set_entry_point("scout")
     
     # Transition 1: Scout -> Decision
-    # If anomaly frequency is high, escalate to Human. Else if anomaly detected, go to CAG (Fast Fix).
-    workflow.add_conditional_edges("scout", 
-        lambda s: "human" if s["anomaly_frequency"] >= 3 else ("cag" if s["is_anomaly"] else END))
+    def scout_next_node(s):
+        freq = s.get("anomaly_frequency", 0)
+        is_anom = s.get("is_anomaly", False)
+        print(f"[GRAPH] Scout Transition: Freq={freq}, IsAnom={is_anom}")
+        if freq >= 3: return "human"
+        if is_anom: return "cag"
+        return END
+
+    workflow.add_conditional_edges("scout", scout_next_node)
     
     # Transition 2: CAG (Tier-1) -> Decision
     # If CAG misses (cache miss), escalate to Brain (Tier-2).

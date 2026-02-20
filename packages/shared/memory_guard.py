@@ -39,6 +39,7 @@ def get_system_stats():
     return {
         "memory_percent": mem.percent,
         "memory_available_mb": round(mem.available / (1024 * 1024), 2),
+        "memory_used_mb": round(mem.used / (1024 * 1024), 2),
         "cpu_percent": psutil.cpu_percent(),
         "degraded": check_memory_health()
     }

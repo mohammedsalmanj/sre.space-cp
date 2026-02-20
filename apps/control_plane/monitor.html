@@ -4,232 +4,394 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRE-Space | Orbital Monitor v4.0</title>
+    <title>SRE-Space | Control Plane v5.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <style>
+        :root {
+            --glass-bg: rgba(13, 17, 23, 0.7);
+            --border-glow: rgba(59, 130, 246, 0.3);
+        }
+
         body {
-            font-family: 'Outfit', sans-serif;
-            background: #010409;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #000;
             color: #f8fafc;
             overflow-x: hidden;
         }
 
-        .glass {
-            background: rgba(13, 17, 23, 0.9);
-            backdrop-filter: blur(20px);
-            border: 1px solid #30363d;
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #000 100%);
+            opacity: 0.5;
+        }
+
+        .liquid-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        .liquid-glass:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.15);
         }
 
         .terminal {
             font-family: 'JetBrains Mono', monospace;
-            background: #000;
-            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 1rem;
         }
 
-        .pulse {
-            animation: pulse 2s infinite;
+        .ooda-step {
+            opacity: 0.3;
+            transition: all 0.3s;
         }
 
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0px rgba(34, 197, 94, 0.4);
-            }
-
-            100% {
-                box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
-            }
+        .ooda-active {
+            opacity: 1;
+            transform: scale(1.05);
+            color: #60a5fa;
+            text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
         }
 
         .stream-active {
-            color: #22c55e;
-            animation: blink 1.5s infinite;
+            color: #3b82f6;
+            animation: pulse-glow 2s infinite;
         }
 
-        @keyframes blink {
+        @keyframes pulse-glow {
 
             0%,
             100% {
                 opacity: 1;
+                text-shadow: 0 0 5px #3b82f6;
             }
 
             50% {
-                opacity: 0.3;
+                opacity: 0.5;
+                text-shadow: 0 0 2px #3b82f6;
             }
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
         }
     </style>
 </head>
 
-<body class="p-4 md:p-10">
-    <div class="max-w-[1440px] mx-auto">
-        <!-- Header -->
-        <header class="flex justify-between items-end mb-10 px-4">
+<body class="p-4 md:p-8 lg:p-12">
+    <div class="bg-mesh"></div>
+
+    <div class="max-w-[1600px] mx-auto">
+        <!-- Header Section -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
             <div>
-                <h1 class="text-3xl font-black text-blue-500 italic tracking-tighter">SRE-SPACE ORBITAL <span
-                        class="text-slate-500 font-light not-italic">v4.0</span></h1>
-                <div class="flex items-center gap-2 mt-1">
-                    <span class="w-2 h-2 rounded-full bg-green-500 stream-active"></span>
-                    <span class="text-[9px] font-black uppercase text-slate-500 tracking-[0.4em]">Live Telemetry
-                        Stream</span>
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="h-3 w-3 rounded-full bg-blue-500 stream-active"></div>
+                    <h1 class="text-2xl font-black italic tracking-tighter uppercase whitespace-nowrap">Control Plane
+                        <span class="text-slate-500 font-light not-italic">SRE-Orbital v5.0</span></h1>
+                </div>
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.5em]">Global Reliability
+                    Orchestration & Telemetry</p>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="liquid-glass px-6 py-3 flex items-center gap-4">
+                    <div class="text-right">
+                        <span class="text-[8px] font-black text-slate-500 block uppercase">Operational Status</span>
+                        <span id="conn-status" class="text-[10px] font-extrabold text-blue-400">NOMINAL</span>
+                    </div>
+                    <div id="status-dot" class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6]"></div>
                 </div>
             </div>
-            <div id="connection-status" class="text-[10px] font-bold text-slate-600 uppercase">Awaiting Uplink...</div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Left: Live Console (SSE Driven) -->
-            <div class="lg:col-span-8 space-y-4">
-                <div class="terminal h-[650px] rounded-2xl border border-slate-800 shadow-2xl flex flex-col">
-                    <div class="bg-slate-900/50 px-6 py-3 border-b border-slate-800 flex justify-between items-center">
-                        <span class="text-[10px] font-black text-slate-500 tracking-widest uppercase">Cognitive Stream
-                            Output</span>
-                        <div id="active-agent" class="text-[10px] font-bold text-blue-400">IDLE</div>
+            <!-- Main Monitoring Column -->
+            <div class="lg:col-span-8 space-y-8">
+                <!-- OODA Loop Visualization -->
+                <div class="liquid-glass p-8">
+                    <div class="flex justify-between items-center mb-10">
+                        <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest">Active Remediation
+                            Pipeline</h2>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] font-bold text-slate-600 uppercase">Engine Loop:</span>
+                            <span id="loop-id" class="text-[9px] font-bold text-blue-400 font-mono">IDLE_STANDBY</span>
+                        </div>
                     </div>
-                    <div id="logs" class="p-8 space-y-3">
-                        <div class="text-slate-700 italic text-sm font-mono">// System standby. Connect to Render hub to
-                            begin...</div>
+                    <div class="grid grid-cols-4 gap-4">
+                        <div id="step-O1" class="ooda-step flex flex-col items-center text-center">
+                            <div class="h-1 bg-slate-800 w-full mb-4 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 w-0 transition-all duration-500"></div>
+                            </div>
+                            <span class="text-[10px] font-black uppercase">Observe</span>
+                        </div>
+                        <div id="step-O2" class="ooda-step flex flex-col items-center text-center">
+                            <div class="h-1 bg-slate-800 w-full mb-4 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 w-0 transition-all duration-500"></div>
+                            </div>
+                            <span class="text-[10px] font-black uppercase">Orient</span>
+                        </div>
+                        <div id="step-D" class="ooda-step flex flex-col items-center text-center">
+                            <div class="h-1 bg-slate-800 w-full mb-4 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 w-0 transition-all duration-500"></div>
+                            </div>
+                            <span class="text-[10px] font-black uppercase">Decide</span>
+                        </div>
+                        <div id="step-A" class="ooda-step flex flex-col items-center text-center">
+                            <div class="h-1 bg-slate-800 w-full mb-4 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 w-0 transition-all duration-500"></div>
+                            </div>
+                            <span class="text-[10px] font-black uppercase">Act</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cognitive Trace Log -->
+                <div class="liquid-glass flex flex-col h-[500px] overflow-hidden">
+                    <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-white/5">
+                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Cognitive
+                            Intelligence Trace</h3>
+                        <span class="text-[9px] font-mono text-slate-600">secure_uplink_v5.4</span>
+                    </div>
+                    <div id="logs" class="p-8 space-y-3 overflow-y-auto flex-grow terminal">
+                        <div class="text-slate-600 italic text-[11px] font-mono">// Control Plane initialized.
+                            Connecting to Render telemetry hub...</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right: Real-time Stats & Git Feed -->
-            <div class="lg:col-span-4 space-y-6">
-                <!-- Real-time Stats -->
-                <div class="glass p-6 space-y-4 border-l-4 border-blue-500">
-                    <div class="flex justify-between items-center">
-                        <span class="text-[10px] font-black text-slate-500 uppercase">System Integrity</span>
-                        <div id="health-dot" class="w-2 h-2 rounded-full bg-green-500 pulse"></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
+            <!-- Side Intelligence Panel -->
+            <div class="lg:col-span-4 space-y-8">
+                <!-- System Health Stats -->
+                <div class="liquid-glass p-8 space-y-6">
+                    <h3 class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-6">System Health
+                        Metrics</h3>
+                    <div class="grid grid-cols-2 gap-y-8 gap-x-4">
                         <div>
-                            <span class="text-[8px] font-bold text-slate-500 block uppercase">Mode</span>
+                            <span class="text-[8px] font-bold text-slate-500 block uppercase mb-1">Compute
+                                Environment</span>
                             <span id="stat-mode" class="text-xs font-black text-blue-400">---</span>
                         </div>
                         <div>
-                            <span class="text-[8px] font-bold text-slate-500 block uppercase">Memory</span>
+                            <span class="text-[8px] font-bold text-slate-500 block uppercase mb-1">Heap
+                                Utilization</span>
                             <span id="stat-mem" class="text-xs font-black text-green-400">--%</span>
                         </div>
                         <div>
-                            <span class="text-[8px] font-bold text-slate-500 block uppercase">Event Bus</span>
-                            <span id="stat-bus" class="text-xs font-black text-purple-400">---</span>
+                            <span class="text-[8px] font-bold text-slate-500 block uppercase mb-1">Circuit
+                                Breaker</span>
+                            <span id="stat-cb" class="text-xs font-black text-slate-500">CLOSED</span>
                         </div>
                         <div>
-                            <span class="text-[8px] font-bold text-slate-500 block uppercase">Chaos</span>
-                            <span id="stat-chaos" class="text-xs font-black text-slate-500">OFF</span>
+                            <span class="text-[8px] font-bold text-slate-500 block uppercase mb-1">Fault Active</span>
+                            <span id="stat-chaos" class="text-xs font-black text-slate-500">NONE</span>
+                        </div>
+                    </div>
+                    <div class="pt-6 border-t border-white/5">
+                        <div class="flex justify-between items-center text-[10px] font-bold mb-2">
+                            <span class="text-slate-500">Memory Pressure</span>
+                            <span id="mem-val" class="text-slate-300">---MB</span>
+                        </div>
+                        <div class="h-1 bg-slate-800 w-full rounded-full overflow-hidden">
+                            <div id="mem-bar" class="h-full bg-green-500 w-0 transition-all duration-500"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- GitHub Intelligence -->
+                <!-- GitHub Integration -->
                 <div class="space-y-4">
-                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">GitOps Activity
-                        (REST Sync)</h3>
-                    <div id="git-feed" class="space-y-3">
-                        <div class="text-center py-10 text-slate-700 text-[10px] font-bold uppercase tracking-widest">
-                            Polling Activity...</div>
+                    <h3 class="text-[11px] font-black text-slate-500 uppercase tracking-widest px-8">Real-Time GitOps
+                        Feed</h3>
+                    <div id="git-feed" class="space-y-4 px-4 overflow-y-auto max-h-[400px]">
+                        <!-- Real items injected here -->
+                        <div class="text-center py-10 opacity-30 text-[10px] font-bold uppercase tracking-widest">
+                            Awaiting API Payload...</div>
                     </div>
                 </div>
 
-                <button onclick="startMonitoring()" id="monitor-btn"
-                    class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs uppercase tracking-[0.2em] transition-all shadow-lg active:scale-95">
-                    Connect Telemetry Stream
+                <button onclick="connectStream()" id="stream-btn"
+                    class="liquid-glass w-full py-5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 font-black text-xs uppercase tracking-[0.3em] transition-all">
+                    Establish Uplink
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        const API_BASE = window.location.origin; // Should be points to Render in prod
+        const API_BASE = window.location.origin;
         let eventSource = null;
 
-        async function updateStats() {
+        async function updateHealth() {
             try {
                 const res = await fetch(`${API_BASE}/system/health`);
                 const data = await res.json();
                 document.getElementById('stat-mode').innerText = data.mode.toUpperCase();
                 document.getElementById('stat-mem').innerText = data.memory.memory_percent + '%';
-                document.getElementById('stat-bus').innerText = data.event_bus.toUpperCase();
-                document.getElementById('stat-chaos').innerText = data.chaos_active ? 'ACTIVE' : 'OFF';
-                document.getElementById('stat-chaos').className = data.chaos_active ? 'text-xs font-black text-red-500' : 'text-xs font-black text-slate-500';
+                document.getElementById('stat-cb').innerText = data.circuit_breaker_active ? 'TRIPPED' : 'CLOSED';
+                document.getElementById('stat-cb').className = data.circuit_breaker_active ? 'text-xs font-black text-red-500' : 'text-xs font-black text-slate-500';
+
+                document.getElementById('stat-chaos').innerText = data.chaos_active ? 'DETECTED' : 'NONE';
+                document.getElementById('stat-chaos').className = data.chaos_active ? 'text-xs font-black text-orange-500' : 'text-xs font-black text-slate-500';
+
+                document.getElementById('mem-val').innerText = data.memory.memory_used_mb.toFixed(1) + 'MB';
+                const mBar = document.getElementById('mem-bar');
+                mBar.style.width = data.memory.memory_percent + '%';
+                mBar.style.backgroundColor = data.memory.memory_percent > 80 ? '#ef4444' : (data.memory.memory_percent > 60 ? '#f59e0b' : '#22c55e');
+
+                if (data.chaos_active) {
+                    document.getElementById('status-dot').className = 'w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_10px_#f59e0b]';
+                    document.getElementById('conn-status').innerText = 'ANOMALY DETECTED';
+                    document.getElementById('conn-status').className = 'text-[10px] font-extrabold text-orange-500';
+                } else {
+                    document.getElementById('status-dot').className = 'w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6]';
+                    document.getElementById('conn-status').innerText = 'NOMINAL';
+                    document.getElementById('conn-status').className = 'text-[10px] font-extrabold text-blue-400';
+                }
             } catch (err) { }
         }
 
-        async function updateGitFeed() {
+        async function updateGitHub() {
             try {
                 const res = await fetch(`${API_BASE}/api/git-activity`);
                 const data = await res.json();
                 const feed = document.getElementById('git-feed');
                 feed.innerHTML = '';
+
+                if (data.length === 0) {
+                    feed.innerHTML = '<div class="text-center py-10 opacity-20 text-[10px] font-bold uppercase italic">No active incidents</div>';
+                    return;
+                }
+
                 data.forEach(item => {
-                    const color = item.state === 'open' ? 'indigo-400' : 'green-400';
+                    const isPR = item.type === 'pull_request';
+                    const stateColor = item.state === 'open' ? 'text-green-400' : 'text-slate-500';
+                    const borderColor = isPR ? 'border-purple-500/30' : 'border-blue-500/30';
+                    const icon = isPR ? 'PR' : 'ISS';
+
                     const div = document.createElement('div');
-                    div.className = 'glass p-4 border-l-2 border-indigo-500/50';
+                    div.className = `liquid-glass p-5 border-l-4 ${borderColor}`;
                     div.innerHTML = `
-                        <div class="flex justify-between text-[8px] font-black mb-1">
-                            <span class="text-${color}">#${item.number}</span>
-                            <span class="text-slate-500 uppercase">${item.state}</span>
+                        <div class="flex justify-between items-start mb-2">
+                             <span class="text-[9px] font-black text-slate-500 uppercase bg-white/5 px-2 py-0.5 rounded">${icon} #${item.number}</span>
+                             <span class="text-[9px] font-black uppercase ${stateColor}">${item.state}</span>
                         </div>
-                        <div class="text-[10px] font-bold text-slate-200 line-clamp-1">${item.title}</div>
+                        <div class="text-[11px] font-bold text-slate-200 leading-relaxed mb-3">${item.title}</div>
+                        <div class="text-[8px] font-medium text-slate-600">${new Date(item.created_at).toLocaleString()}</div>
                     `;
                     feed.appendChild(div);
                 });
             } catch (err) { }
         }
 
+        function setOODA(stepId) {
+            const steps = ['step-O1', 'step-O2', 'step-D', 'step-A'];
+            steps.forEach(id => {
+                const el = document.getElementById(id);
+                const bar = el.querySelector('div div');
+                if (id === stepId) {
+                    el.classList.add('ooda-active');
+                    bar.style.width = '100%';
+                } else {
+                    el.classList.remove('ooda-active');
+                    // We keep bars full if it's already passed
+                    const idxCurrent = steps.indexOf(stepId);
+                    const idxThis = steps.indexOf(id);
+                    if (idxThis < idxCurrent) {
+                        bar.style.width = '100%';
+                        el.style.opacity = '0.6';
+                    } else {
+                        bar.style.width = '0%';
+                        el.style.opacity = '0.3';
+                    }
+                }
+            });
+        }
+
         function addLog(msg) {
             const logs = document.getElementById('logs');
             const div = document.createElement('div');
-            div.className = "text-[12px] font-mono leading-relaxed border-l-2 border-slate-800 pl-4 py-1";
+            div.className = "text-[11px] font-mono leading-relaxed border-l border-white/5 pl-4 py-1 animate-in fade-in duration-300";
 
-            let color = "text-slate-400";
-            if (msg.includes('Scout')) { color = "text-green-400"; updateAgent('SCOUT'); }
-            else if (msg.includes('Brain')) { color = "text-purple-400"; updateAgent('BRAIN'); }
-            else if (msg.includes('Fixer')) { color = "text-orange-400"; updateAgent('FIXER'); }
-            else if (msg.includes('Guardrail')) { color = "text-yellow-400"; updateAgent('SAFETY'); }
+            let color = "text-slate-500";
+            if (msg.includes('[SCOUT]')) { color = "text-green-400"; setOODA('step-O1'); }
+            else if (msg.includes('[CAG]')) { color = "text-purple-400"; setOODA('step-O2'); }
+            else if (msg.includes('[BRAIN]')) { color = "text-purple-400"; setOODA('step-O2'); }
+            else if (msg.includes('[GUARDRAIL]')) { color = "text-yellow-400"; setOODA('step-D'); }
+            else if (msg.includes('[FIXER]')) { color = "text-blue-400"; setOODA('step-A'); }
+            else if (msg.includes('Merge Successful')) { color = "text-green-500 font-bold"; }
 
-            div.innerHTML = `<span class="opacity-20 mr-2">»</span><span class="${color}">${msg}</span>`;
+            const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            div.innerHTML = `<span class="opacity-20 mr-2 text-[9px]">${timestamp}</span><span class="${color}">${msg}</span>`;
+
             logs.appendChild(div);
             logs.scrollTop = logs.scrollHeight;
-            if (logs.children.length > 30) logs.removeChild(logs.firstChild);
+            if (logs.children.length > 50) logs.removeChild(logs.firstChild);
         }
 
-        function updateAgent(name) {
-            document.getElementById('active-agent').innerText = name;
-        }
-
-        function startMonitoring() {
+        function connectStream() {
             if (eventSource) eventSource.close();
-            document.getElementById('logs').innerHTML = '<div class="text-blue-500 font-mono text-xs italic">// Establishing Telemetry Uplink...</div>';
-            document.getElementById('monitor-btn').innerText = "Stream Connected";
-            document.getElementById('monitor-btn').classList.replace('bg-blue-600', 'bg-slate-800');
-            document.getElementById('connection-status').innerText = "Link Established";
-            document.getElementById('connection-status').classList.replace('text-slate-600', 'text-green-500');
+
+            document.getElementById('logs').innerHTML = '<div class="text-blue-500 font-mono text-[11px] italic">// Establishing Satellite Uplink to SRE Engine...</div>';
+            document.getElementById('stream-btn').innerText = "STREAM ACTIVE";
+            document.getElementById('stream-btn').classList.replace('text-blue-400', 'text-slate-500');
+            document.getElementById('stream-btn').classList.remove('hover:bg-blue-600/30');
+            document.getElementById('loop-id').innerText = 'WAITING_FOR_SIGNAL';
 
             eventSource = new EventSource(`${API_BASE}/api/sre-loop?anomaly=false`);
 
             eventSource.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                if (data.message) addLog(data.message);
+                if (data.message) {
+                    addLog(data.message);
+                    if (data.message.includes('SRE Loop initiated')) {
+                        document.getElementById('loop-id').innerText = 'INCIDENT_PROCESSING';
+                    }
+                }
                 if (data.final_state) {
-                    addLog("--- ENGINE CYCLE COMPLETE ---");
-                    updateAgent('IDLE');
-                    updateGitFeed();
-                    updateStats();
+                    addLog("--- ENGINE CYCLE PERSISTED ---");
+                    document.getElementById('loop-id').innerText = 'IDLE_STANDBY';
+                    // Wait a bit then clear OODA
+                    setTimeout(() => {
+                        if (document.getElementById('loop-id').innerText === 'IDLE_STANDBY') {
+                            setOODA(null);
+                        }
+                    }, 5000);
+                    updateGitHub();
+                    updateHealth();
                 }
             };
 
             eventSource.onerror = () => {
                 eventSource.close();
-                document.getElementById('connection-status').innerText = "Link Interrupted";
-                document.getElementById('connection-status').classList.replace('text-green-500', 'text-red-500');
+                document.getElementById('loop-id').innerText = 'CONNECTION_RESTRICTED';
             };
         }
 
-        setInterval(updateStats, 5000);
-        setInterval(updateGitFeed, 10000);
-        updateStats();
-        updateGitFeed();
+        setInterval(updateHealth, 3000);
+        setInterval(updateGitHub, 8000);
+        updateHealth();
+        updateGitHub();
     </script>
 </body>
 

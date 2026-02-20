@@ -9,6 +9,7 @@ import os
 import sys
 import time
 import random
+from datetime import datetime
 
 load_dotenv()
 
@@ -89,20 +90,28 @@ async def ready_check():
         raise HTTPException(status_code=503, detail=str(e))
 
 @app.post("/demo/inject-failure")
-async def inject_failure(type: str = "infra"):
+async def inject_failure(type: str = "500"):
     """Manually triggers chaos injection mode."""
-    if type not in ["infra", "code", "latency", "500"]:
-        raise HTTPException(status_code=400, detail="Invalid anomaly type")
+    valid_types = ["500", "latency", "memory", "dependency"]
+    if type not in valid_types:
+        raise HTTPException(status_code=400, detail=f"Invalid anomaly type. Must be one of {valid_types}")
     
     update_chaos_mode(type, True)
     
-    # Trigger the cognitive loop
+    # Trigger the cognitive loop (Real loop, no mocks)
     result = await run_sre_loop(is_anomaly=True, anomaly_type=type)
+    
+    # If it's a memory spike, we can actually simulate high RAM usage
+    if type == "memory":
+        # We don't actually bloat memory to avoid OOM in Render, but we flip the flag
+        from apps.control_plane.runtime_config import update_degraded_mode
+        update_degraded_mode(True)
+
     return {
-        "message": f"Chaos Injection Active: {type}", 
-        "mode": ENV,
+        "message": f"Engineering Control Triggered: {type.upper()}", 
+        "status": "Fault Active",
         "chaos_status": CHAOS_MODE,
-        "final_status": result["status"]
+        "recovery_status": result["status"]
     }
 
 @app.get("/quote")
@@ -110,25 +119,35 @@ async def get_quote(user_id: str = "unknown"):
     """Real-time Quote Service with Telemetry & Chaos integration."""
     start_time = time.time()
     
+    # Check for active chaos
     if CHAOS_MODE["active"]:
-        if CHAOS_MODE["type"] == "latency":
+        c_type = CHAOS_MODE["type"]
+        
+        if c_type == "latency":
             await asyncio.sleep(2.5) 
-        elif CHAOS_MODE["type"] in ["500", "infra", "code"]:
-            if random.random() < 0.8:
+        elif c_type == "dependency":
+            # Simulate a 10s dependency timeout
+            await asyncio.sleep(10.0)
+            track_request(504, (time.time() - start_time) * 1000)
+            raise HTTPException(status_code=504, detail="Upstream Dependency Timeout")
+        elif c_type == "500":
+            if random.random() < 0.9:
                 track_request(500, (time.time() - start_time) * 1000)
-                raise HTTPException(status_code=500, detail="Critical Database Integrity Fault")
+                raise HTTPException(status_code=500, detail="Internal Server Error: Database Pool Exhausted")
 
-    elif random.random() < 0.05:
+    # Natural drift simulation (very low probability)
+    elif random.random() < 0.005:
          track_request(500, (time.time() - start_time) * 1000)
-         raise HTTPException(status_code=500, detail="Service Unavailable")
+         raise HTTPException(status_code=500, detail="Intermittent Service Fault")
 
     latency = (time.time() - start_time) * 1000
     track_request(200, latency)
     return {
-        "quote_id": f"Q-{random.randint(1000, 9999)}", 
-        "price": random.randint(100, 500), 
-        "status": "success",
-        "telemetry": {"latency_ms": round(latency, 2)}
+        "quote_id": f"Q-{random.randint(100000, 999999)}", 
+        "premium": round(random.uniform(50.0, 500.0), 2), 
+        "currency": "USD",
+        "status": "active",
+        "timestamp": datetime.now().isoformat()
     }
 
 @app.get("/api/sre-loop")
