@@ -118,7 +118,7 @@ SRE-Space is organized as a unified monorepo for maximum traceability and compon
 - **`packages/`**: Shared logic and libraries.
   - `agents/`: The 8-agent squad logic (Scout, CAG, Brain, Guardrail, Fixer, Curator, Human, Jules).
   - `shared/`: Common GitOps, GitHub, and reporting utilities.
-- **`infra/`**: Infrastructure-as-Code (Docker Compose, OTel configuration).
+- **`infra/`**: Infrastructure-as-Code (Docker Compose, Otel configuration).
 - **`scripts/`**: Automation, verification, and chaos testing utilities.
 
 ---

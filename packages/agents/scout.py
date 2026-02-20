@@ -4,19 +4,9 @@ import random
 def scout_agent(state):
     """
     Agent: Scout (Detection)
-    
-    The Scout agent is the sensory organ of the SRE squad. Its primary responsibility 
-    is to monitor OpenTelemetry traces and identify anomalies such as high latency 
-    spikes or 5xx error responses.
-    
-    Args:
-        state (dict): The current LangGraph state containing logs, service info, and anomaly data.
-        
-    Returns:
-        dict: The updated state with identified error spans if an anomaly is detected.
     """
-    from packages.shared.agent_utils import add_agent_log
-    add_agent_log(state, "scout", "Polling OTel traces...")
+    logs = state.get("logs", [])
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] Polling OTel traces...")
     
     # Mocking target service context for demonstration
     state["service"] = "policy-service"
@@ -35,10 +25,11 @@ def scout_agent(state):
             
         state["error_spans"] = [{"exception.message": msg}]
         state["anomaly_frequency"] = 1 
-        add_agent_log(state, "scout", f"Detected anomaly -> {msg}")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] Warning: Detected anomaly -> {msg}")
     else:
         # System is healthy
         state["error_spans"] = []
-        add_agent_log(state, "scout", "System health nominal.")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] System health nominal.")
 
+    state["logs"] = logs
     return state

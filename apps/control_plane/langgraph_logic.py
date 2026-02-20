@@ -38,7 +38,6 @@ class SREState(TypedDict):
     anomaly_type: str
     anomaly_frequency: int
     incident_number: int
-    language: Literal["en", "ar"]
 
 # --- Compiled Graph Cache ---
 # Bolt Optimization: Compiling the graph once at module level to avoid redundant overhead.
@@ -89,14 +88,13 @@ def create_sre_graph():
     
     return workflow.compile()
 
-async def run_sre_loop(is_anomaly: bool = False, anomaly_type: str = "infra", lang: str = "en"):
+async def run_sre_loop(is_anomaly: bool = False, anomaly_type: str = "infra"):
     """
     Executes a single cognitive cycle of the SRE engine.
     
     Args:
         is_anomaly (bool): Whether to inject an anomaly for testing/simulation.
         anomaly_type (str): Type of anomaly ('infra' or 'code')
-        lang (str): Language for logs ('en' or 'ar')
     """
     global _COMPILED_SRE_GRAPH
     if _COMPILED_SRE_GRAPH is None:
@@ -110,8 +108,7 @@ async def run_sre_loop(is_anomaly: bool = False, anomaly_type: str = "infra", la
         "status": "Starting", "logs": [], "is_anomaly": is_anomaly, "historical_context": "",
         "cache_hit": False, "confidence_score": 0.0, "decision": "", "guardrail_reason": "",
         "service": "policy-service", "namespace": "insurance-cloud", "env": "production", "anomaly_frequency": 0, "incident_number": 0,
-        "remediation_type": "infra", "anomaly_type": anomaly_type,
-        "language": lang
+        "remediation_type": "infra", "anomaly_type": anomaly_type
     }
     
     # Simulate a frequency surge if anomaly is injected for demo purposes

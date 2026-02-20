@@ -5,11 +5,11 @@ def human_agent(state):
     """
     Agent: Human (The Investigator) - Human-in-the-Loop
     """
-    from packages.shared.agent_utils import add_agent_log
+    logs = state.get("logs", [])
     frequency = state.get("anomaly_frequency", 0)
     
-    add_agent_log(state, "human", "HUMAN INTERVENTION TRIGGERED!")
-    add_agent_log(state, "human", f"Reason: Issue detected {frequency} times in the last hour.")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] HUMAN INTERVENTION TRIGGERED!")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] Reason: Issue detected {frequency} times in the last hour.")
     
     # Send Notification and Create Escalation Ticket
     from packages.shared.notifications import send_sre_alert
@@ -24,9 +24,9 @@ def human_agent(state):
     gh_res = gh.create_issue(title=issue_title, body=issue_body, labels=["critical", "human-needed"])
     
     if "number" in gh_res:
-        add_agent_log(state, "human", f"GitHub Issue Created: #{gh_res['number']}")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] GitHub Issue Created: #{gh_res['number']}")
     else:
-        add_agent_log(state, "human", "Warning: Failed to create GitHub Issue.")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] Warning: Failed to create GitHub Issue.")
 
     # Trigger external alert (Simulated email)
     success = send_sre_alert(
@@ -35,7 +35,8 @@ def human_agent(state):
     )
     
     if success:
-        add_agent_log(state, "human", "Alert triggered for mohammedsalmanj@outlook.com")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] Alert triggered for mohammedsalmanj@outlook.com")
     
+    state["logs"] = logs
     state["status"] = "Awaiting Human"
     return state

@@ -16,17 +16,6 @@
             background-image: radial-gradient(circle at 100% 0%, #172554 0%, transparent 40%),
                 radial-gradient(circle at 0% 100%, #1e1b4b 0%, transparent 40%);
             min-height: 100vh;
-            transition: direction 0.3s ease;
-        }
-
-        body.rtl {
-            direction: rtl;
-            font-family: 'Amiri', serif;
-            /* Or any other Arabic font */
-        }
-
-        .rtl .text-right-aligned {
-            text-align: right;
         }
 
         .glass {
@@ -70,18 +59,9 @@
                 <p class="text-slate-400 mt-2 text-lg">Autonomous Reliability Engine v3.0 | <span
                         class="text-blue-400">LangGraph Powered</span></p>
             </div>
-            <div class="flex items-center gap-6">
-                <!-- Language Toggle -->
-                <div class="glass flex p-1 rounded-lg">
-                    <button id="btn-en" onclick="setLang('en')"
-                        class="px-3 py-1 text-xs font-bold rounded-md bg-blue-600">EN</button>
-                    <button id="btn-ar" onclick="setLang('ar')"
-                        class="px-3 py-1 text-xs font-bold rounded-md text-slate-400">AR</button>
-                </div>
-                <div id="system-status" class="hidden md:flex items-center gap-3 glass px-5 py-2">
-                    <div class="w-3 h-3 bg-green-500 rounded-full pulse"></div>
-                    <span class="text-sm font-semibold text-green-400 uppercase tracking-widest">System Stable</span>
-                </div>
+            <div id="system-status" class="hidden md:flex items-center gap-3 glass px-5 py-2">
+                <div class="w-3 h-3 bg-green-500 rounded-full pulse"></div>
+                <span class="text-sm font-semibold text-green-400 uppercase tracking-widest">System Stable</span>
             </div>
         </header>
 
@@ -151,30 +131,18 @@
     <script>
         const logContainer = document.getElementById('logs');
         const systemStatus = document.getElementById('system-status');
-        let currentLang = 'en';
-
-        function setLang(lang) {
-            currentLang = lang;
-            document.body.classList.toggle('rtl', lang === 'ar');
-
-            // Update buttons
-            document.getElementById('btn-en').className = `px-3 py-1 text-xs font-bold rounded-md ${lang === 'en' ? 'bg-blue-600' : 'text-slate-400'}`;
-            document.getElementById('btn-ar').className = `px-3 py-1 text-xs font-bold rounded-md ${lang === 'ar' ? 'bg-blue-600' : 'text-slate-400'}`;
-
-            addLog(lang === 'en' ? 'System: Language set to English' : 'النظام: تم تعيين اللغة إلى العربية');
-        }
 
         function addLog(msg, type = 'info') {
             const div = document.createElement('div');
             div.className = "text-sm font-mono leading-relaxed";
 
-            if (msg.includes('Scout') || msg.includes('فحص')) div.classList.add('text-green-400');
-            else if (msg.includes('CAG') || msg.includes('تخزين')) div.classList.add('text-teal-400');
-            else if (msg.includes('Brain') || msg.includes('التحليل')) div.classList.add('text-purple-400');
-            else if (msg.includes('Guardrail') || msg.includes('تقييم')) div.classList.add('text-yellow-400');
-            else if (msg.includes('Fixer') || msg.includes('إصلاح')) div.classList.add('text-orange-400');
+            if (msg.includes('Scout')) div.classList.add('text-green-400');
+            else if (msg.includes('CAG')) div.classList.add('text-teal-400');
+            else if (msg.includes('Brain')) div.classList.add('text-purple-400');
+            else if (msg.includes('Guardrail')) div.classList.add('text-yellow-400');
+            else if (msg.includes('Fixer')) div.classList.add('text-orange-400');
             else if (msg.includes('Jules')) div.classList.add('text-blue-400');
-            else if (msg.includes('System') || msg.includes('النظام')) div.classList.add('text-slate-500');
+            else if (msg.includes('System')) div.classList.add('text-slate-500');
             else div.classList.add('text-slate-300');
 
             div.innerText = "> " + msg;
@@ -184,9 +152,9 @@
 
         async function processQuote(policy, isChaos = false, type = 'infra') {
             logContainer.innerHTML = '';
-            addLog(currentLang === 'en' ? `System: Initiating ${policy} for customer...` : `النظام: جاري بدء ${policy} للعميل...`);
+            addLog(`System: Initiating ${policy} for customer...`);
 
-            const eventSource = new EventSource(`/api/sre-loop?anomaly=${isChaos}&type=${type}&lang=${currentLang}`);
+            const eventSource = new EventSource(`/api/sre-loop?anomaly=${isChaos}&type=${type}`);
 
             eventSource.onmessage = (event) => {
                 const data = JSON.parse(event.data);
@@ -195,9 +163,9 @@
                 if (data.final_state) {
                     eventSource.close();
                     if (data.final_state === 'Stable') {
-                        addLog(currentLang === 'en' ? "System: Recovery successful. Business as usual." : "النظام: نجح الاسترداد. العمل كالمعتاد.", 'success');
+                        addLog("System: Recovery successful. Business as usual.", 'success');
                     } else {
-                        addLog(currentLang === 'en' ? "System: Operation completed within SLA." : "النظام: تم إكمال العملية ضمن اتفاقية مستوى الخدمة.", 'success');
+                        addLog("System: Operation completed within SLA.", 'success');
                     }
                 }
             };

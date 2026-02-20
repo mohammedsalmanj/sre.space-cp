@@ -7,18 +7,11 @@ def jules_agent(state=None):
     """
     Agent: Jules (The Architect) - Tier-3 Architectural Authority
     """
-    from packages.shared.agent_utils import add_agent_log
-    
+    logs = []
     current_time = datetime.now().strftime('%H:%M:%S')
-    print(f"[{current_time}] [JULES] Initiating Daily Architectural Review...")
     
-    internal_logs = []
-    def log(msg):
-        internal_logs.append(f"[{current_time}] [JULES] {msg}")
-        if state:
-            add_agent_log(state, "jules", msg)
-
-    log("TIER-3 SCHEDULED SCAN: Assessing system-wide integrity.")
+    print(f"[{current_time}] [JULES] Initiating Daily Architectural Review...")
+    logs.append(f"[{current_time}] [JULES] TIER-3 SCHEDULED SCAN: Assessing system-wide integrity.")
     
     # Logic: Select optimizations ...
     optimizations = [
@@ -46,10 +39,12 @@ def jules_agent(state=None):
     gh_res = gh.create_issue(title=report_title, body=report_body, labels=["architectural", "daily-optimizer"])
     
     if "number" in gh_res:
-        msg = f"Optimization Proposal Created -> #{gh_res['number']}"
         print(f"[{current_time}] [JULES] Daily Report Published -> #{gh_res['number']}")
-        log(msg)
+        logs.append(f"[{current_time}] [JULES] Optimization Proposal Created -> #{gh_res['number']}")
     else:
         print(f"[{current_time}] [JULES] Warning: GitHub reporting failed.")
 
-    return state if state else internal_logs
+    if state:
+        state["logs"].extend(logs)
+        return state
+    return logs
