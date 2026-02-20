@@ -86,3 +86,25 @@ class GitHubService:
         url = f"{self.base_url}/repos/{self.owner}/{self.repo}"
         response = requests.get(url, headers=self.headers, timeout=10)
         return response.json()
+
+    def list_issues(self, state="open", per_page=10):
+        """Fetches a list of issues from the repository."""
+        url = f"{self.base_url}/repos/{self.owner}/{self.repo}/issues"
+        params = {"state": state, "per_page": per_page, "sort": "created", "direction": "desc"}
+        try:
+            response = requests.get(url, headers=self.headers, params=params, timeout=10)
+            return response.json()
+        except Exception as e:
+            print(f"❌ [GitHubService] List issues failed: {str(e)}")
+            return []
+
+    def list_pulls(self, state="open", per_page=5):
+        """Fetches a list of pull requests from the repository."""
+        url = f"{self.base_url}/repos/{self.owner}/{self.repo}/pulls"
+        params = {"state": state, "per_page": per_page, "sort": "created", "direction": "desc"}
+        try:
+            response = requests.get(url, headers=self.headers, params=params, timeout=10)
+            return response.json()
+        except Exception as e:
+            print(f"❌ [GitHubService] List pulls failed: {str(e)}")
+            return []

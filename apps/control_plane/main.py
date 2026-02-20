@@ -18,10 +18,13 @@ from packages.agents.jules import jules_agent
 from apps.control_plane.runtime_config import ENV, EVENT_BUS as BUS_BACKEND, AGENT_LOOP_INTERVAL, DEGRADED_MODE, LOG_LEVEL
 from packages.shared.memory_guard import get_system_stats, check_memory_health
 from packages.shared.event_bus.factory import get_event_bus
+from packages.shared.github_service import GitHubService
 
 app = FastAPI(title=f"SRE-Space | {ENV.upper()} Mode")
 # Update templates path to be relative to the file location
 templates = Jinja2Templates(directory=os.path.dirname(__file__))
+
+github = GitHubService()
 
 @app.get("/", response_class=HTMLResponse)
 async def get_dashboard(request: Request):
@@ -42,6 +45,26 @@ async def health_check():
         "last_incident": "INC-457", 
         "remediation_status": "Merged & Deployed"
     }
+
+@app.get("/api/git-activity")
+async def git_activity():
+    """Fetches real-time GitHub issues and PRs for the dashboard."""
+    try:
+        issues = github.list_issues(state="all", per_page=5)
+        # Filter out PRs from issues (GitHub API returns both in /issues)
+        filtered_issues = [
+            {
+                "number": i["number"],
+                "title": i["title"],
+                "state": i["state"],
+                "created_at": i["created_at"],
+                "type": "pull_request" if "pull_request" in i else "issue"
+            }
+            for i in issues if isinstance(i, dict)
+        ]
+        return filtered_issues
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/ready")
 async def ready_check():
