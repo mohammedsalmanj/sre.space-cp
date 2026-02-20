@@ -39,6 +39,10 @@ class SREState(TypedDict):
     anomaly_frequency: int
     incident_number: int
 
+# --- Compiled Graph Cache ---
+# Bolt Optimization: Compiling the graph once at module level to avoid redundant overhead.
+_COMPILED_SRE_GRAPH = None
+
 # --- Graph Logic ---
 def create_sre_graph():
     """
@@ -87,12 +91,12 @@ def create_sre_graph():
 async def run_sre_loop(is_anomaly: bool = False, anomaly_type: str = "infra"):
     """
     Executes a single cognitive cycle of the SRE engine.
-    
-    Args:
-        is_anomaly (bool): Whether to inject an anomaly for testing/simulation.
-        anomaly_type (str): Type of anomaly ('infra' or 'code')
     """
-    graph = create_sre_graph()
+    global _COMPILED_SRE_GRAPH
+    if _COMPILED_SRE_GRAPH is None:
+        _COMPILED_SRE_GRAPH = create_sre_graph()
+    
+    graph = _COMPILED_SRE_GRAPH
     
     # Initial State Initialization (TypedDict compliant)
     initial_state = {
