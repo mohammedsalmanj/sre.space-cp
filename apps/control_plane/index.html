@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRE-Space | Insurance Market</title>
+    <title>SRE-Space | Premium Insurance</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -12,9 +12,6 @@
             font-family: 'Outfit', sans-serif;
             background: #020617;
             color: #f8fafc;
-            background-image:
-                radial-gradient(circle at 100% 0%, #1e1b4b 0%, transparent 40%),
-                radial-gradient(circle at 0% 100%, #020617 0%, transparent 60%);
             min-height: 100vh;
         }
 
@@ -23,162 +20,203 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 2rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s;
         }
 
         .glass:hover {
-            background: rgba(15, 23, 42, 0.6);
             transform: translateY(-8px);
             border-color: rgba(59, 130, 246, 0.3);
-            box-shadow: 0 20px 40px -20px rgba(59, 130, 246, 0.3);
         }
 
         .cta-button {
             background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
         }
 
-        .cta-button:hover {
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
-            transform: scale(1.02);
+        .chaos-btn {
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
-        .loader {
-            width: 48px;
-            height: 48px;
-            border: 5px solid #FFF;
-            border-bottom-color: #3b82f6;
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-        }
-
-        @keyframes rotation {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+        .chaos-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
         }
     </style>
 </head>
 
 <body class="p-6 md:p-20">
     <div class="max-w-6xl mx-auto">
-        <!-- Brand Header -->
-        <nav class="flex justify-between items-center mb-24">
+        <header class="flex justify-between items-center mb-24">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center font-black text-xl">S
                 </div>
                 <span class="text-2xl font-black tracking-tighter uppercase italic">SRE-Space</span>
             </div>
-            <div class="hidden md:flex gap-8 text-sm font-bold text-slate-400">
-                <a href="#" class="hover:text-white transition">Personal</a>
-                <a href="#" class="hover:text-white transition">Business</a>
-                <a href="#" class="hover:text-white transition">Claims</a>
+            <div id="system-status"
+                class="flex items-center gap-2 px-4 py-2 bg-slate-900 rounded-full border border-slate-800">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">System Nominal</span>
             </div>
-        </nav>
+        </header>
 
-        <!-- Hero Section -->
         <main class="text-center mb-32">
-            <h2 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight leading-none">
-                Insurance That <br /><span class="text-blue-500">Self-Heals.</span>
-            </h2>
-            <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-12">
-                The world's first policy marketplace protected by an autonomous agent squad.
-                Experience infinite uptime for your peace of mind.
-            </p>
+            <h2 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight leading-none">Protecting What <br /><span
+                    class="text-blue-500">Matters.</span></h2>
+            <p class="text-slate-400 text-lg max-w-2xl mx-auto mb-12">The first autonomous insurance marketplace.
+                High-performance policies under the watch of an 8-agent SRE squad.</p>
         </main>
 
-        <!-- Product Cards -->
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Card 1 -->
-            <div class="glass p-10 flex flex-col items-center text-center cursor-pointer group"
-                onclick="triggerChaos('infra')">
-                <div class="text-6xl mb-8 group-hover:scale-110 transition">💎</div>
-                <h3 class="text-2xl font-bold mb-3">Premium Life</h3>
-                <p class="text-slate-400 text-sm mb-10 leading-relaxed">Full identity and financial protection with
-                    AI-backed claim verification.</p>
-                <button
-                    class="w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest cta-button transition">Request
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+            <div class="glass p-10 flex flex-col items-center text-center">
+                <div class="text-5xl mb-6">💎</div>
+                <h3 class="text-xl font-bold mb-3">Health Premium</h3>
+                <p class="text-slate-400 text-sm mb-8">Unlimited coverage for digital healthcare and telemetry-backed
+                    claims.</p>
+                <button onclick="getQuote()"
+                    class="w-full py-4 rounded-xl font-black text-xs uppercase tracking-widest cta-button">Get
                     Quote</button>
             </div>
-
-            <!-- Card 2 -->
-            <div class="glass p-10 flex flex-col items-center text-center cursor-pointer group"
-                onclick="triggerChaos('code')">
-                <div class="text-6xl mb-8 group-hover:scale-110 transition">🛡️</div>
-                <h3 class="text-2xl font-bold mb-3">Cyber Defense</h3>
-                <p class="text-slate-400 text-sm mb-10 leading-relaxed">Infrastructure-level assurance for your digital
-                    assets and enterprise data.</p>
-                <button
-                    class="w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest cta-button transition">Request
+            <div class="glass p-10 flex flex-col items-center text-center">
+                <div class="text-5xl mb-6">🏘️</div>
+                <h3 class="text-xl font-bold mb-3">Property Guard</h3>
+                <p class="text-slate-400 text-sm mb-8">Smart home monitoring integrated with autonomous repair squads.
+                </p>
+                <button onclick="getQuote()"
+                    class="w-full py-4 rounded-xl font-black text-xs uppercase tracking-widest cta-button">Get
                     Quote</button>
             </div>
-
-            <!-- Card 3 -->
-            <div class="glass p-10 flex flex-col items-center text-center opacity-60">
-                <div class="text-6xl mb-8">🏠</div>
-                <h3 class="text-2xl font-bold mb-3">Home Secure</h3>
-                <p class="text-slate-400 text-sm mb-10 leading-relaxed">Coming Soon: IoT integrated property monitoring
-                    and auto-remediation.</p>
-                <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Waitlisting v4.0</div>
+            <div class="glass p-10 flex flex-col items-center text-center">
+                <div class="text-5xl mb-6">🚗</div>
+                <h3 class="text-xl font-bold mb-3">Auto Mobility</h3>
+                <p class="text-slate-400 text-sm mb-8">Dynamic pricing based on real-time driving telemetry and risk
+                    analysis.</p>
+                <button onclick="getQuote()"
+                    class="w-full py-4 rounded-xl font-black text-xs uppercase tracking-widest cta-button">Get
+                    Quote</button>
             </div>
         </section>
 
-        <!-- Status Modal (Overlay when chaos happens) -->
-        <div id="status-overlay"
-            class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center hidden backdrop-blur-md">
-            <div class="text-center">
-                <div class="loader mb-8"></div>
-                <h2 id="status-title" class="text-3xl font-black text-white mb-4 italic">Detecting Anomaly...</h2>
-                <div id="status-logs" class="text-blue-400 font-mono text-xs space-y-2 opacity-80">
-                    <p>// SRE Scout initialized</p>
-                </div>
-                <button onclick="closeOverlay()"
-                    class="mt-12 text-slate-500 font-bold hover:text-white transition text-xs uppercase tracking-widest">Close
-                    Dashboard View</button>
+        <!-- Chaos Engineering Panel (For Demos) -->
+        <div class="max-w-4xl mx-auto space-y-6">
+            <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Chaos Engineering
+                Dashboard</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button onclick="injectChaos('500')" class="glass p-6 text-left chaos-btn group">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-black text-red-500 uppercase">Inject 500 Errors</span>
+                        <span class="text-lg group-hover:rotate-12 transition">🚨</span>
+                    </div>
+                    <p class="text-[10px] text-slate-500">Triggers 'Database pool exhausted' anomaly in the Quote
+                        Service.</p>
+                </button>
+                <button onclick="injectChaos('latency')" class="glass p-6 text-left chaos-btn group">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-black text-amber-500 uppercase">Inject Latency</span>
+                        <span class="text-lg group-hover:scale-110 transition">⏳</span>
+                    </div>
+                    <p class="text-[10px] text-slate-500">Forces >2.5s delay on all quote calculations. Tests timeout
+                        alerts.</p>
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- Processing Overlay -->
+    <div id="overlay"
+        class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center hidden backdrop-blur-lg">
+        <div class="text-center max-w-md p-8">
+            <div id="loader"
+                class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-8">
+            </div>
+            <h2 id="modal-title" class="text-2xl font-black mb-4 italic tracking-tight">Processing Request...</h2>
+            <div id="quote-result" class="hidden glass p-6 mb-8 text-left space-y-2">
+                <div class="flex justify-between border-b border-slate-700 pb-2 mb-2">
+                    <span class="text-[10px] font-black uppercase text-slate-500">Quote ID</span>
+                    <span id="res-id" class="text-xs font-bold text-white">---</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[10px] font-black uppercase text-slate-500">Monthly Premium</span>
+                    <span id="res-price" class="text-xs font-black text-blue-400">---</span>
+                </div>
+            </div>
+            <div id="anomaly-report" class="hidden glass p-6 mb-8 text-left border-red-500/30 bg-red-500/5">
+                <div class="text-[10px] font-black text-red-500 uppercase mb-2">SRE System Alert</div>
+                <p id="anomaly-msg" class="text-xs text-slate-300 italic mb-4">Detection in progress...</p>
+                <div id="agent-logs" class="text-[9px] font-mono text-blue-400 space-y-1 opacity-80"></div>
+            </div>
+            <button onclick="closeModal()"
+                class="text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition">Close
+                View</button>
+        </div>
+    </div>
+
     <script>
-        const overlay = document.getElementById('status-overlay');
-        const logsBox = document.getElementById('status-logs');
-        const title = document.getElementById('status-title');
+        async function getQuote() {
+            const overlay = document.getElementById('overlay');
+            const quoteRes = document.getElementById('quote-result');
+            const anomalyReport = document.getElementById('anomaly-report');
+            const title = document.getElementById('modal-title');
+            const loader = document.getElementById('loader');
 
-        async function triggerChaos(type) {
             overlay.classList.remove('hidden');
-            logsBox.innerHTML = '<p>// System failure detected. Notifying SRE-Space Engine...</p>';
+            quoteRes.classList.add('hidden');
+            anomalyReport.classList.add('hidden');
+            title.innerText = "Processing Quote Request...";
+            loader.classList.remove('hidden');
 
-            const eventSource = new EventSource(`/api/sre-loop?anomaly=true&type=${type}`);
+            try {
+                const res = await fetch('/quote');
+                const data = await res.json();
 
-            eventSource.onmessage = (event) => {
-                const data = JSON.parse(event.data);
+                if (res.ok) {
+                    loader.classList.add('hidden');
+                    title.innerText = "Quote Generated Successfully";
+                    document.getElementById('res-id').innerText = data.quote_id;
+                    document.getElementById('res-price').innerText = `$${data.price}.00`;
+                    quoteRes.classList.remove('hidden');
+                } else {
+                    throw new Error(data.detail || "Service Error");
+                }
+            } catch (err) {
+                loader.classList.add('hidden');
+                title.innerText = "System Anomaly Detected";
+                title.className = "text-2xl font-black mb-4 italic tracking-tight text-red-500";
+                anomalyReport.classList.remove('hidden');
+                document.getElementById('anomaly-msg').innerText = err.message;
+                startAgentStream();
+            }
+        }
+
+        function startAgentStream() {
+            const logs = document.getElementById('agent-logs');
+            logs.innerHTML = '<p>⚡ SRE Squad Notified. Engaging loops...</p>';
+
+            const eventSource = new EventSource('/api/sre-loop?anomaly=false');
+            eventSource.onmessage = (e) => {
+                const data = JSON.parse(e.data);
                 if (data.message) {
                     const p = document.createElement('p');
-                    p.innerText = `// ${data.message}`;
-                    logsBox.appendChild(p);
-                    if (data.message.includes('Brain')) title.innerText = "Diagnosing Root Cause...";
-                    if (data.message.includes('Fixer')) title.innerText = "Applying GitOps Repair...";
+                    p.innerText = `» ${data.message}`;
+                    logs.appendChild(p);
                 }
-
                 if (data.final_state) {
                     eventSource.close();
-                    title.innerText = "System Fully Restored.";
                     const p = document.createElement('p');
-                    p.className = "text-green-400 font-bold mt-4";
-                    p.innerText = "✓ AUTONOMOUS REPAIR SUCCESSFUL";
-                    logsBox.appendChild(p);
+                    p.className = "text-green-400 font-bold mt-2";
+                    p.innerText = "✓ SYSTEM RESTORED BY SRE-SPACE";
+                    logs.appendChild(p);
                 }
             };
         }
 
-        function closeOverlay() {
-            overlay.classList.add('hidden');
+        async function injectChaos(type) {
+            const status = document.getElementById('system-status');
+            status.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span><span class="text-[10px] font-bold text-red-400 uppercase tracking-widest">Injected: ${type.toUpperCase()}</span>`;
+            await fetch(`/demo/inject-failure?type=${type}`, { method: 'POST' });
+        }
+
+        function closeModal() {
+            document.getElementById('overlay').classList.add('hidden');
+            document.getElementById('modal-title').className = "text-2xl font-black mb-4 italic tracking-tight text-white";
         }
     </script>
 </body>

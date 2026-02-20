@@ -1,85 +1,78 @@
 from datetime import datetime
 import random
-from packages.shared.git_utils import generate_sre_commit_message
+import time
+from packages.shared.git_utils import generate_sre_commit_message, generate_sre_pr_title
+from packages.shared.github_service import GitHubService
+from packages.shared.reporting import format_fixer_action
 
 def fixer_agent(state):
     """
     Agent: Fixer (Execution)
+    Implements REAL GitOps lifecycle: Branch -> Commit -> PR -> Merge.
     """
     logs = state.get("logs", [])
-    
-    # Safety Check: Only execute if the Guardrail has allowed the action
-    if state["decision"] != "ALLOW": return state
+    if state["decision"] != "ALLOW":
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] Vetoed by Guardrail. Action aborted.")
+        return state
 
-    remediation = state.get('remediation', 'Apply patch')
-    remediation_type = state.get('remediation_type', 'code')
-    
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] Analysis: Remediation Type identified as '{remediation_type}'")
-    
-    # STEP 1: Real GitHub Integration initialization
-    from packages.shared.github_service import GitHubService
-    from packages.shared.reporting import format_fixer_action
-    from packages.shared.git_utils import generate_sre_pr_title
+    remediation = state.get('remediation', 'Apply system patch')
+    remediation_type = state.get('remediation_type', 'infra')
     gh = GitHubService()
     
-    incident_num = state.get("incident_number", 0)
-    issue_body = format_fixer_action(state)
-
-    # UNIFIED GITOPS FLOW: Always create branch, fix, PR, and merge
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] ⚡ [GITOPS-FLOW] Initiating Autonomous Lifecycle...")
 
-    # 1. Ensure an Issue exists to track the work
-    if incident_num > 0:
-        gh.create_comment(issue_number=incident_num, body=f"🚀 Starting Autonomous Fix Cycle: {remediation}")
-    else:
+    # 1. Create/Comment on Issue
+    incident_num = state.get("incident_number", 0)
+    if incident_num == 0:
         issue_res = gh.create_issue(
             title=f"[AUTO-FIX] {state.get('service', 'System')} - {remediation}", 
-            body=issue_body, 
+            body=format_fixer_action(state), 
             labels=["auto-fix", remediation_type]
         )
         incident_num = issue_res.get("number", 0)
         logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] Incident Issue Raised: #{incident_num}")
-
-    # 2. Branch & Commit Simulation
-    branch_name = f"fix-inc-{incident_num}"
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] 🌿 Branch Created: '{branch_name}'")
-    
-    commit_msg = generate_sre_commit_message(
-        action_type=remediation_type,
-        description=remediation,
-        incident_id=incident_num
-    )
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] 💾 Changes Committed: {commit_msg.splitlines()[0]}")
-
-    # 3. Create Pull Request (PR)
-    pr_title = generate_sre_pr_title(state.get("service"), remediation)
-    pr_res = gh.create_pr(title=pr_title, head=branch_name, body=f"Closes #{incident_num}\n\n{issue_body}")
-    
-    # Handle both real GitHub results and demo-safe simulations
-    if "number" in pr_res or state.get("is_anomaly"):
-        pr_num = pr_res.get("number", random.randint(1000, 1999))
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] ✅ PR Opened: #{pr_num}")
-        
-        # 4. Autonomous Merge
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] 🤝 PR #{pr_num} matches safety policies. Merging...")
-        merge_res = gh.merge_pr(pull_number=pr_num)
-        
-        if ("merged" in merge_res and merge_res["merged"]) or state.get("is_anomaly"):
-            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] 🚀 Merge Complete. Triggering Deployment...")
-            
-            # 5. Deployment Simulation
-            deploy_msg = "quote-service:v2.1-patched" if remediation_type == "code" else "infra-config:v4.2-scaled"
-            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] 📦 Deployment: {deploy_msg} rolling out to production.")
-        else:
-            error_msg = merge_res.get('message', 'Merge checks failed or pending.')
-            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] ⚠️ {error_msg}")
     else:
-        error_reason = pr_res.get('message', 'Unknown API Error')
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] ❌ PR Creation Failed: {error_reason}")
+        gh.create_comment(incident_num, f"🚀 Fixer executing remediation: {remediation}")
 
-    # STEP 3: Final Deployment Verification
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] Running Post-remediation health checks...")
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] Environment stabilized. Operations logic verified.")
+    # 2. REAL Branch Creation
+    main_sha = gh.get_ref_sha()
+    if not main_sha:
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] ❌ Error: Could not fetch main branch SHA.")
+        return state
+
+    ts = int(time.time())
+    branch_name = f"fix/incident-{incident_num}-{ts}"
+    gh.create_branch(branch_name, main_sha)
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] 🌿 Real Branch Created: '{branch_name}'")
+
+    # 3. REAL Commit (Updating a status/fix file)
+    fix_path = f"incidents/FIX-{incident_num}.md"
+    fix_content = f"# Autonomous Fix Report\nIncident: {incident_num}\nTime: {datetime.now().isoformat()}\nRemediation: {remediation}\nStatus: Applied"
+    gh.create_or_update_file(fix_path, f"fix: apply autonomous patch for #{incident_num}", fix_content, branch_name)
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] 💾 Real Patch Committed to '{fix_path}'")
+
+    # 4. REAL Pull Request
+    pr_title = generate_sre_pr_title(state.get("service"), remediation)
+    pr_res = gh.create_pr(title=pr_title, head=branch_name, body=f"Closes #{incident_num}\n\nAutomated fix applied by SRE-Space.")
+    pr_num = pr_res.get("number")
+
+    if not pr_num:
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] ❌ PR Creation Failed: {pr_res.get('message', 'API Error')}")
+        return state
     
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] ✅ Real PR Opened: #{pr_num}")
+
+    # 5. REAL Autonomous Merge
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] 🤝 Merging PR #{pr_num} into main...")
+    merge_res = gh.merge_pr(pr_num)
+    
+    if merge_res.get("merged"):
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] 🚀 Merge Successful. Deployment in progress...")
+        state["status"] = "Success"
+    else:
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] ⚠️ Merge deferred: {merge_res.get('message', 'Policy check')}")
+        state["status"] = "Pending Approval"
+
     state["logs"] = logs
+    state["incident_number"] = incident_num
     return state

@@ -24,6 +24,18 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO") # Production hardening requires INFO 
 MEMORY_THRESHOLD_MB = int(os.getenv("MEMORY_THRESHOLD_MB", 400)) # Aggressive for 512MB RAM
 DEGRADED_MODE = False
 
+# CHAOS INJECTION STATE
+# Used for deterministic failure simulation across the control plane.
+CHAOS_MODE = {
+    "type": None,  # "latency", "500", "memory"
+    "active": False
+}
+
+def update_chaos_mode(mode_type: str, active: bool):
+    global CHAOS_MODE
+    CHAOS_MODE["type"] = mode_type
+    CHAOS_MODE["active"] = active
+
 def update_degraded_mode(is_degraded: bool):
     global DEGRADED_MODE, MAX_LLM_CONCURRENCY, AGENT_LOOP_INTERVAL, TRACE_SAMPLING_RATE
     DEGRADED_MODE = is_degraded
