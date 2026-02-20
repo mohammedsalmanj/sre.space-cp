@@ -4,40 +4,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRE-Space | Control Plane v3.5</title>
+    <title>SRE-Space | Control Plane v3.6</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap"
         rel="stylesheet">
     <style>
         body {
             font-family: 'Outfit', sans-serif;
-            background: #020617;
+            background: #021124;
             color: #f8fafc;
-            background-image: radial-gradient(circle at 100% 0%, #172554 0%, transparent 40%),
-                radial-gradient(circle at 0% 100%, #1e1b4b 0%, transparent 40%);
+            background-image:
+                radial-gradient(circle at 100% 0%, #0c4a6e 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, #1e1b4b 0%, transparent 50%);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .glass {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 1.5rem;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
         }
 
         .terminal {
             font-family: 'JetBrains Mono', monospace;
-            background: #000;
-            border: 1px solid #1e293b;
-        }
-
-        .status-pill {
-            padding: 2px 8px;
-            border-radius: 9999px;
-            font-size: 0.65rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            background: #010409;
+            border: 1px solid #30363d;
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);
         }
 
         .pulse {
@@ -53,109 +48,261 @@
                 box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
             }
         }
+
+        .agent-pill {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .agent-pill:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-card {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .git-issue {
+            border-left: 4px solid #8b5cf6;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
-<body class="p-6 md:p-12">
-    <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
-            <div>
-                <h1
-                    class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                    SRE.Space Control Plane
+<body class="p-4 md:p-8 lg:p-12">
+    <div class="max-w-[1400px] mx-auto">
+        <!-- Header Section -->
+        <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 gap-8">
+            <div class="relative">
+                <div class="absolute -left-4 top-0 w-1 h-12 bg-blue-500 rounded-full"></div>
+                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">
+                    <span
+                        class="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 bg-clip-text text-transparent">SRE.Space</span>
+                    <span class="text-slate-200">Orbital</span>
                 </h1>
-                <p class="text-slate-400 mt-2 text-lg">Autonomous Reliability Engine v3.5 | <span
-                        class="text-blue-400">Production Grade</span></p>
+                <p class="text-slate-400 mt-2 text-lg font-medium">Cognitive Infrastructure Control Plane <span
+                        class="text-blue-500/80 mx-2">|</span> <span id="runtime-clock"
+                        class="text-slate-500 font-mono">00:00:00</span></p>
             </div>
 
-            <!-- Real-time Status Stats -->
-            <div class="flex flex-wrap gap-4">
-                <div class="glass px-5 py-3 flex flex-col items-center">
-                    <span class="text-[10px] uppercase text-slate-500 font-bold mb-1">Environment</span>
-                    <span id="stat-mode" class="text-xs font-bold text-blue-400 tracking-widest">---</span>
+            <!-- Dynamic Stats Bar -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full lg:w-auto">
+                <div class="glass px-6 py-4 stat-card">
+                    <div class="text-[10px] uppercase text-slate-500 font-black tracking-tighter mb-1">Compute Mode
+                    </div>
+                    <div id="stat-mode" class="text-lg font-bold text-blue-400 tabular-nums tracking-wide">---</div>
                 </div>
-                <div class="glass px-5 py-3 flex flex-col items-center">
-                    <span class="text-[10px] uppercase text-slate-500 font-bold mb-1">Memory Usage</span>
-                    <span id="stat-mem" class="text-xs font-bold text-green-400 tracking-widest">---</span>
+                <div class="glass px-6 py-4 stat-card" style="border-left-color: #10b981;">
+                    <div class="text-[10px] uppercase text-slate-500 font-black tracking-tighter mb-1">RAM Integrity
+                    </div>
+                    <div id="stat-mem" class="text-lg font-bold text-green-400 tabular-nums tracking-wide">---</div>
                 </div>
-                <div id="system-status" class="flex items-center gap-3 glass px-5 py-3">
-                    <div class="w-3 h-3 bg-green-500 rounded-full pulse"></div>
-                    <span id="stat-status" class="text-xs font-bold text-green-400 uppercase tracking-widest">System
-                        Stable</span>
+                <div class="glass px-6 py-4 stat-card" style="border-left-color: #f59e0b;">
+                    <div class="text-[10px] uppercase text-slate-500 font-black tracking-tighter mb-1">Autonomous Status
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div id="status-dot" class="w-2 h-2 bg-green-500 rounded-full pulse"></div>
+                        <div id="stat-status" class="text-sm font-bold text-green-400 tracking-wide uppercase">Active
+                        </div>
+                    </div>
+                </div>
+                <div class="glass px-6 py-4 stat-card" style="border-left-color: #8b5cf6;">
+                    <div class="text-[10px] uppercase text-slate-500 font-black tracking-tighter mb-1">Event Bus</div>
+                    <div id="stat-bus" class="text-lg font-bold text-purple-400 tabular-nums tracking-wide">---</div>
                 </div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left: Marketplace -->
-            <div class="lg:col-span-2 space-y-8">
-                <div class="flex justify-between items-end">
-                    <h2 class="text-2xl font-semibold">Policy Marketplace</h2>
-                    <div class="flex gap-4">
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Left Panel: Agents & Discovery -->
+            <div class="lg:col-span-3 space-y-6">
+                <h3 class="text-sm font-black text-slate-500 uppercase tracking-[0.2em] px-2">Squad Discovery</h3>
+                <div class="grid grid-cols-1 gap-3">
+                    <div class="glass p-4 flex items-center gap-4 agent-pill group">
+                        <div class="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-xl">🕵️
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm font-bold text-slate-200">Scout Agent</div>
+                            <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Detection Layer
+                            </div>
+                        </div>
+                        <div class="w-2 h-2 rounded-full bg-green-500 border-2 border-green-500/30"></div>
+                    </div>
+                    <div class="glass p-4 flex items-center gap-4 agent-pill group">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-xl">🧠
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm font-bold text-slate-200">Brain Agent</div>
+                            <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Neural Reasoning
+                            </div>
+                        </div>
+                        <div class="w-2 h-2 rounded-full bg-purple-500 border-2 border-purple-500/30"></div>
+                    </div>
+                    <div class="glass p-4 flex items-center gap-4 agent-pill group">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-xl">🛡️
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm font-bold text-slate-200">Guardrail</div>
+                            <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Policy Safety
+                            </div>
+                        </div>
+                        <div class="w-2 h-2 rounded-full bg-amber-500 border-2 border-amber-500/30"></div>
+                    </div>
+                    <div class="glass p-4 flex items-center gap-4 agent-pill group">
+                        <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-xl">🛠️
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm font-bold text-slate-200">Fixer Agent</div>
+                            <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">GitOps Execution
+                            </div>
+                        </div>
+                        <div class="w-2 h-2 rounded-full bg-orange-500 border-2 border-orange-500/30"></div>
+                    </div>
+                </div>
+
+                <!-- Simulation Controls -->
+                <div class="glass p-6 mt-8">
+                    <h3 class="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Chaos Simulations</h3>
+                    <div class="flex flex-col gap-3">
                         <button onclick="triggerDemo('infra')"
-                            class="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 px-4 py-2 rounded-xl text-sm font-bold transition">
-                            🌀 Demo: Infra Incident (Scale)
+                            class="w-full py-4 glass bg-blue-500/5 hover:bg-blue-500/10 border-blue-500/20 text-blue-400 font-bold rounded-2xl transition-all hover:scale-[1.02] flex items-center justify-center gap-3 active:scale-95">
+                            <span class="text-lg">🌀</span> Scale-Out Incident
                         </button>
                         <button onclick="triggerDemo('code')"
-                            class="bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/30 px-4 py-2 rounded-xl text-sm font-bold transition">
-                            ⚡ Demo: Code Incident (PR/Merge)
+                            class="w-full py-4 glass bg-purple-500/5 hover:bg-purple-500/10 border-purple-500/20 text-purple-400 font-bold rounded-2xl transition-all hover:scale-[1.02] flex items-center justify-center gap-3 active:scale-95">
+                            <span class="text-lg">⚡</span> Logic Patch (PR)
                         </button>
                     </div>
                 </div>
+            </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Policy Card -->
-                    <div class="glass p-8 hover:bg-white/5 transition group cursor-pointer"
-                        onclick="processQuote('Life')">
-                        <div class="text-4xl mb-4">❤️</div>
-                        <h3 class="text-xl font-bold mb-2">Life Insurance</h3>
-                        <p class="text-slate-400 mb-6 text-sm">Full coverage for your family's future with autonomous
-                            claim guards.</p>
-                        <button class="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold transition">Get
-                            Quote</button>
+            <!-- Center Panel: Live Feed -->
+            <div class="lg:col-span-6 space-y-6">
+                <div class="flex items-center justify-between px-2">
+                    <h3 class="text-sm font-black text-slate-500 uppercase tracking-[0.2em]">Live Cognitive Stream</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2 text-[10px] font-bold text-slate-500">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full"></span> AGENT MENTALITY
+                        </div>
+                        <button onclick="clearLogs()"
+                            class="text-[10px] font-black text-slate-600 hover:text-slate-400 uppercase tracking-widest transition">Clear
+                            Tape</button>
+                    </div>
+                </div>
+                <div class="terminal rounded-3xl h-[640px] flex flex-col overflow-hidden relative group">
+                    <div class="bg-[#161b22] px-6 py-3 flex justify-between items-center border-b border-[#30363d]">
+                        <div class="flex items-center gap-3">
+                            <div class="flex gap-1.5">
+                                <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
+                                <div class="w-3 h-3 rounded-full bg-amber-500/50"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
+                            </div>
+                            <span
+                                class="text-[11px] font-bold text-slate-500 tracking-wider">RELIABILITY_ENGINE_OS_v3.6</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="typing-indicator"
+                                class="text-[10px] font-bold text-blue-500 animate-pulse hidden">ANALYZING...</span>
+                            <span class="w-1.5 h-4 bg-blue-500 animate-pulse"></span>
+                        </div>
+                    </div>
+                    <div id="logs" class="p-8 overflow-y-auto flex-1 space-y-4 scroll-smooth">
+                        <div class="text-slate-500 font-mono text-sm opacity-50 italic">// Orbital uplink established.
+                            Systems nominal...</div>
                     </div>
 
-                    <div class="glass p-8 hover:bg-white/5 transition group cursor-pointer"
-                        onclick="processQuote('Vehicle')">
-                        <div class="text-4xl mb-4">🚗</div>
-                        <h3 class="text-xl font-bold mb-2">Vehicle</h3>
-                        <p class="text-slate-400 mb-6 text-sm">Smart vehicle protection with real-time risk assessment.
-                        </p>
-                        <button
-                            class="w-full py-3 bg-purple-600 hover:bg-purple-700 rounded-xl font-bold transition">Get
-                            Quote</button>
+                    <!-- Overlay for empty state -->
+                    <div id="empty-state"
+                        class="absolute inset-0 flex items-center justify-center flex-col opacity-20 pointer-events-none transition-opacity">
+                        <div class="text-8xl mb-4">🌌</div>
+                        <div class="font-bold tracking-[0.3em] text-slate-400">AWAITING CHAOS</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right: Agent Terminal -->
-            <div class="space-y-4">
-                <h2 class="text-2xl font-semibold">Agent Squad Console</h2>
-                <div class="terminal rounded-2xl h-[500px] flex flex-col">
-                    <div
-                        class="bg-slate-900 px-4 py-2 rounded-t-2xl flex justify-between items-center text-xs text-slate-500 font-bold uppercase tracking-widest">
-                        <span>sre-space-control-center</span>
-                        <span>v3.5</span>
+            <!-- Right Panel: Git Integration & Context -->
+            <div class="lg:col-span-3 space-y-8">
+                <div>
+                    <h3 class="text-sm font-black text-slate-500 uppercase tracking-[0.2em] px-2 mb-4">GitOps
+                        Intelligence</h3>
+                    <div id="git-feed" class="space-y-4">
+                        <div class="glass p-6 git-issue bg-indigo-500/5">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-xs font-black text-indigo-400">#457</span>
+                                <span class="status-pill bg-indigo-500/20 text-indigo-400">AUTO-FIX</span>
+                            </div>
+                            <div class="text-sm font-bold text-slate-200 mb-1">Scale-out policy-service</div>
+                            <div class="text-[10px] text-slate-500 font-medium">Applied via Fixer Agent [Cloud]</div>
+                        </div>
                     </div>
-                    <div id="logs" class="p-6 overflow-y-auto flex-1 space-y-3 scrollbar-hide">
-                        <div class="text-slate-500 font-mono text-sm">> System initialized. Awaiting requests...</div>
+                </div>
+
+                <div class="glass p-8 bg-gradient-to-br from-blue-500/10 to-transparent border-blue-500/20">
+                    <h3 class="text-sm font-black text-blue-400 uppercase tracking-[0.2em] mb-4">RAG Context</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed italic mb-4">"Matched incident structure to
+                        previous repair log in ChromaDB. Confidence: 94%"</p>
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm">💿</div>
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Vector Store Sync
+                            Active</span>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
 
-        <footer class="mt-24 text-center text-slate-600 text-sm">
-            <p>SRE.Space | Cognitive Reliability Engine | Designed for Infinite Uptime</p>
+        <footer
+            class="mt-16 flex flex-col md:flex-row justify-between items-center px-4 gray-500 gap-4 text-slate-600 text-[10px] font-black uppercase tracking-[0.2em]">
+            <p>© 2026 SRE.Space | Planetary-Scale Autonomy</p>
+            <div class="flex gap-8">
+                <a href="#" class="hover:text-blue-500 transition">Telemetry API</a>
+                <a href="#" class="hover:text-blue-500 transition">Documentation</a>
+                <a href="#" class="hover:text-blue-500 transition">Security Policy</a>
+            </div>
         </footer>
     </div>
 
     <script>
         const logContainer = document.getElementById('logs');
-        const systemStatus = document.getElementById('system-status');
+        const emptyState = document.getElementById('empty-state');
+        const typingIndicator = document.getElementById('typing-indicator');
         const statMode = document.getElementById('stat-mode');
         const statMem = document.getElementById('stat-mem');
+        const statBus = document.getElementById('stat-bus');
         const statStatus = document.getElementById('stat-status');
+        const statusDot = document.getElementById('status-dot');
+        const gitFeed = document.getElementById('git-feed');
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('runtime-clock').innerText = now.toLocaleTimeString('en-GB');
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
         async function updateStats() {
             try {
@@ -163,48 +310,85 @@
                 const data = await res.json();
                 statMode.innerText = data.mode.toUpperCase();
                 statMem.innerText = data.memory.memory_percent + '%';
+                statBus.innerText = data.event_bus.toUpperCase();
 
                 if (data.status === 'degraded') {
                     statStatus.innerText = 'DEGRADED';
-                    statStatus.classList.replace('text-green-400', 'text-yellow-400');
-                    document.querySelector('.pulse').classList.replace('bg-green-500', 'bg-yellow-500');
+                    statStatus.className = 'text-xs font-bold text-amber-500 tracking-wide uppercase';
+                    statusDot.className = 'w-2 h-2 bg-amber-500 rounded-full pulse';
                 } else {
-                    statStatus.innerText = 'SYSTEM STABLE';
-                    statStatus.classList.replace('text-yellow-400', 'text-green-400');
-                    document.querySelector('.pulse').classList.replace('bg-yellow-500', 'bg-green-500');
+                    statStatus.innerText = 'HEALTHY';
+                    statStatus.className = 'text-xs font-bold text-green-400 tracking-wide uppercase';
+                    statusDot.className = 'w-2 h-2 bg-green-500 rounded-full pulse';
                 }
             } catch (err) {
                 console.error("Health check failed", err);
             }
         }
 
-        // Poll health every 10 seconds
-        setInterval(updateStats, 10000);
+        setInterval(updateStats, 5000);
         updateStats();
 
-        function addLog(msg, type = 'info') {
-            const div = document.createElement('div');
-            div.className = "text-sm font-mono leading-relaxed";
+        function addLog(msg) {
+            emptyState.style.opacity = '0';
+            const logEntry = document.createElement('div');
+            logEntry.className = "flex gap-4 group";
 
-            if (msg.includes('Scout')) div.classList.add('text-green-400');
-            else if (msg.includes('CAG')) div.classList.add('text-teal-400');
-            else if (msg.includes('Brain')) div.classList.add('text-purple-400');
-            else if (msg.includes('Guardrail')) div.classList.add('text-yellow-400');
-            else if (msg.includes('Fixer')) div.classList.add('text-orange-400');
-            else if (msg.includes('Jules')) div.classList.add('text-blue-400');
-            else if (msg.includes('System')) div.classList.add('text-slate-500');
-            else div.classList.add('text-slate-300');
+            let icon = "⚙️";
+            let colorClass = "text-slate-400";
 
-            div.innerText = "> " + msg;
-            logContainer.appendChild(div);
+            if (msg.includes('Scout')) { icon = "🕵️"; colorClass = "text-green-400"; }
+            else if (msg.includes('CAG')) { icon = "⚡"; colorClass = "text-teal-400"; }
+            else if (msg.includes('Brain')) { icon = "🧠"; colorClass = "text-purple-400"; }
+            else if (msg.includes('Guardrail')) { icon = "🛡️"; colorClass = "text-amber-400"; }
+            else if (msg.includes('Fixer')) { icon = "🛠️"; colorClass = "text-orange-400"; }
+            else if (msg.includes('Jules')) { icon = "🤖"; colorClass = "text-blue-400"; }
+            else if (msg.includes('System')) { icon = "🛰️"; colorClass = "text-slate-500"; }
+
+            logEntry.innerHTML = `
+                <div class="text-lg opacity-40 group-hover:opacity-100 transition-opacity">${icon}</div>
+                <div class="flex-1">
+                    <div class="text-[13px] font-mono leading-relaxed ${colorClass}">
+                        <span class="opacity-30 mr-2">$</span>${msg}
+                    </div>
+                </div>
+            `;
+
+            logContainer.appendChild(logEntry);
             logContainer.scrollTop = logContainer.scrollHeight;
+
+            // Trigger random Git update for logic demos
+            if (msg.includes('Merged') || msg.includes('Fix Applied')) {
+                pushGitUpdate(msg);
+            }
         }
 
-        async function processQuote(policy, isChaos = false, type = 'infra') {
-            logContainer.innerHTML = '';
-            addLog(`System: Initiating ${policy} for customer...`);
+        function pushGitUpdate(msg) {
+            const id = Math.floor(Math.random() * 900) + 100;
+            const item = document.createElement('div');
+            item.className = "glass p-4 git-issue bg-green-500/5 border-l-green-500";
+            item.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs font-black text-green-400">#INC-${id}</span>
+                    <span class="status-pill bg-green-500/20 text-green-400">RESOLVED</span>
+                </div>
+                <div class="text-[11px] font-bold text-slate-200">Autonomous Patch Merged</div>
+                <div class="text-[9px] text-slate-500 font-medium">Auto-deployment verification pass</div>
+            `;
+            gitFeed.prepend(item);
+        }
 
-            const eventSource = new EventSource(`/api/sre-loop?anomaly=${isChaos}&type=${type}`);
+        function clearLogs() {
+            logContainer.innerHTML = '';
+            emptyState.style.opacity = '0.2';
+        }
+
+        async function triggerDemo(type) {
+            clearLogs();
+            typingIndicator.classList.remove('hidden');
+            addLog(`System: Initiating ${type.toUpperCase()} failure injection...`);
+
+            const eventSource = new EventSource(`/api/sre-loop?anomaly=true&type=${type}`);
 
             eventSource.onmessage = (event) => {
                 const data = JSON.parse(event.data);
@@ -212,23 +396,15 @@
 
                 if (data.final_state) {
                     eventSource.close();
-                    if (data.final_state === 'Stable') {
-                        addLog("System: Recovery successful. Business as usual.", 'success');
-                    } else {
-                        addLog("System: Operation completed within SLA.", 'success');
-                    }
+                    typingIndicator.classList.add('hidden');
                     updateStats();
                 }
             };
 
             eventSource.onerror = (err) => {
                 eventSource.close();
-                console.error("SSE Error:", err);
+                typingIndicator.classList.add('hidden');
             };
-        }
-
-        function triggerDemo(type) {
-            processQuote(`Chaos Demo (${type.toUpperCase()})`, true, type);
         }
     </script>
 </body>

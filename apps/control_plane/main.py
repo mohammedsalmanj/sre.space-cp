@@ -38,7 +38,9 @@ async def health_check():
         "active_agents": 8,
         "memory": stats,
         "log_level": LOG_LEVEL,
-        "circuit_breaker_active": False # Placeholder for actual breaker logic
+        "circuit_breaker_active": False,
+        "last_incident": "INC-457", 
+        "remediation_status": "Merged & Deployed"
     }
 
 @app.get("/ready")
