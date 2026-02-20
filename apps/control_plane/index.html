@@ -6,179 +6,198 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SRE-Space | Insurance Marketplace</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono&display=swap"
         rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fcfcfd;
             color: #1e293b;
         }
 
         .hero-gradient {
-            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        }
+
+        .liquid-glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
         }
 
         .btn-primary {
-            background-color: #2563eb;
+            background: #2563eb;
             color: white;
             transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
 
         .btn-primary:hover {
-            background-color: #1d4ed8;
             transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
         }
 
-        .card {
-            background: white;
-            border/1px solid #e2e8f0;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        .intel-panel {
+            background: #0f172a;
+            border-radius: 1rem;
+            border-top: 4px solid #3b82f6;
         }
 
-        .eng-badge {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 2px 8px;
-            border-radius: 9999px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        .eng-card {
-            border: 1px solid #fee2e2;
-            transition: all 0.2s;
-            cursor: pointer;
+        .dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            display: inline-block;
         }
 
-        .eng-card:hover {
-            border-color: #ef4444;
-            background: #fff1f2;
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
         }
     </style>
 </head>
 
-<body>
-    <!-- Navigation -->
-    <nav class="border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+<body class="pb-20">
+    <!-- Clean Header -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 h-20 flex items-center">
+        <div class="max-w-7xl mx-auto px-6 w-full flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">S
-                </div>
-                <span class="text-xl font-extrabold tracking-tight text-slate-900 uppercase italic">SRE-Space</span>
+                <div
+                    class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg">
+                    S</div>
+                <span class="text-xl font-extrabold tracking-tighter text-slate-900 italic">SRE-SPACE</span>
             </div>
-            <div class="flex items-center gap-6 text-sm font-medium text-slate-600">
-                <a href="#" class="hover:text-blue-600">Personal</a>
-                <a href="#" class="hover:text-blue-600">Business</a>
-                <a href="#" class="hover:text-blue-600">Claims</a>
+            <div class="flex items-center gap-6">
                 <a href="{{ monitor_url }}" target="_blank"
-                    class="px-4 py-2 bg-slate-100 rounded-lg hover:bg-slate-200 transition">Control Plane</a>
+                    class="px-5 py-2.5 bg-blue-50 text-blue-600 rounded-xl font-bold text-sm hover:bg-blue-100 transition border border-blue-100/50">
+                    🛰️ Orbital Monitor
+                </a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-gradient py-24 text-white">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">Insurance Marketplace <br /><span
-                    class="text-blue-400 font-light opacity-80">Reliability Powered Backend</span></h1>
-            <p class="text-lg text-slate-300 max-w-2xl mx-auto mb-10">Experience the next generation of digital
-                insurance. Real-time pricing, instant approval, and 100% autonomous reliability under the hood.</p>
+    <!-- Professional Hero -->
+    <header class="py-20 hero-gradient text-white text-center">
+        <div class="max-w-4xl mx-auto px-6">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">Insurance Marketplace <br><span
+                    class="opacity-70 font-light">Reliability Powered Backend</span></h1>
+            <p class="text-lg opacity-80 max-w-2xl mx-auto">Instant coverage for your enterprise, secured by an
+                autonomous multi-agent SRE control loop.</p>
         </div>
-    </section>
+    </header>
 
-    <main class="max-w-7xl mx-auto px-4 -mt-16 pb-20">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Quote Form -->
-            <div class="lg:col-span-2 card p-8 md:p-12">
-                <h2 class="text-2xl font-bold mb-8 text-slate-900 border-b pb-4">Generate Instant Quote</h2>
-                <form id="quote-form" onsubmit="event.preventDefault(); generateQuote();" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-2">
-                            <label class="text-xs font-bold text-slate-500 uppercase">Coverage Type</label>
-                            <select
-                                class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                                <option>Comprehensive Personal</option>
-                                <option>Business Liability</option>
-                                <option>Property Protection</option>
-                            </select>
+    <main class="max-w-7xl mx-auto px-6 -mt-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Left: App Content -->
+            <div class="lg:col-span-8">
+                <div class="liquid-glass p-10 min-h-[500px]">
+                    <h2 class="text-2xl font-black mb-10 text-slate-900">Request Policy Quote</h2>
+                    <form onsubmit="event.preventDefault(); triggerQuote();" class="space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-3">
+                                <label
+                                    class="text-[10px] uppercase font-black text-slate-400 tracking-widest">Enterprise
+                                    Sector</label>
+                                <select
+                                    class="w-full p-4 bg-slate-50 border-0 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold">
+                                    <option>FinTech Infrastructure</option>
+                                    <option>Cloud Logistics</option>
+                                    <option>Healthcare Systems</option>
+                                </select>
+                            </div>
+                            <div class="space-y-3">
+                                <label class="text-[10px] uppercase font-black text-slate-400 tracking-widest">Coverage
+                                    Target</label>
+                                <input type="text" value="$1,000,000"
+                                    class="w-full p-4 bg-slate-50 border-0 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold" />
+                            </div>
                         </div>
-                        <div class="space-y-2">
-                            <label class="text-xs font-bold text-slate-500 uppercase">Policy Amount</label>
-                            <input type="text" placeholder="$500,000"
-                                class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                        <button type="submit" id="quote-btn"
+                            class="w-full py-5 btn-primary rounded-xl font-black text-sm uppercase tracking-[0.2em]">
+                            Calculate Premium Flow
+                        </button>
+                    </form>
+
+                    <!-- Feedback Areas -->
+                    <div id="status-box"
+                        class="mt-12 hidden p-8 rounded-2xl bg-blue-50/50 border border-blue-100 animate-in fade-in duration-300">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <span
+                                    class="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-2">Quote
+                                    Generated Successfully</span>
+                                <h3 id="quote-id" class="text-3xl font-black text-slate-900 tracking-tighter">#---</h3>
+                            </div>
+                            <div class="text-right">
+                                <span
+                                    class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Monthly
+                                    Premium</span>
+                                <span id="premium-val"
+                                    class="text-3xl font-black text-blue-600 tracking-tighter">---</span>
+                            </div>
                         </div>
                     </div>
-                    <button type="submit" id="submit-btn"
-                        class="w-full py-4 btn-primary rounded-xl font-bold text-sm uppercase tracking-widest shadow-lg shadow-blue-500/20">
-                        Calculate Premium Trace
-                    </button>
-                </form>
 
-                <!-- Result Area -->
-                <div id="result-area"
-                    class="hidden mt-10 p-8 rounded-xl bg-blue-50 border border-blue-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div class="flex justify-between items-start mb-6">
-                        <div>
-                            <span
-                                class="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-1">Quote
-                                Successfully Processed</span>
-                            <h3 id="quote-id" class="text-2xl font-extrabold text-slate-900">#---</h3>
+                    <div id="error-box"
+                        class="mt-12 hidden p-8 rounded-2xl bg-red-50/50 border border-red-100 animate-in slide-in-from-top-2 duration-300">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="w-3 h-3 rounded-full bg-red-600 pulse"></span>
+                            <h3 class="text-red-700 font-bold">Operational Fault Detected</h3>
                         </div>
-                        <div class="text-right">
-                            <span
-                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Monthly
-                                Premium</span>
-                            <span id="quote-price" class="text-3xl font-black text-blue-600">---</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase">
-                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        OTel Span Emitted: <span id="trace-id" class="text-blue-500 ml-1">---</span>
-                    </div>
-                </div>
-
-                <!-- Error area -->
-                <div id="error-area" class="hidden mt-10 p-8 rounded-xl bg-red-50 border border-red-100 border-l-4">
-                    <h3 class="text-red-700 font-bold mb-2">System Anomaly Detected</h3>
-                    <p id="error-msg" class="text-sm text-red-600 italic mb-4">---</p>
-                    <div class="flex items-center gap-2 text-[10px] font-bold text-red-500 uppercase">
-                        <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                        SRE Control Plane Escalation Active
+                        <p id="error-msg" class="text-sm text-red-600 font-medium italic">---</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Engineering Controls Sidebar -->
-            <div class="space-y-6">
-                <div class="card p-6 border-t-4 border-red-500">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-sm font-black text-slate-900 uppercase">Engineering Controls</h3>
-                        <span class="eng-badge">Fault Injection</span>
-                    </div>
-                    <div class="grid grid-cols-1 gap-3">
-                        <button onclick="injectFault('latency')" class="eng-card p-4 rounded-xl text-left bg-white">
-                            <div class="text-xs font-bold text-slate-900">Latency</div>
-                            <div class="text-[10px] text-slate-500 mt-1">Add 2.5s artificial delay</div>
+            <!-- Right: SRE Interface (The Bridge) -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- Fault Injection Area -->
+                <div class="liquid-glass p-6 border-t-4 border-red-500">
+                    <h3 class="text-xs font-black text-slate-900 uppercase tracking-widest mb-6">Engineering Triage</h3>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="injectFault('500')"
+                            class="w-full p-4 text-left border border-slate-100 rounded-xl hover:bg-red-50 hover:border-red-200 transition group">
+                            <div class="text-xs font-bold group-hover:text-red-700">Database Saturation</div>
+                            <div class="text-[10px] text-slate-400 mt-1">Force 500 Network Errors</div>
                         </button>
-                        <button onclick="injectFault('500')" class="eng-card p-4 rounded-xl text-left bg-white">
-                            <div class="text-xs font-bold text-slate-900">500 Errors</div>
-                            <div class="text-[10px] text-slate-500 mt-1">Exhaust DB connection pool</div>
-                        </button>
-                        <button onclick="injectFault('memory')" class="eng-card p-4 rounded-xl text-left bg-white">
-                            <div class="text-xs font-bold text-slate-900">Memory Spike</div>
-                            <div class="text-[10px] text-slate-500 mt-1">Force system degradation</div>
-                        </button>
-                        <button onclick="injectFault('dependency')" class="eng-card p-4 rounded-xl text-left bg-white">
-                            <div class="text-xs font-bold text-slate-900">Dependency Timeout</div>
-                            <div class="text-[10px] text-slate-500 mt-1">10s Upstream stall</div>
+                        <button onclick="injectFault('latency')"
+                            class="w-full p-4 text-left border border-slate-100 rounded-xl hover:bg-orange-50 hover:border-orange-200 transition group">
+                            <div class="text-xs font-bold group-hover:text-orange-700">p99 Latency Spike</div>
+                            <div class="text-[10px] text-slate-400 mt-1">Inject 2.5s simulated lag</div>
                         </button>
                     </div>
-                    <div class="mt-6 pt-6 border-t border-slate-100">
-                        <p class="text-[10px] text-slate-400 font-medium leading-relaxed">Injection triggers the
-                            autonomous OODA loop. Monitor progress in the Control Plane dashboard.</p>
+                </div>
+
+                <!-- Mini SRE Monitor -->
+                <div class="intel-panel p-6 shadow-2xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">SRE Intelligence
+                            Feed</span>
+                        <span id="loop-dot" class="dot bg-slate-700"></span>
+                    </div>
+                    <div id="intel-logs" class="space-y-3 h-[250px] overflow-y-auto pr-2 scrollbar-hide">
+                        <div class="text-[11px] mono text-slate-600 italic">// Awaiting telemetry pulse...</div>
+                    </div>
+                    <div
+                        class="mt-6 pt-4 border-t border-slate-800 flex justify-between text-[10px] font-bold text-slate-500">
+                        <span id="agent-hint">UPLINK: ACTIVE</span>
+                        <span class="text-blue-500">v5.5-SECURE</span>
                     </div>
                 </div>
             </div>
@@ -186,45 +205,81 @@
     </main>
 
     <script>
-        async function generateQuote() {
-            const btn = document.getElementById('submit-btn');
-            const resultArea = document.getElementById('result-area');
-            const errorArea = document.getElementById('error-area');
-            const loader = document.createElement('span');
+        let eventSource = null;
+        const monitorUrl = "{{ monitor_url }}";
+
+        async function triggerQuote() {
+            const btn = document.getElementById('quote-btn');
+            const sBox = document.getElementById('status-box');
+            const eBox = document.getElementById('error-box');
 
             btn.disabled = true;
-            btn.innerText = "Processing Logic...";
-            resultArea.classList.add('hidden');
-            errorArea.classList.add('hidden');
+            btn.innerText = "EXECUTING BACKEND LOGIC...";
+            sBox.classList.add('hidden');
+            eBox.classList.add('hidden');
 
             try {
-                const start = performance.now();
                 const res = await fetch('/quote');
                 const data = await res.json();
-                const duration = (performance.now() - start).toFixed(2);
 
                 if (res.ok) {
                     document.getElementById('quote-id').innerText = data.quote_id;
-                    document.getElementById('quote-price').innerText = `$${data.premium}`;
-                    document.getElementById('trace-id').innerText = `span-${Math.random().toString(36).substr(2, 9)}`;
-                    resultArea.classList.remove('hidden');
+                    document.getElementById('premium-val').innerText = `$${data.premium}`;
+                    sBox.classList.remove('hidden');
                 } else {
-                    throw new Error(data.detail || "Upstream Error");
+                    throw new Error(data.detail || "System Error");
                 }
             } catch (err) {
                 document.getElementById('error-msg').innerText = err.message;
-                errorArea.classList.remove('hidden');
+                eBox.classList.remove('hidden');
+                // Auto-connect to loop monitoring when error happens
+                if (!eventSource) connectSRELoop();
             } finally {
                 btn.disabled = false;
-                btn.innerText = "Calculate Premium Trace";
+                btn.innerText = "Calculate Premium Flow";
             }
         }
 
         async function injectFault(type) {
-            const res = await fetch(`/demo/inject-failure?type=${type}`, { method: 'POST' });
-            if (res.ok) {
-                alert(`Engineering Control Triggered: ${type.toUpperCase()}\nAutonomous loop initiated.`);
-            }
+            await fetch(`/demo/inject-failure?type=${type}`, { method: 'POST' });
+            addIntelLog(`⚠️ Engineering Control: ${type.toUpperCase()} injection triggered.`);
+            connectSRELoop();
+        }
+
+        function addIntelLog(msg) {
+            const logs = document.getElementById('intel-logs');
+            const div = document.createElement('div');
+            div.className = "text-[11px] mono animate-in fade-in duration-300 border-l border-slate-800 pl-3 py-0.5";
+
+            let color = "text-slate-500";
+            if (msg.includes('[SCOUT]')) color = "text-green-500";
+            else if (msg.includes('[BRAIN]')) color = "text-purple-500";
+            else if (msg.includes('[FIXER]')) color = "text-blue-400";
+            else if (msg.includes('SUCCESS')) color = "text-green-400 font-bold";
+
+            div.innerHTML = `<span class="${color}">${msg}</span>`;
+            logs.appendChild(div);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function connectSRELoop() {
+            if (eventSource) eventSource.close();
+            document.getElementById('loop-dot').className = 'dot bg-blue-500 pulse';
+            document.getElementById('agent-hint').innerText = "ENGINE: RUNNING";
+
+            eventSource = new EventSource('/api/sre-loop?anomaly=false');
+            eventSource.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                if (data.message) addIntelLog(data.message);
+                if (data.final_state) {
+                    document.getElementById('loop-dot').className = 'dot bg-green-500';
+                    document.getElementById('agent-hint').innerText = "SYSTEM: RECOVERED";
+                    setTimeout(() => {
+                        document.getElementById('loop-dot').className = 'dot bg-slate-700';
+                        document.getElementById('agent-hint').innerText = "UPLINK: ACTIVE";
+                    }, 5000);
+                }
+            };
         }
     </script>
 </body>
