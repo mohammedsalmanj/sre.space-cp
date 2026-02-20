@@ -5,9 +5,10 @@ from openai import OpenAI
 
 def get_memory_collection():
     try:
-        # Block 3: Embedded ChromaDB Persistence
-        persist_dir = os.path.join(os.getcwd(), "chroma_data")
-        client = chromadb.PersistentClient(path=persist_dir)
+        # Block 3: Restore ChromaDB Server Mode
+        host = os.getenv('CHROMA_DB_HOST', 'localhost')
+        port = int(os.getenv('CHROMA_DB_PORT', 8000))
+        client = chromadb.HttpClient(host=host, port=port)
         return client.get_or_create_collection(name="sre_incident_memory")
     except Exception as e:
         return None

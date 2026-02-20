@@ -11,8 +11,9 @@ def curator_agent(state):
     
     try:
         import os
-        persist_dir = os.path.join(os.getcwd(), "chroma_data")
-        client = chromadb.PersistentClient(path=persist_dir)
+        host = os.getenv('CHROMA_DB_HOST', 'localhost')
+        port = int(os.getenv('CHROMA_DB_PORT', 8000))
+        client = chromadb.HttpClient(host=host, port=port)
         collection = client.get_or_create_collection(name="sre_incident_memory")
         if collection:
             doc_id = f"inc-{random.randint(1000, 9999)}"

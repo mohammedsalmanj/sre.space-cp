@@ -12,8 +12,11 @@
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <script>
-        // Block 1: Injection point for Vercel Env Vars
-        window.NEXT_PUBLIC_API_URL = "https://sre-space-cp.onrender.com";
+        // Block 2: Bridge to Local Control Plane
+        // REPLACE with your Ngrok/LocalTunnel URL for production observability
+        window.NEXT_PUBLIC_API_URL = window.location.origin === "http://localhost:8001"
+            ? "http://localhost:8001"
+            : "https://your-sre-tunnel.ngrok.io";
     </script>
 </head>
 

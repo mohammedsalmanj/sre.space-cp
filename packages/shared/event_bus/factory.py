@@ -10,10 +10,6 @@ def get_event_bus() -> EventBusInterface:
 
     from apps.control_plane.runtime_config import EVENT_BUS as BUS_TYPE
     
-    # Block 3: Force Redis in Cloud if Kafka isn't explicitly required
-    env = os.getenv("ENV", "local")
-    if env == "cloud" and BUS_TYPE != "redis":
-        BUS_TYPE = "redis"
     if BUS_TYPE == "kafka":
         try:
             from .kafka_bus import KafkaEventBus

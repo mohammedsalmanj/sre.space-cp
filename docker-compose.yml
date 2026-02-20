@@ -1,6 +1,30 @@
 version: '3.8'
 
 services:
+  # --- SRE CONTROL PLANE (THE ENGINE) ---
+  sre-engine:
+    build: .
+    ports:
+      - "8001:8001"
+    environment:
+      - ENV=local
+      - PORT=8001
+      - EVENT_BUS=kafka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - CHROMA_DB_HOST=chromadb
+      - CHROMA_DB_PORT=8000
+      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MAX_LLM_CONCURRENCY=5
+    deploy:
+      resources:
+        limits:
+          memory: 2gb
+    depends_on:
+      - kafka
+      - chromadb
+      - jaeger
+
   # --- OBSERVABILITY BACKBONE ---
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -22,23 +46,28 @@ services:
     depends_on:
       - jaeger
 
-  # --- EVENT BUS ---
+  # --- EVENT BUS (KAFKA + ZOOKEEPER) ---
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - "2181:2181"
+
   kafka:
-    image: apache/kafka:latest
+    image: bitnami/kafka:latest
     ports:
       - "9092:9092"
+      - "9093:9093"
     environment:
-      - KAFKA_NODE_ID=1
-      - KAFKA_PROCESS_ROLES=broker,controller
-      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
-      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@localhost:9093
-      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
-      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
-      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+    depends_on:
+      - zookeeper
 
   # --- VECTOR MEMORY ---
   chromadb:

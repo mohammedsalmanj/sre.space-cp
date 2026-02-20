@@ -1,17 +1,21 @@
 <div align="center">
-  <h1>🌌 SRE-Space: The Cognitive Reliability Engine v3.5</h1>
-  <p><i>"Self-Healing Infrastructure through Multi-Agent Cognitive Cycles"</i></p>
+  <h1>🌌 SRE-Space: Local-Power Control Plane v4.0</h1>
+  <p><i>"Distributed SRE Monorepo with High-Performance Local Orchestration"</i></p>
 
-  [![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-  [![LangGraph](https://img.shields.io/badge/AI-LangGraph-FF6F00?style=for-the-badge&logo=langchain&logoColor=white)](https://langchain-ai.github.io/langgraph/)
-  [![OpenAI](https://img.shields.io/badge/LLM-GPT--4o--mini-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
-  [![ChromaDB](https://img.shields.io/badge/Memory-ChromaDB-white?style=for-the-badge&logo=googlechrome&logoColor=black)](https://www.trychroma.com/)
-  [![OpenTelemetry](https://img.shields.io/badge/Tracing-OTel-F46800?style=for-the-badge&logo=opentelemetry&logoColor=white)](https://opentelemetry.io/)
+  [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+  [![LangGraph](https://img.shields.io/badge/Agent-Orchestration-FF6F00?style=for-the-badge&logo=langchain&logoColor=white)](https://langchain-ai.github.io/langgraph/)
+  [![Docker](https://img.shields.io/badge/Infra-Local_Power-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 </div>
 
 ---
 
-## 🚀 The Vision
+## 🏛️ Local-Power Architecture
+**SRE-Space** has transitioned to a local-first, high-performance architecture. While the sensor and brain core run on local Docker infrastructure to bypass cloud resource limits (e.g., 512MB RAM constraints), the **Dashboard** remains optimized for Vercel deployment, providing a global window into local SRE operations.
+
+This setup enables:
+- **Unrestricted Agent Reasoning**: Multi-agent loops run at full speed with 2GB+ memory.
+- **Enterprise Event Bus**: Full Kafka + Zookeeper stack for high-throughput sensory intake.
+- **Persistent Memory**: Local ChromaDB server for deep architectural history.
 **SRE-Space** is not just a monitoring tool; it's an autonomous **Cognitive Control Plane**. It replaces traditional "alert-and-wait" workflows with a high-fidelity **Agentic Repair Loop**. 
 
 Powered by **LangGraph**, it orchestrates a specialized squad of agents that simulate human SRE reasoning—detecting anomalies via OpenTelemetry, diagnosing root causes using RAG (Retrieval-Augmented Generation), and executing remediations through GitOps and Docker automation.

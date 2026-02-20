@@ -16,7 +16,19 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 
 from apps.control_plane.langgraph_logic import run_sre_loop
 
-app = FastAPI(title="Insurance Platform | Autonomous Reliability Engine v3.0")
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI(title="SRE.Space | Local-Power Orchestration Engine v4.0")
+
+# Block 2: CORS Bridge for Vercel Observability
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # Allow all origins for the bridge
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Update templates path to be relative to the file location
 templates = Jinja2Templates(directory=os.path.dirname(__file__))
 
