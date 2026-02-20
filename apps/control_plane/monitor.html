@@ -4,21 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRE-Space | Control Plane v5.0</title>
+    <title>SRE-Space | Control Plane v5.5 (Frost)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --glass-bg: rgba(13, 17, 23, 0.7);
-            --border-glow: rgba(59, 130, 246, 0.3);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --border-glow: rgba(59, 130, 246, 0.2);
+            --bg-accent: #f8fafc;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: #000;
-            color: #f8fafc;
+            background: #ffffff;
+            color: #0f172a;
             overflow-x: hidden;
         }
 
@@ -29,44 +30,45 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #000 100%);
-            opacity: 0.5;
+            background: radial-gradient(circle at 50% 50%, #f1f5f9 0%, #ffffff 100%);
+            opacity: 0.8;
         }
 
         .liquid-glass {
             background: var(--glass-bg);
-            backdrop-filter: blur(12px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(15, 23, 42, 0.08);
             border-radius: 1.5rem;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
         }
 
         .liquid-glass:hover {
-            border-color: var(--border-glow);
-            box-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 15px 50px -10px rgba(59, 130, 246, 0.15);
         }
 
         .terminal {
             font-family: 'JetBrains Mono', monospace;
-            background: rgba(0, 0, 0, 0.6);
+            background: #f8fafc;
             border-radius: 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .ooda-step {
-            opacity: 0.3;
+            opacity: 0.2;
             transition: all 0.3s;
         }
 
         .ooda-active {
             opacity: 1;
             transform: scale(1.05);
-            color: #60a5fa;
-            text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+            color: #2563eb;
+            text-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
         }
 
         .stream-active {
-            color: #3b82f6;
+            color: #2563eb;
             animation: pulse-glow 2s infinite;
         }
 
@@ -75,12 +77,11 @@
             0%,
             100% {
                 opacity: 1;
-                text-shadow: 0 0 5px #3b82f6;
+                filter: drop-shadow(0 0 4px #2563eb);
             }
 
             50% {
                 opacity: 0.5;
-                text-shadow: 0 0 2px #3b82f6;
             }
         }
 
@@ -93,7 +94,7 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.1);
             border-radius: 10px;
         }
     </style>
@@ -107,22 +108,23 @@
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
             <div>
                 <div class="flex items-center gap-3 mb-2">
-                    <div class="h-3 w-3 rounded-full bg-blue-500 stream-active"></div>
-                    <h1 class="text-2xl font-black italic tracking-tighter uppercase whitespace-nowrap">Control Plane
-                        <span class="text-slate-500 font-light not-italic">SRE-Orbital v5.0</span>
-                    </h1>
+                    <div class="h-3 w-3 rounded-full bg-blue-600 stream-active"></div>
+                    <h1 class="text-2xl font-black italic tracking-tighter uppercase whitespace-nowrap text-slate-900">
+                        Control Plane <span class="text-slate-400 font-light not-italic">SRE-Orbital v5.5</span></h1>
                 </div>
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.5em]">Global Reliability
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em]">Global Reliability
                     Orchestration & Telemetry</p>
             </div>
 
             <div class="flex items-center gap-4">
                 <div class="liquid-glass px-6 py-3 flex items-center gap-4">
                     <div class="text-right">
-                        <span class="text-[8px] font-black text-slate-500 block uppercase">Operational Status</span>
-                        <span id="conn-status" class="text-[10px] font-extrabold text-blue-400">NOMINAL</span>
+                        <span class="text-[8px] font-black text-slate-400 block uppercase">Operational Status</span>
+                        <span id="conn-status" class="text-[10px] font-extrabold text-blue-600 uppercase">Nominal
+                            Uplink</span>
                     </div>
-                    <div id="status-dot" class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6]"></div>
+                    <div id="status-dot"
+                        class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.3)]"></div>
                 </div>
             </div>
         </header>
@@ -133,51 +135,51 @@
                 <!-- OODA Loop Visualization -->
                 <div class="liquid-glass p-8">
                     <div class="flex justify-between items-center mb-10">
-                        <h2 class="text-[11px] font-black text-slate-500 uppercase tracking-widest">Active Remediation
+                        <h2 class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Active Remediation
                             Pipeline</h2>
                         <div class="flex items-center gap-2">
-                            <span class="text-[9px] font-bold text-slate-600 uppercase">Engine Loop:</span>
-                            <span id="loop-id" class="text-[9px] font-bold text-blue-400 font-mono">IDLE_STANDBY</span>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">Engine Loop:</span>
+                            <span id="loop-id" class="text-[9px] font-bold text-blue-600 font-mono">IDLE_STANDBY</span>
                         </div>
                     </div>
                     <div class="grid grid-cols-4 gap-4">
                         <div id="step-O1" class="ooda-step flex flex-col items-center text-center">
-                            <div class="h-1 bg-slate-800 w-full mb-4 rounded-full overflow-hidden">
-                                <div class="h-full bg-blue-500 w-0 transition-all duration-500"></div>
+                            <div class="h-1 bg-slate-200 w-full mb-4 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-600 w-0 transition-all duration-500"></div>
                             </div>
-                            <span class="text-[10px] font-black uppercase">Observe</span>
+                            <span class="text-[10px] font-black uppercase text-slate-600">Observe</span>
                         </div>
                         <div id="step-O2" class="ooda-step flex flex-col items-center text-center">
-                            <div class="h-1 bg-slate-800 w-full mb-4 rounded-full overflow-hidden">
-                                <div class="h-full bg-blue-500 w-0 transition-all duration-500"></div>
+                            <div class="h-1 bg-slate-200 w-full mb-4 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-600 w-0 transition-all duration-500"></div>
                             </div>
-                            <span class="text-[10px] font-black uppercase">Orient</span>
+                            <span class="text-[10px] font-black uppercase text-slate-600">Orient</span>
                         </div>
                         <div id="step-D" class="ooda-step flex flex-col items-center text-center">
-                            <div class="h-1 bg-slate-800 w-full mb-4 rounded-full overflow-hidden">
-                                <div class="h-full bg-blue-500 w-0 transition-all duration-500"></div>
+                            <div class="h-1 bg-slate-200 w-full mb-4 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-600 w-0 transition-all duration-500"></div>
                             </div>
-                            <span class="text-[10px] font-black uppercase">Decide</span>
+                            <span class="text-[10px] font-black uppercase text-slate-600">Decide</span>
                         </div>
                         <div id="step-A" class="ooda-step flex flex-col items-center text-center">
-                            <div class="h-1 bg-slate-800 w-full mb-4 rounded-full overflow-hidden">
-                                <div class="h-full bg-blue-500 w-0 transition-all duration-500"></div>
+                            <div class="h-1 bg-slate-200 w-full mb-4 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-600 w-0 transition-all duration-500"></div>
                             </div>
-                            <span class="text-[10px] font-black uppercase">Act</span>
+                            <span class="text-[10px] font-black uppercase text-slate-600">Act</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Cognitive Trace Log -->
                 <div class="liquid-glass flex flex-col h-[500px] overflow-hidden">
-                    <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-white/5">
-                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Cognitive
+                    <div class="px-6 py-4 border-b border-black/5 flex justify-between items-center bg-slate-50">
+                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cognitive
                             Intelligence Trace</h3>
-                        <span class="text-[9px] font-mono text-slate-600">secure_uplink_v5.4</span>
+                        <span class="text-[9px] font-mono text-slate-400">secure_uplink_v5.4</span>
                     </div>
                     <div id="logs" class="p-8 space-y-3 overflow-y-auto flex-grow terminal">
-                        <div class="text-slate-600 italic text-[11px] font-mono">// Control Plane initialized.
-                            Connecting to Render telemetry hub...</div>
+                        <div class="text-slate-400 italic text-[11px] font-mono">// System standby. Establishing frosty
+                            satellite uplink...</div>
                     </div>
                 </div>
             </div>
@@ -186,35 +188,33 @@
             <div class="lg:col-span-4 space-y-8">
                 <!-- System Health Stats -->
                 <div class="liquid-glass p-8 space-y-6">
-                    <h3 class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-6">System Health
-                        Metrics</h3>
-                    <div class="grid grid-cols-2 gap-y-8 gap-x-4">
+                    <h3
+                        class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-4">
+                        Health Telemetry</h3>
+                    <div class="grid grid-cols-2 gap-y-8 gap-x-4 text-slate-900">
                         <div>
-                            <span class="text-[8px] font-bold text-slate-500 block uppercase mb-1">Compute
-                                Environment</span>
-                            <span id="stat-mode" class="text-xs font-black text-blue-400">---</span>
+                            <span class="text-[8px] font-bold text-slate-400 block uppercase mb-1">Compute Mode</span>
+                            <span id="stat-mode" class="text-xs font-black text-blue-600">---</span>
                         </div>
                         <div>
-                            <span class="text-[8px] font-bold text-slate-500 block uppercase mb-1">Heap
-                                Utilization</span>
-                            <span id="stat-mem" class="text-xs font-black text-green-400">--%</span>
+                            <span class="text-[8px] font-bold text-slate-400 block uppercase mb-1">Heap Use</span>
+                            <span id="stat-mem" class="text-xs font-black text-green-600">--%</span>
                         </div>
                         <div>
-                            <span class="text-[8px] font-bold text-slate-500 block uppercase mb-1">Circuit
-                                Breaker</span>
-                            <span id="stat-cb" class="text-xs font-black text-slate-500">CLOSED</span>
+                            <span class="text-[8px] font-bold text-slate-400 block uppercase mb-1">Ckt Breaker</span>
+                            <span id="stat-cb" class="text-xs font-black text-slate-500">STBY</span>
                         </div>
                         <div>
-                            <span class="text-[8px] font-bold text-slate-500 block uppercase mb-1">Fault Active</span>
-                            <span id="stat-chaos" class="text-xs font-black text-slate-500">NONE</span>
+                            <span class="text-[8px] font-bold text-slate-400 block uppercase mb-1">Anomaly Signal</span>
+                            <span id="stat-chaos" class="text-xs font-black text-slate-500">SILENT</span>
                         </div>
                     </div>
-                    <div class="pt-6 border-t border-white/5">
+                    <div class="pt-6 border-t border-slate-100">
                         <div class="flex justify-between items-center text-[10px] font-bold mb-2">
-                            <span class="text-slate-500">Memory Pressure</span>
-                            <span id="mem-val" class="text-slate-300">---MB</span>
+                            <span class="text-slate-400">RAM Pressure</span>
+                            <span id="mem-val" class="text-slate-900">---MB</span>
                         </div>
-                        <div class="h-1 bg-slate-800 w-full rounded-full overflow-hidden">
+                        <div class="h-1 bg-slate-100 w-full rounded-full overflow-hidden">
                             <div id="mem-bar" class="h-full bg-green-500 w-0 transition-all duration-500"></div>
                         </div>
                     </div>
@@ -222,17 +222,17 @@
 
                 <!-- GitHub Integration -->
                 <div class="space-y-4">
-                    <h3 class="text-[11px] font-black text-slate-500 uppercase tracking-widest px-8">Real-Time GitOps
-                        Feed</h3>
+                    <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest px-8">Real-Time GitOps
+                        Sync</h3>
                     <div id="git-feed" class="space-y-4 px-4 overflow-y-auto max-h-[400px]">
-                        <!-- Real items injected here -->
-                        <div class="text-center py-10 opacity-30 text-[10px] font-bold uppercase tracking-widest">
-                            Awaiting API Payload...</div>
+                        <div
+                            class="text-center py-10 opacity-30 text-[10px] font-bold uppercase tracking-widest text-slate-900">
+                            Awaiting GitHub Payload...</div>
                     </div>
                 </div>
 
                 <button onclick="connectStream()" id="stream-btn"
-                    class="liquid-glass w-full py-5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 font-black text-xs uppercase tracking-[0.3em] transition-all">
+                    class="liquid-glass w-full py-5 bg-blue-50 hover:bg-white text-blue-600 border border-blue-200 font-black text-xs uppercase tracking-[0.3em] transition-all">
                     Establish Uplink
                 </button>
             </div>
@@ -240,7 +240,6 @@
     </div>
 
     <script>
-        // Cross-Origin Logic: Check if we are on Vercel connecting to Render
         const urlParams = new URLSearchParams(window.location.search);
         const API_BASE = urlParams.get('server') || window.location.origin;
         let eventSource = null;
@@ -251,11 +250,11 @@
                 const data = await res.json();
                 document.getElementById('stat-mode').innerText = data.mode.toUpperCase();
                 document.getElementById('stat-mem').innerText = data.memory.memory_percent + '%';
-                document.getElementById('stat-cb').innerText = data.circuit_breaker_active ? 'TRIPPED' : 'CLOSED';
+                document.getElementById('stat-cb').innerText = data.circuit_breaker_active ? 'TRIPPED' : 'NOMINAL';
                 document.getElementById('stat-cb').className = data.circuit_breaker_active ? 'text-xs font-black text-red-500' : 'text-xs font-black text-slate-500';
 
-                document.getElementById('stat-chaos').innerText = data.chaos_active ? 'DETECTED' : 'NONE';
-                document.getElementById('stat-chaos').className = data.chaos_active ? 'text-xs font-black text-orange-500' : 'text-xs font-black text-slate-500';
+                document.getElementById('stat-chaos').innerText = data.chaos_active ? 'BREACHED' : 'SILENT';
+                document.getElementById('stat-chaos').className = data.chaos_active ? 'text-xs font-black text-orange-600' : 'text-xs font-black text-slate-500';
 
                 document.getElementById('mem-val').innerText = data.memory.memory_used_mb.toFixed(1) + 'MB';
                 const mBar = document.getElementById('mem-bar');
@@ -263,13 +262,13 @@
                 mBar.style.backgroundColor = data.memory.memory_percent > 80 ? '#ef4444' : (data.memory.memory_percent > 60 ? '#f59e0b' : '#22c55e');
 
                 if (data.chaos_active) {
-                    document.getElementById('status-dot').className = 'w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_10px_#f59e0b]';
-                    document.getElementById('conn-status').innerText = 'ANOMALY DETECTED';
-                    document.getElementById('conn-status').className = 'text-[10px] font-extrabold text-orange-500';
+                    document.getElementById('status-dot').className = 'w-2 h-2 rounded-full bg-orange-600 shadow-[0_0_10px_rgba(245,158,11,0.3)]';
+                    document.getElementById('conn-status').innerText = 'Anomaly Warning';
+                    document.getElementById('conn-status').className = 'text-[10px] font-extrabold text-orange-600';
                 } else {
-                    document.getElementById('status-dot').className = 'w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6]';
-                    document.getElementById('conn-status').innerText = 'NOMINAL';
-                    document.getElementById('conn-status').className = 'text-[10px] font-extrabold text-blue-400';
+                    document.getElementById('status-dot').className = 'w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.2)]';
+                    document.getElementById('conn-status').innerText = 'Nominal Uplink';
+                    document.getElementById('conn-status').className = 'text-[10px] font-extrabold text-blue-600';
                 }
             } catch (err) { }
         }
@@ -282,25 +281,24 @@
                 feed.innerHTML = '';
 
                 if (data.length === 0) {
-                    feed.innerHTML = '<div class="text-center py-10 opacity-20 text-[10px] font-bold uppercase italic">No active incidents</div>';
+                    feed.innerHTML = '<div class="text-center py-10 opacity-20 text-[10px] font-bold uppercase italic text-slate-900">No active incidents</div>';
                     return;
                 }
 
                 data.forEach(item => {
                     const isPR = item.type === 'pull_request';
-                    const stateColor = item.state === 'open' ? 'text-green-400' : 'text-slate-500';
-                    const borderColor = isPR ? 'border-purple-500/30' : 'border-blue-500/30';
-                    const icon = isPR ? 'PR' : 'ISS';
+                    const stateColor = item.state === 'open' ? 'text-green-600' : 'text-slate-400';
+                    const icon = isPR ? 'PR' : 'ISSUE';
 
                     const div = document.createElement('div');
-                    div.className = `liquid-glass p-5 border-l-4 ${borderColor}`;
+                    div.className = `liquid-glass p-5 border-l-4 ${isPR ? 'border-purple-200' : 'border-blue-200'}`;
                     div.innerHTML = `
                         <div class="flex justify-between items-start mb-2">
-                             <span class="text-[9px] font-black text-slate-500 uppercase bg-white/5 px-2 py-0.5 rounded">${icon} #${item.number}</span>
+                             <span class="text-[9px] font-black text-slate-400 uppercase bg-slate-50 px-2 py-0.5 rounded">${icon} #${item.number}</span>
                              <span class="text-[9px] font-black uppercase ${stateColor}">${item.state}</span>
                         </div>
-                        <div class="text-[11px] font-bold text-slate-200 leading-relaxed mb-3">${item.title}</div>
-                        <div class="text-[8px] font-medium text-slate-600">${new Date(item.created_at).toLocaleString()}</div>
+                        <div class="text-[11px] font-bold text-slate-900 leading-relaxed mb-3">${item.title}</div>
+                        <div class="text-[8px] font-medium text-slate-400">${new Date(item.created_at).toLocaleString()}</div>
                     `;
                     feed.appendChild(div);
                 });
@@ -317,7 +315,6 @@
                     bar.style.width = '100%';
                 } else {
                     el.classList.remove('ooda-active');
-                    // We keep bars full if it's already passed
                     const idxCurrent = steps.indexOf(stepId);
                     const idxThis = steps.indexOf(id);
                     if (idxThis < idxCurrent) {
@@ -325,7 +322,7 @@
                         el.style.opacity = '0.6';
                     } else {
                         bar.style.width = '0%';
-                        el.style.opacity = '0.3';
+                        el.style.opacity = '0.2';
                     }
                 }
             });
@@ -334,60 +331,39 @@
         function addLog(msg) {
             const logs = document.getElementById('logs');
             const div = document.createElement('div');
-            div.className = "text-[11px] font-mono leading-relaxed border-l border-white/5 pl-4 py-1 animate-in fade-in duration-300";
+            div.className = "text-[11px] font-mono leading-relaxed border-l border-slate-100 pl-4 py-1 animate-in fade-in duration-300";
 
             let color = "text-slate-500";
-            if (msg.includes('[SCOUT]')) { color = "text-green-400"; setOODA('step-O1'); }
-            else if (msg.includes('[CAG]')) { color = "text-purple-400"; setOODA('step-O2'); }
-            else if (msg.includes('[BRAIN]')) { color = "text-purple-400"; setOODA('step-O2'); }
-            else if (msg.includes('[GUARDRAIL]')) { color = "text-yellow-400"; setOODA('step-D'); }
-            else if (msg.includes('[FIXER]')) { color = "text-blue-400"; setOODA('step-A'); }
-            else if (msg.includes('Merge Successful')) { color = "text-green-500 font-bold"; }
+            if (msg.includes('[SCOUT]')) { color = "text-green-600"; setOODA('step-O1'); }
+            else if (msg.includes('[CAG]')) { color = "text-indigo-600"; setOODA('step-O2'); }
+            else if (msg.includes('[BRAIN]')) { color = "text-purple-600"; setOODA('step-O2'); }
+            else if (msg.includes('[GUARDRAIL]')) { color = "text-orange-600"; setOODA('step-D'); }
+            else if (msg.includes('[FIXER]')) { color = "text-blue-600"; setOODA('step-A'); }
 
-            const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            div.innerHTML = `<span class="opacity-20 mr-2 text-[9px]">${timestamp}</span><span class="${color}">${msg}</span>`;
-
+            const ts = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            div.innerHTML = `<span class="opacity-20 mr-2 text-[9px]">${ts}</span><span class="${color}">${msg}</span>`;
             logs.appendChild(div);
             logs.scrollTop = logs.scrollHeight;
-            if (logs.children.length > 50) logs.removeChild(logs.firstChild);
         }
 
         function connectStream() {
             if (eventSource) eventSource.close();
-
-            document.getElementById('logs').innerHTML = '<div class="text-blue-500 font-mono text-[11px] italic">// Establishing Satellite Uplink to SRE Engine...</div>';
-            document.getElementById('stream-btn').innerText = "STREAM ACTIVE";
-            document.getElementById('stream-btn').classList.replace('text-blue-400', 'text-slate-500');
-            document.getElementById('stream-btn').classList.remove('hover:bg-blue-600/30');
-            document.getElementById('loop-id').innerText = 'WAITING_FOR_SIGNAL';
+            document.getElementById('logs').innerHTML = '<div class="text-blue-600 font-mono text-[11px] italic">// Uplink Established. Awaiting Telemetry...</div>';
+            document.getElementById('stream-btn').innerText = "STREAM LIVE";
+            document.getElementById('loop-id').innerText = 'LISTENING';
 
             eventSource = new EventSource(`${API_BASE}/api/sre-loop?anomaly=false`);
 
             eventSource.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                if (data.message) {
-                    addLog(data.message);
-                    if (data.message.includes('SRE Loop initiated')) {
-                        document.getElementById('loop-id').innerText = 'INCIDENT_PROCESSING';
-                    }
-                }
+                if (data.message) addLog(data.message);
                 if (data.final_state) {
-                    addLog("--- ENGINE CYCLE PERSISTED ---");
+                    addLog("--- CYCLE COMPLETE ---");
                     document.getElementById('loop-id').innerText = 'IDLE_STANDBY';
-                    // Wait a bit then clear OODA
-                    setTimeout(() => {
-                        if (document.getElementById('loop-id').innerText === 'IDLE_STANDBY') {
-                            setOODA(null);
-                        }
-                    }, 5000);
+                    setTimeout(() => setOODA(null), 5000);
                     updateGitHub();
                     updateHealth();
                 }
-            };
-
-            eventSource.onerror = () => {
-                eventSource.close();
-                document.getElementById('loop-id').innerText = 'CONNECTION_RESTRICTED';
             };
         }
 
