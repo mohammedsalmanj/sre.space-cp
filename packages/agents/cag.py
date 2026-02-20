@@ -18,17 +18,12 @@ CAG_FAST_CACHE = {
 def cag_agent(state):
     """
     Agent: CAG (Context-Aware Guide / Fast Cache)
-    
-    The CAG agent is a Tier-1 remediation specialist. It checks a "Fast Cache" 
-    of known issues and their solutions. If a match is found, it provides 
-    an instant remediation, bypassing the need for deep LLM reasoning.
-    
-    Role: Rapid recovery for well-documented, recurring failures.
     """
-    logs = state.get("logs", [])
+    from packages.shared.agent_utils import add_agent_log
+    
     if not state["error_spans"]: return state
 
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] Checking Tier-1 Fast Cache for incident FAQ...")
+    add_agent_log(state, "cag", "Checking Tier-1 Fast Cache for incident FAQ...")
     msg = state["error_spans"][0]["exception.message"]
     
     # Check if the error signature exists in our pre-defined knowledge base
@@ -40,8 +35,8 @@ def cag_agent(state):
         state["confidence_score"] = known["confidence"]
         state["cache_hit"] = True
         
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] INSTANT-HIT. Known incident signature.")
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] Attempting to raise incident via GitHub...")
+        add_agent_log(state, "cag", "INSTANT-HIT. Known incident signature.")
+        add_agent_log(state, "cag", "Attempting to raise incident via GitHub...")
         
         # We raise a GitHub incident immediately because CAG hits are highly reliable
         try:
@@ -55,13 +50,12 @@ def cag_agent(state):
             gh_res = gh.create_issue(title=issue_title, body=issue_body, labels=["incident", "cag-hit"])
             if "number" in gh_res:
                 state["incident_number"] = gh_res["number"]
-                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] Incident Raised (Cache Hit) -> #{gh_res['number']}")
+                add_agent_log(state, "cag", f"Incident Raised (Cache Hit) -> #{gh_res['number']}")
         except Exception as e:
-            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] Warning: GitHub reporting failed: {str(e)}")
+            add_agent_log(state, "cag", f"Warning: GitHub reporting failed: {str(e)}")
     else:
         # If no match is found, we set cache_hit to False so the graph routes to Brain (LLM)
         state["cache_hit"] = False
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] Cache Miss. Escalating to Brain...")
+        add_agent_log(state, "cag", "Cache Miss. Escalating to Brain...")
 
-    state["logs"] = logs
     return state

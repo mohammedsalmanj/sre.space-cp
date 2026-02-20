@@ -10,12 +10,12 @@ def curator_agent(state):
     After a successful remediation, it takes the root cause and fix 
     and archives it into ChromaDB for future RAG-based analysis.
     """
-    logs = state.get("logs", [])
+    from packages.shared.agent_utils import add_agent_log
     
     # We only archive if the action was allowed and it's a new (non-cached) incident
     if state["decision"] != "ALLOW" or state["cache_hit"]: return state
 
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] Incident unique. Archiving Knowledge into ChromaDB.")
+    add_agent_log(state, "curator", "Incident unique. Archiving Knowledge into ChromaDB.")
     
     try:
         # Connect to ChromaDB memory layer
@@ -28,11 +28,10 @@ def curator_agent(state):
                 documents=[f"Issue: {state['root_cause']} | Fix: {state['remediation']}"],
                 ids=[doc_id]
             )
-            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] Indexing complete ID: {doc_id}")
+            add_agent_log(state, "curator", f"Indexing complete ID: {doc_id}")
     except Exception as e:
         # Fail gracefully if the memory layer is down (non-critical path)
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] Memory Layer unreachable. Skipping archiving.")
+        add_agent_log(state, "curator", "Memory Layer unreachable. Skipping archiving.")
 
     state["status"] = "Stable"
-    state["logs"] = logs
     return state

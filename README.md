@@ -86,51 +86,65 @@ Autonomous systems require trust. SRE-Space implements three layers of protectio
 
 ---
 
+## 🌌 High-Autonomy Features (The "Fix Path" Evolution)
+
+SRE-Space has evolved from simple logging to **Autonomous Operations**. The engine now differentiates between incident types and manages the entire GitOps lifecycle:
+
+### ⚡ Unified GitOps Lifecycle (Standard for ALL Fixes)
+Whether it's a code patch OR an infrastructure change, the engine follows a strict engineering protocol:
+1. **🌿 Branching**: Automatically creates a unique fix branch (e.g., `fix-inc-441`).
+2. **💾 Commits**: Prepares and pushes standardized, traceable commits.
+3. **✅ Pull Requests**: Opens a PR on GitHub for full observability.
+4. **🤝 Autonomous Merge**: Verifies the fix against safety policies and executes a Squash-Merge into `main`.
+5. **📦 Deployment**: Triggers the rollout of the patched service or scaled infrastructure.
+
+### 🌀 Parallel Autonomous Paths
+- **Code Path**: Detects logic bugs (e.g., `ZeroDivisionError`) and executes a full GitOps cycle.
+- **Infra Path**: Detects saturation/scaling issues and applies direct operational adjustments via IaC.
+
+---
+
+## 🛠️ Performance-First Design
+- **⚡ Bolt Optimization**: The LangGraph state machine is **pre-compiled and cached** at the module level, eliminating cold-start latency (reduction of ~20ms per loop).
+- **🚀 Real-time Streaming**: Incident reports are streamed via Server-Sent Events (SSE) for sub-second dashboard feedback.
+
+---
+
 ## 🏛️ Monorepo Architecture
 SRE-Space is organized as a unified monorepo for maximum traceability and component reuse.
 
 - **`apps/`**: Deployable services.
   - `control_plane/`: The LangGraph squad engine and core API.
-  - `dashboard/`: Frontend visualization for SRE operations.
-  - `websocket_bridge/`: Real-time telemetry stream handler.
 - **`packages/`**: Shared logic and libraries.
-  - `agents/`: The 8-agent squad logic.
-  - `shared/`: Common GitOps and connectivity utilities.
+  - `agents/`: The 8-agent squad logic (Scout, CAG, Brain, Guardrail, Fixer, Curator, Human, Jules).
+  - `shared/`: Common GitOps, GitHub, and reporting utilities.
 - **`infra/`**: Infrastructure-as-Code (Docker Compose, OTel configuration).
 - **`scripts/`**: Automation, verification, and chaos testing utilities.
 
 ---
 
-## ⚡ Getting Started (Pro Mode)
+## ⚡ Getting Started (Verification)
 
-### 1. Launch Infrastructure
-Start the sensors, event bus, and memory:
+### 1. Launch & Start
 ```bash
 docker-compose up -d
-```
-
-### 2. Start the Control Plane
-```bash
-pip install -r requirements.txt
 python apps/control_plane/main.py
 ```
 
-### 3. Verify & Try Chaos
-Confirm the stack is healthy and trigger a self-healing loop:
+### 2. Run the Autonomy Suite
+Verify both **Infra** and **Code** autonomous paths in one command:
 ```bash
-python scripts/verify_sre_stack.py
-python scripts/verify_loop.py
+python scripts/verify_autonomy.py
+```
+
+### 3. Verify Jules (The Architect)
+Trigger a standalone architectural review:
+```bash
+python scripts/verify_jules.py
 ```
 
 ---
 
-## 📊 Live Verification
-Run the verification suite to confirm all connections (Chroma, OpenAI, GitHub) are green:
-```bash
-python scripts/verify_sre_stack.py
-```
-
----
 <div align="center">
   <p><i>"Monitoring tells you that you have a problem. SRE-Space makes sure you don't have it again."</i></p>
   <b>🌌 Built for the Future of Autonomous Operations</b>

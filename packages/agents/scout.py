@@ -15,8 +15,8 @@ def scout_agent(state):
     Returns:
         dict: The updated state with identified error spans if an anomaly is detected.
     """
-    logs = state.get("logs", [])
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] Polling OTel traces...")
+    from packages.shared.agent_utils import add_agent_log
+    add_agent_log(state, "scout", "Polling OTel traces...")
     
     # Mocking target service context for demonstration
     state["service"] = "policy-service"
@@ -35,11 +35,10 @@ def scout_agent(state):
             
         state["error_spans"] = [{"exception.message": msg}]
         state["anomaly_frequency"] = 1 
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] Warning: Detected anomaly -> {msg}")
+        add_agent_log(state, "scout", f"Detected anomaly -> {msg}")
     else:
         # System is healthy
         state["error_spans"] = []
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] System health nominal.")
+        add_agent_log(state, "scout", "System health nominal.")
 
-    state["logs"] = logs
     return state

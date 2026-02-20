@@ -4,20 +4,12 @@ import os
 def human_agent(state):
     """
     Agent: Human (The Investigator) - Human-in-the-Loop
-    
-    The Human agent is triggered when autonomous remediation is deemed too risky 
-    or when an anomaly repeats too frequently, suggesting a systemic failure 
-    that requires human intuition.
-    
-    Mission:
-    - Escalate the incident to the SRE team via Email and GitHub.
-    - Pause the autonomous loop to prevent "flapping" or damage.
     """
-    logs = state.get("logs", [])
+    from packages.shared.agent_utils import add_agent_log
     frequency = state.get("anomaly_frequency", 0)
     
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] HUMAN INTERVENTION TRIGGERED!")
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] Reason: Issue detected {frequency} times in the last hour.")
+    add_agent_log(state, "human", "HUMAN INTERVENTION TRIGGERED!")
+    add_agent_log(state, "human", f"Reason: Issue detected {frequency} times in the last hour.")
     
     # Send Notification and Create Escalation Ticket
     from packages.shared.notifications import send_sre_alert
@@ -32,9 +24,9 @@ def human_agent(state):
     gh_res = gh.create_issue(title=issue_title, body=issue_body, labels=["critical", "human-needed"])
     
     if "number" in gh_res:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] GitHub Issue Created: #{gh_res['number']}")
+        add_agent_log(state, "human", f"GitHub Issue Created: #{gh_res['number']}")
     else:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] Warning: Failed to create GitHub Issue.")
+        add_agent_log(state, "human", "Warning: Failed to create GitHub Issue.")
 
     # Trigger external alert (Simulated email)
     success = send_sre_alert(
@@ -43,8 +35,7 @@ def human_agent(state):
     )
     
     if success:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] Alert triggered for mohammedsalmanj@outlook.com")
+        add_agent_log(state, "human", "Alert triggered for mohammedsalmanj@outlook.com")
     
-    state["logs"] = logs
     state["status"] = "Awaiting Human"
     return state

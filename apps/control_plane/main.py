@@ -36,16 +36,17 @@ async def get_quote(user_id: str = "unknown"):
     return {"quote_id": f"Q-{random.randint(1000, 9999)}", "price": random.randint(100, 500), "status": "success"}
 
 @app.get("/api/sre-loop")
-async def sre_loop_stream(anomaly: bool = False, type: str = "infra"):
+async def sre_loop_stream(anomaly: bool = False, type: str = "infra", lang: str = "en"):
     """
     Triggers the SRE cognitive cycle and streams logs in real-time via Server-Sent Events (SSE).
     
     Args:
         anomaly (bool): If true, simulates a service failure to trigger the full repair loop.
         type (str): The type of anomaly ('infra' or 'code')
+        lang (str): Language ('en' or 'ar')
     """
     async def event_generator():
-        result = await run_sre_loop(is_anomaly=anomaly, anomaly_type=type)
+        result = await run_sre_loop(is_anomaly=anomaly, anomaly_type=type, lang=lang)
         for log in result["logs"]:
             yield f"data: {json.dumps({'message': log})}\n\n"
             await asyncio.sleep(0.4) # Simulated delay for visual realism in dashboard
