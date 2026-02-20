@@ -5,9 +5,9 @@ from openai import OpenAI
 
 def get_memory_collection():
     try:
-        host = os.getenv('CHROMA_DB_HOST', 'localhost')
-        port = int(os.getenv('CHROMA_DB_PORT', 8000))
-        client = chromadb.HttpClient(host=host, port=port)
+        # Block 3: Embedded ChromaDB Persistence
+        persist_dir = os.path.join(os.getcwd(), "chroma_data")
+        client = chromadb.PersistentClient(path=persist_dir)
         return client.get_or_create_collection(name="sre_incident_memory")
     except Exception as e:
         return None
@@ -18,7 +18,7 @@ def brain_agent(state):
     if state.get("cache_hit") or not state["error_spans"]: return state
 
     msg = state["error_spans"][0]["exception.message"]
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] Consulting RAG Memory for '{msg}'")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] [ORIENT] Consulting RAG Memory for '{msg}'")
 
     # 1. Try RAG first (Fast/Cheap)
     collection = get_memory_collection()

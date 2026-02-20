@@ -1,15 +1,21 @@
 {
     "version": 2,
+    "name": "sre-space-dashboard",
     "builds": [
         {
-            "src": "main.py",
-            "use": "@vercel/python"
+            "src": "apps/dashboard/**",
+            "use": "@vercel/static"
         }
     ],
-    "routes": [
+    "rewrites": [
         {
-            "src": "/(.*)",
-            "dest": "main.py"
+            "source": "/",
+            "destination": "/apps/dashboard/index.html"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/apps/dashboard/$1"
         }
-    ]
+    ],
+    "cleanUrls": true
 }

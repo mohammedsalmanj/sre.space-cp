@@ -4,7 +4,7 @@ import random
 def scout_agent(state):
     """Agent: Scout (Detection)"""
     logs = state.get("logs", [])
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] Polling OTel traces...")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] [OBSERVE] Polling OTel traces...")
     
     state["service"] = "policy-service"
     state["namespace"] = "insurance-prod"

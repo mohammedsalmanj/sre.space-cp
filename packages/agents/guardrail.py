@@ -5,7 +5,7 @@ def guardrail_agent(state):
     logs = state.get("logs", [])
     if not state["error_spans"]: return state
 
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [GUARDRAIL] Evaluating safety of remediation action...")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [GUARDRAIL] [DECIDE] Evaluating safety of remediation action...")
     
     if state["confidence_score"] < 0.75:
         state["decision"] = "REQUIRE_APPROVAL"

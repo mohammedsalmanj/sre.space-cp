@@ -10,7 +10,9 @@ def curator_agent(state):
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] Incident unique. Archiving Knowledge into ChromaDB.")
     
     try:
-        client = chromadb.HttpClient(host='localhost', port=8000)
+        import os
+        persist_dir = os.path.join(os.getcwd(), "chroma_data")
+        client = chromadb.PersistentClient(path=persist_dir)
         collection = client.get_or_create_collection(name="sre_incident_memory")
         if collection:
             doc_id = f"inc-{random.randint(1000, 9999)}"

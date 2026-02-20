@@ -8,3 +8,5 @@ chromadb
 python-dotenv
 openai
 requests
+psutil
+redis

@@ -52,6 +52,28 @@ class GitHubService:
             print(f"❌ [GitHubService] Request failed: {str(e)}")
             return {"error": str(e)}
 
+    def create_ref(self, ref, sha):
+        url = f"{self.base_url}/repos/{self.owner}/{self.repo}/git/refs"
+        data = {"ref": f"refs/heads/{ref}", "sha": sha}
+        res = requests.post(url, headers=self.headers, json=data, timeout=10)
+        return res.json()
+
+    def get_ref(self, ref="heads/main"):
+        url = f"{self.base_url}/repos/{self.owner}/{self.repo}/git/ref/{ref}"
+        res = requests.get(url, headers=self.headers, timeout=10)
+        return res.json()
+
+    def update_file(self, path, message, content, branch, sha=None):
+        url = f"{self.base_url}/repos/{self.owner}/{self.repo}/contents/{path}"
+        data = {
+            "message": message,
+            "content": content,
+            "branch": branch
+        }
+        if sha: data["sha"] = sha
+        res = requests.put(url, headers=self.headers, json=data, timeout=10)
+        return res.json()
+
     def get_repo_info(self):
         url = f"{self.base_url}/repos/{self.owner}/{self.repo}"
         response = requests.get(url, headers=self.headers, timeout=10)

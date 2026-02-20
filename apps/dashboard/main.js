@@ -1,45 +1,41 @@
+// API Configuration
+const API_BASE_URL = window.NEXT_PUBLIC_API_URL || "https://sre-space-cp.onrender.com";
+
 // Simulate Real-time data fetching
 const incidentList = document.getElementById('incident-list');
 
-const mockIncidents = [
-    {
-        id: 5,
-        title: "[INCIDENT] Critical Failure Detected by Scout",
-        description: "Scout Agent detected a health check failure (Simulation).",
-        severity: "HIGH",
-        agents: ["scout", "brain", "memory", "fixer"],
-        status: "RESOLVED"
-    },
-    {
-        id: 4,
-        title: "[INCIDENT] Latency Spike in Backend",
-        description: "MTTR improved by Brain Agent suggesting a container restart.",
-        severity: "MEDIUM",
-        agents: ["scout", "brain", "fixer"],
-        status: "RESOLVED"
-    }
-];
 
-function renderIncidents() {
-    incidentList.innerHTML = mockIncidents.map(inc => `
-        <div class="incident-card">
-            <div class="number-tag">#${inc.id}</div>
-            <div class="incident-info">
-                <h4>${inc.title}</h4>
-                <p>${inc.description}</p>
-                <div class="agent-badges">
-                    ${inc.agents.map(a => `<span class="a-badge ${a}">${a.toUpperCase()}</span>`).join('')}
+async function fetchIncidents() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/git-activity`);
+        const data = await res.json();
+
+        if (!data || data.error) throw new Error("API Error");
+
+        incidentList.innerHTML = data.map(inc => `
+            <div class="incident-card" onclick="window.open('${inc.html_url}', '_blank')">
+                <div class="number-tag">#${inc.number}</div>
+                <div class="incident-info">
+                    <h4>${inc.title}</h4>
+                    <p>Status: ${inc.state.toUpperCase()}</p>
+                    <div class="agent-badges">
+                        <span class="a-badge scout">SCOUT</span>
+                        <span class="a-badge brain">BRAIN</span>
+                        <span class="a-badge fixer">FIXER</span>
+                    </div>
                 </div>
+                <div class="status-check">${inc.state === 'open' ? '⚡ ACTIVE' : '✓ RESOLVED'}</div>
             </div>
-            <div class="status-check">✓ ${inc.status}</div>
-        </div>
-    `).join('');
+        `).join('');
+    } catch (err) {
+        console.error("Dashboard Sync Failed:", err);
+        incidentList.innerHTML = `<div class="error">Agent Stream Disconnected. Retrying...</div>`;
+    }
 }
 
-// Initial Render
-setTimeout(() => {
-    renderIncidents();
-}, 800);
+// Initial Render and Polling
+fetchIncidents();
+setInterval(fetchIncidents, 10000);
 
 // Add interactive hover effect or some "live" feel
 setInterval(() => {
