@@ -1,130 +1,76 @@
-# SRE-Space: The Autonomous Cognitive Engine
+# SRE-Space: The Autonomous Reliability Engine
 
-### Self-Healing Control Plane for Modern Cloud Infrastructure
-[![Architecture: User vs Control Plane](https://img.shields.io/badge/Architecture-Distributed_Plane-blue?style=for-the-badge)](https://github.com/your-repo/sre-space)
-[![Reliability: Autonomous GitOps](https://img.shields.io/badge/Reliability-Autonomous_GitOps-green?style=for-the-badge)](https://github.com/your-repo/sre-space)
-
----
-
-## 🛰️ Project Overview
-
-**SRE-Space** is a production-grade, autonomous reliability engine that bridges the gap between passive observability and active remediation. By implementing a high-level **OODA Loop (Observe, Orient, Decide, Act)** via a multi-agent cognitive squad, the system detects anomalies, performs deep-reasoning RCA, executes GitOps code fixes, and merges them—all without human intervention.
-
-### 🎯 The "Autonomy Gap" We Solve
-Modern SRE teams are overwhelmed by "High-Signal, No-Action" environments. 
-1.  **Alert Fatigue**: Systems signal failures but don't explain why.
-2.  **MTTR Lag**: Mean Time To Repair is gated by human context-switching and manual PR reviews.
-3.  **Context Loss**: Knowledge of past incidents is often buried in Slack threads rather than codified in a RAG-accessible memory.
-
-**SRE-Space closes this gap by transforming telemetry into physical repository state changes.**
+### A Production-Grade Multi-Agent Control Plane for Self-Healing Infrastructure
+[![Architecture: Master Portal](https://img.shields.io/badge/UI-Master_Portal-blue?style=for-the-badge)](https://github.com/mohammedsalmanj/sre.space-cp)
+[![Reliability: LangGraph Loop](https://img.shields.io/badge/Loop-Hardened_OODA-green?style=for-the-badge)](https://github.com/mohammedsalmanj/sre.space-cp)
 
 ---
 
-## 🏗️ High-Level Architecture
-
-The system demonstrates a clear **Separation of Planes**, a pattern critical for large-scale engineering platforms.
-
-### 1. The User Plane (Marketplace)
-*   **Infrastructure**: Deployed on Render.
-*   **Role**: The "Frontline" application (Insurance Marketplace).
-*   **Engineering Controls**: Built-in fault injection (Real 500s, Latency, Memory) to test the engine's resilience.
-*   **Telemetry**: Emits real-time OpenTelemetry spans for every user transaction.
-
-### 2. The Control Plane (Orbital Monitor)
-*   **Infrastructure**: Deployed on Vercel (or high-concurrency Node edge).
-*   **Role**: The "Command Center" for SREs.
-*   **Visual Style**: Premium "Liquid Glass" design for elite situational awareness.
-*   **Intelligence**: Real-time SSE stream of the internal "Agent Thoughts" and GitHub activity sync.
-
-```mermaid
-graph TD
-    subgraph "🛸 Control Plane (Vercel)"
-        UI[Orbital Monitor Dashboard]
-        SSE[SSE Telemetry Stream]
-        GitSync[GitHub API Sync]
-    end
-
-    subgraph "🏢 User Plane (Render)"
-        App[Insurance Marketplace]
-        OTel[OTel Span Exporter]
-        Faults[Engineering Controls]
-    end
-
-    subgraph "🧠 Cognitive Engine (LangGraph)"
-        Scout[Scout Agent] --> Brain[Brain Agent]
-        Brain --> Guard[Guardrail Agent]
-        Guard --> Fixer[Fixer Agent]
-        Fixer --> GitHub[GitHub GitOps]
-    end
-
-    App -->|Telemetry| Scout
-    Faults -->|Trigger| App
-    GitHub -->|PR/Merge| App
-```
+## 🌌 The Mission
+**SRE-Space** is not just an application; it is an autonomous engineering supervisor. It transforms modern distributed systems from **Passive Observability** to **Active Autonomy**. By orchestrating a squad of 8 specialized agents via **LangGraph**, it creates a closed-loop system that identifies, diagnoses, and remediates infrastructure anomalies in real-time.
 
 ---
 
-## 🤖 The Cognitive Agent Squad (OODA)
+## 🏛️ The Master Portal Architecture
+The entire platform is unified into a single, high-fidelity **Master Portal**, eliminating the friction of multi-url monitoring.
 
-We orchestrate specialized agents via **LangGraph** to maintain system equilibrium. No mocks, no fake state.
+### 1. The Insurance Nexus (User Plane)
+*   **Purpose**: A live enterprise underwriting application.
+*   **Chaos controls**: Built-in Engineering Controls to inject real Database Saturation (500) and Latency spikes.
+
+### 2. The SRE Intelligence Plane (Control Station)
+*   **Purpose**: Real-time observability of the agentic cognitive flow.
+*   **Capabilities**:
+    *   **OODA Pulse Visualization**: Live tracking of the Observe → Orient → Decide → Act cycle.
+    *   **Intelligence Stream**: A sub-second SSE terminal showing the raw cognitive thoughts of the agents.
+    *   **GitOps Sync**: Real-time integration with the GitHub API to display autonomous PRs and Issues.
+
+---
+
+## 🤖 The agentic Squad (OODA Loop)
+
+Our agents operate in a strict, high-confidence sequence:
 
 | Phase | Agent | Role | Capability |
 | :--- | :--- | :--- | :--- |
-| **OBSERVE** | 🕵️ **Scout** | Telemetry Analyst | Samples real OTel traces and error rates. Identifies breaches. |
-| **ORIENT** | 🧠 **Brain** | RCA Synthesis | Combines ChromaDB RAG memory with GPT-4 deep reasoning. |
-| **DECIDE** | 🛡️ **Guardrail** | Safety Enforcer | Vetoes unsafe remediation or low-confidence fixes. |
-| **ACT** | 🛠️ **Fixer** | GitOps Executor | 100% Real Branch Creation -> File Update -> PR -> Merge. |
+| **OBSERVE** | 🕵️ **Scout** | Telemetry Analyst | Samples real OTel traces and hardware metrics (`psutil`). |
+| **ORIENT** | 🧠 **Brain** | RCA Synthesis | Synthesizes Root Cause using GPT-4 and RAG memory. |
+| **DECIDE** | 🛡️ **Guardrail** | Safety Enforcer | Vetoes any fix that doesn't meet strict safety policies. |
+| **ACT** | 🛠️ **Fixer** | GitOps Executor | Creates real GitHub branches, commits code, and merges PRs. |
+| **AUDIT** | 🤖 **Jules** | Arch Reviewer | Performs daily architectural integrity scans. |
 
 ---
 
-## 💎 Key Features
+## 💎 Elite Features
 
-*   **Real-Time OODA Loop**: Watch the system move from Anomaly Detection to GitHub Merge in 30 seconds.
-*   **Liquid Glass Dashboard**: Professional-grade observability UI with real-time SSE log streaming.
-*   **GitOps Enforcement**: The system doesn't just "fix things"—it follows your engineering standards by creating audited PRs and issues.
-*   **Memory Guard (Render-Hardened)**: Active `psutil` governor that throttles LLM usage when approaching the 512MB RAM limit.
-*   **Dual-Event Bus Support**: Adaptive fallback between **Apache Kafka** (Local High-Performance) and **Redis** (Cloud Managed).
-
----
-
-## 🚀 Getting Started
-
-### 1. Environment Configuration
-Create a `.env` file in the root:
-```bash
-GITHUB_PERSONAL_ACCESS_TOKEN=your_pat_here
-OPENAI_API_KEY=your_key_here
-ENV=cloud # Use 'local' for Kafka mode
-EVENT_BUS=local # Use 'redis' for managed cloud
-```
-
-### 2. Local Launch
-```bash
-# 1. Start the Backend Hub
-python apps/control_plane/main.py
-
-# 2. Access the Planes
-# User Plane: http://localhost:8001
-# Control Plane: http://localhost:8001/monitor
-```
+*   **100% Real Autonomy**: No mocks. No fake data. The system physically modifies the GitHub repository state to apply fixes.
+*   **Neural Bridge UI**: A "Frost Glass" design language that unifies the user app and the monitoring station.
+*   **Memory Guard**: An active runtime governor that throttles agent execution to stay within Render's 512MB RAM limits.
+*   **Unified Deployment**: Single-entry deployment via Docker, optimized for the Render (Backend) + Vercel (Monitor) architecture.
 
 ---
 
-## 🧪 Testing and Validation
+## 🚀 Quick Launch
 
-For a complete walkthrough of injecting faults and watching the system heal itself, please refer to the **[End-to-End Validation Guide (DEMO.md)](./DEMO.md)**.
+1.  **Configure Environment**:
+    ```bash
+    GITHUB_PERSONAL_ACCESS_TOKEN=your_pat
+    OPENAI_API_KEY=your_key
+    ENV=cloud
+    ```
+2.  **Execute Backend**:
+    ```bash
+    python apps/control_plane/main.py
+    ```
+3.  **Access Portal**: Visit `http://localhost:8001` or your cloud URL to experience the self-healing loop.
 
 ---
 
-## 📜 Technical Specifications
-
-*   **Logic Framework**: LangGraph (Stateful Dataflow)
-*   **API Layer**: FastAPI / Uvicorn
-*   **Memory Layer**: ChromaDB (Vector Store), Redis/Kafka (Message Bus)
-*   **Design Language**: Vanilla CSS + Tailwind + Liquid Glass Backdrop
-*   **Observability**: OpenTelemetry compliant
+## 🧪 Validation & Demo
+For a step-by-step sequence on how to break the system and watch it heal, refer to the **[DEMO.md](./DEMO.md)**.
 
 ---
 <div align="center">
-  <b>Designed for Infinite Uptime. Driven by Autonomous Intelligence.</b>
+  <b>Designed for Zero-Downtime. Driven by Cognitive Intelligence.</b><br>
+  <i>SRE-Space Portal v5.5 (Final Release)</i>
 </div>
