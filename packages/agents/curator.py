@@ -1,6 +1,7 @@
 from datetime import datetime
 import random
 import chromadb
+from packages.shared.sim_state import sim_state
 
 def curator_agent(state):
     """Agent: Memory Curator (Memory Lifecycle)"""
@@ -28,5 +29,9 @@ def curator_agent(state):
 
     state["status"] = "Stable"
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] [ACT] Remediation Cycle Bridged Successfully. Verifying Veracity...")
+    
+    # Veracity Layer: Restore the ground-truth system state to Healthy
+    sim_state.resolve_fix()
+    
     state["logs"] = logs
     return state

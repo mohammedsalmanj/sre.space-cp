@@ -137,6 +137,23 @@ Our agents do not just generate text; they perform **Stateful Chain-of-Thought**
 
 ---
 
+## 🚀 Deployment Veracity (Local vs Cloud)
+
+SRE-Space is designed with a **Pluggable Infrastructure Engine** that adapts to its host environment:
+
+### 🏠 Local Unleashed (Enterprise Mode)
+- **Engine**: `docker-compose.yml` orchestrates the full squad.
+- **Messaging**: Apache Kafka for distributed event streaming.
+- **Usage**: Run `mission-control.sh` to spin up the local cluster.
+
+### ☁️ Cloud Managed (Render & Vercel)
+- **Backend (Mind)**: Deployed on **Render** via the unified `Dockerfile`.
+  - *Dynamic Port Binding*: Automatically respects Render's `$PORT`.
+  - *Lean Squad*: Adjusts to 512MB RAM by switching to Managed Redis.
+- **Frontend (Eye)**: Deployed on **Vercel** for global low-latency metric visualization.
+
+---
+
 ## 🛠️ Tech Stack & Links
 - **[LangGraph](https://langchain-ai.github.io/langgraph/)**: Stateful Multi-Agent Workflows.
 - **[OpenAI GPT-4o](https://openai.com/)**: High-reasoning node logic.

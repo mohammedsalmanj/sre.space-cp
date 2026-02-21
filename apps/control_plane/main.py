@@ -54,13 +54,6 @@ async def memory_guard_middleware(request: Request, call_next):
 # Template configuration for serving the Insurance Playground UI
 templates = Jinja2Templates(directory=os.path.dirname(__file__))
 
-# --- Global Orchestration State ---
-# Represents the simulated state of the external "Policy Service"
-SYSTEM_STATE = {
-    "is_anomaly": False,
-    "failure_type": None
-}
-
 @app.get("/", response_class=HTMLResponse)
 async def get_dashboard(request: Request):
     """Serve the cyber-insurance playground UI."""
@@ -78,6 +71,8 @@ async def system_health():
         "version": "4.5.1"
     }
 
+from packages.shared.sim_state import sim_state
+
 @app.post("/demo/inject-failure")
 async def inject_failure(request: Request):
     """
@@ -91,8 +86,7 @@ async def inject_failure(request: Request):
         chaos_type = "db_pool_exhaustion"
 
     logger.info(f"🔥 [CHAOS] Synthetic {chaos_type.replace('_', ' ')} injected into policy-service.")
-    SYSTEM_STATE["is_anomaly"] = True
-    SYSTEM_STATE["failure_type"] = chaos_type
+    sim_state.inject_failure(chaos_type)
     
     # Fire and forget: SRE loop starts detecting the trace immediately
     asyncio.create_task(run_sre_loop(is_anomaly=True))
@@ -105,8 +99,9 @@ async def get_quote(user_id: str = "unknown"):
     import random
     from fastapi import HTTPException
     
+    current = sim_state.get_state()
     # Check if the system is currently under simulated failure
-    if SYSTEM_STATE["is_anomaly"] and SYSTEM_STATE["failure_type"] == "db_pool_exhaustion":
+    if current["is_anomaly"] and current["failure_type"] == "db_pool_exhaustion":
         raise HTTPException(status_code=500, detail="Database connection pool exhausted")
     
     # Simulated 20% random noise failure for higher baseline observability
@@ -114,6 +109,12 @@ async def get_quote(user_id: str = "unknown"):
         raise HTTPException(status_code=500, detail="Sensory noise timeout")
         
     return {"quote_id": f"Q-{random.randint(1000, 9999)}", "price": random.randint(100, 500), "status": "success"}
+
+@app.post("/demo/resolve")
+async def resolve_system():
+    """Manual trigger to restore system health."""
+    sim_state.resolve_fix()
+    return {"status": "success", "message": "System restored."}
 
 @app.get("/api/git-activity")
 async def get_git_activity():

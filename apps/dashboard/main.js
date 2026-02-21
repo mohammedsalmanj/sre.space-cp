@@ -64,10 +64,15 @@ function connectToAgentStream(isAnomaly = false) {
             currentEventSource.close();
             resetHealthStatus();
             fetchGitVeracity(); // Sync PRs after a possible fix
+
+            // Continuous Observability: Restart normal polling after 5 seconds
+            console.log("Cycle complete. Next sensory audit in 5s...");
+            setTimeout(() => connectToAgentStream(false), 5000);
         }
     };
 
     currentEventSource.onerror = function () {
+        console.warn("Stream break detected. Re-bridging...");
         currentEventSource.close();
         setTimeout(() => connectToAgentStream(false), 10000);
     };

@@ -1,6 +1,8 @@
 from datetime import datetime
 import random
 
+from packages.shared.sim_state import sim_state
+
 def scout_agent(state):
     """
     Agent Node: Scout (The Watcher)
@@ -15,9 +17,13 @@ def scout_agent(state):
     state["namespace"] = "insurance-prod"
     state["env"] = "production"
 
+    # Veracity Layer: Pull the real ground-truth from the shared simulation state
+    current_sim = sim_state.get_state()
+    is_anomaly = state.get("is_anomaly") or current_sim["is_anomaly"]
+
     # Simulation Logic: If an anomaly is injected, Scout translates the raw 
     # signal into a structured state for the Brain agent to analyze.
-    if state.get("is_anomaly"):
+    if is_anomaly:
         # Simulated high-fidelity error message matching user's 'real' experience
         error_msg = ("policy-service: DOWN (HTTPConnectionPool(host='policy-service', port=8002): "
                      "Max retries exceeded with url: /health "
