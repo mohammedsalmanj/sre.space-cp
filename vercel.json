@@ -1,6 +1,6 @@
 {
     "version": 2,
-    "name": "aegis-orbital-control",
+    "name": "sre-space-orbital",
     "builds": [
         {
             "src": "apps/dashboard/**",
