@@ -9,13 +9,26 @@
 
 ---
 
-## 🏛️ Local-Power Architecture
-**SRE-Space** has transitioned to a local-first, high-performance architecture. While the sensor and brain core run on local Docker infrastructure to bypass cloud resource limits (e.g., 512MB RAM constraints), the **Dashboard** remains optimized for Vercel deployment, providing a global window into local SRE operations.
+## 🚀 Dual-Deployment Framework
+**SRE-Space** utilizes a split-brain architecture optimized for both scale and stability:
 
-This setup enables:
-- **Unrestricted Agent Reasoning**: Multi-agent loops run at full speed with 2GB+ memory.
-- **Enterprise Event Bus**: Full Kafka + Zookeeper stack for high-throughput sensory intake.
-- **Persistent Memory**: Local ChromaDB server for deep architectural history.
+- **Mind (Render)**: The backend agents (FastAPI), Vector Memory (ChromaDB), and Event Bus (Redis/Kafka) run on Render. This ensures real-time detection and remediation execution.
+- **Eye (Vercel)**: The **Liquid Glass Monitor** runs on Vercel, bridging live telemetry via Server-Sent Events (SSE) and GitHub API veracity feeds.
+
+## 🛠️ Tech Stack
+- **AI Core**: LangGraph (Stateful Multi-Agent Orchestration).
+- **LLM**: GPT-4o-mini (Unleashed in local mode, Optimized in cloud).
+- **Observability**: OpenTelemetry + Jaeger (Tracing).
+- **Event Bus**: Redis (Cloud) / Apache Kafka (Local).
+- **Persistence**: ChromaDB (Embedded/Persistent).
+- **Frontend**: Vanilla JS + CSS (Liquid Glass Design System).
+
+## 📊 Deployment Integrity
+| Feature | Local Mode (Unleashed) | Cloud Mode (Optimized) |
+| :--- | :--- | :--- |
+| **Agents** | 8 (Full Squad) | 5 (Core Operations) |
+| **Resources**| Uncapped | 450MB Memory Guard |
+| **Latency** | < 100ms | < 500ms |
 **SRE-Space** is not just a monitoring tool; it's an autonomous **Cognitive Control Plane**. It replaces traditional "alert-and-wait" workflows with a high-fidelity **Agentic Repair Loop**. 
 
 Powered by **LangGraph**, it orchestrates a specialized squad of agents that simulate human SRE reasoning—detecting anomalies via OpenTelemetry, diagnosing root causes using RAG (Retrieval-Augmented Generation), and executing remediations through GitOps and Docker automation.

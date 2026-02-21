@@ -48,6 +48,17 @@ def fixer_agent(state):
             
             if "number" in pr_res:
                 logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] [ACT] Pull Request Created: #{pr_res['number']}")
+                
+                # Block 2: Trigger Render Redeploy via Hook
+                from apps.control_plane.config import RENDER_DEPLOY_HOOK
+                if RENDER_DEPLOY_HOOK:
+                    import requests
+                    try:
+                        deploy_res = requests.post(RENDER_DEPLOY_HOOK, timeout=10)
+                        if deploy_res.status_code in [200, 201]:
+                            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] [ACT] Render Redeploy Triggered.")
+                    except:
+                        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] Warning: Failed to trigger Render hook.")
             else:
                 logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] Warning: PR creation failed.")
     except Exception as e:

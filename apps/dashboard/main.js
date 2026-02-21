@@ -1,64 +1,83 @@
-// API Configuration
-const API_BASE_URL = window.NEXT_PUBLIC_API_URL || "https://sre-space-cp.onrender.com";
-
-// Simulate Real-time data fetching
+const API_BASE_URL = window.NEXT_PUBLIC_API_URL;
+const logsFeed = document.getElementById('logs-feed');
 const incidentList = document.getElementById('incident-list');
+const activePRsCount = document.getElementById('active-prs');
+const envBadge = document.getElementById('env-badge');
 
+// Block 1: Real-Time Veracity (SSE)
+function connectToAgentStream() {
+    console.log("🔗 Opening SRE Agent Stream...");
+    const eventSource = new EventSource(`${API_BASE_URL}/api/sre-loop?anomaly=false`);
 
-async function checkHealth() {
-    try {
-        const res = await fetch(`${API_BASE_URL}/system/health`);
-        const data = await res.json();
-        const badge = document.getElementById('env-badge');
-        if (data.env) {
-            badge.innerText = data.env.toUpperCase();
-            badge.className = data.env === 'cloud'
-                ? 'px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-400 border border-blue-500/20'
-                : 'px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-500 border border-amber-500/20';
-        }
-    } catch (err) {
-        document.getElementById('env-badge').innerText = 'OFFLINE';
-    }
+    eventSource.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+
+        // Add color coding for OODA stages
+        if (data.message.includes('[OBSERVE]')) entry.classList.add('observe');
+        if (data.message.includes('[ORIENT]')) entry.classList.add('orient');
+        if (data.message.includes('[DECIDE]')) entry.classList.add('decide');
+        if (data.message.includes('[ACT]')) entry.classList.add('act');
+
+        entry.innerText = data.message;
+        logsFeed.appendChild(entry);
+        logsFeed.scrollTop = logsFeed.scrollHeight;
+    };
+
+    eventSource.onerror = function () {
+        console.error("Stream failed. Retrying...");
+        eventSource.close();
+        setTimeout(connectToAgentStream, 5000);
+    };
 }
 
-async function fetchIncidents() {
+// Block 3: GitHub Integrity Feed
+async function fetchGitVeracity() {
     try {
         const res = await fetch(`${API_BASE_URL}/api/git-activity`);
         const data = await res.json();
 
-        if (!data || data.error) throw new Error("API Error");
-
-        incidentList.innerHTML = data.map(inc => `
-            <div class="incident-card" onclick="window.open('${inc.html_url}', '_blank')">
-                <div class="number-tag">#${inc.number}</div>
-                <div class="incident-info">
-                    <h4>${inc.title}</h4>
-                    <p>Status: ${inc.state.toUpperCase()}</p>
-                    <div class="agent-badges">
-                        <span class="a-badge scout">SCOUT</span>
-                        <span class="a-badge brain">BRAIN</span>
-                        <span class="a-badge fixer">FIXER</span>
+        if (data && !data.error) {
+            activePRsCount.innerText = data.length;
+            incidentList.innerHTML = data.map(pr => `
+                <div class="incident-card" onclick="window.open('${pr.html_url}', '_blank')">
+                    <div class="incident-info">
+                        <h4>PR #${pr.number} - ${pr.title}</h4>
+                        <p style="font-family: 'JetBrains Mono'; font-size: 10px;">SHA: ${pr.head.sha.substring(0, 7)} | 👤 ${pr.user.login}</p>
+                    </div>
+                    <div class="status-badge" style="background: ${pr.state === 'open' ? '#dcfce7' : '#f1f5f9'}; color: ${pr.state === 'open' ? '#10b981' : '#64748b'};">
+                        ${pr.state.toUpperCase()}
                     </div>
                 </div>
-                <div class="status-check">${inc.state === 'open' ? '⚡ ACTIVE' : '✓ RESOLVED'}</div>
-            </div>
-        `).join('');
+            `).join('');
+        }
     } catch (err) {
-        console.error("Dashboard Sync Failed:", err);
-        incidentList.innerHTML = `<div class="error">Agent Stream Disconnected. Retrying...</div>`;
+        console.error("Git veracity sync failed:", err);
     }
 }
 
-// Initial Render and Polling
-checkHealth();
-fetchIncidents();
-setInterval(checkHealth, 5000);
-setInterval(fetchIncidents, 8000);
+async function updateSystemState() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/system/health`);
+        const data = await res.json();
 
-// Add interactive hover effect or some "live" feel
-setInterval(() => {
-    const onlineBadges = document.querySelectorAll('.online .tag');
-    onlineBadges.forEach(badge => {
-        badge.style.opacity = Math.random() > 0.5 ? '1' : '0.7';
-    });
-}, 500);
+        if (data.env) {
+            envBadge.innerText = data.env.toUpperCase();
+            envBadge.style.background = data.env === 'cloud' ? '#3b82f6' : '#f59e0b';
+            envBadge.style.color = 'white';
+        }
+    } catch (err) {
+        envBadge.innerText = "OFFLINE";
+        envBadge.style.background = "#ef4444";
+    }
+}
+
+// Initialization
+connectToAgentStream();
+fetchGitVeracity();
+updateSystemState();
+
+// Polling
+setInterval(fetchGitVeracity, 10000);
+setInterval(updateSystemState, 5000);

@@ -4,16 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRE.Space | Control Plane</title>
+    <title>SRE.Space | Orbital Control Plane</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <script>
-        // Block 1: Vercel Dashboard Bridge
-        // Defaults to Render for Cloud deployment, local for development
+        // Block 1: Multi-Cloud Awareness
         window.NEXT_PUBLIC_API_URL = window.location.origin.includes("localhost")
             ? "http://localhost:8001"
             : "https://sre-space-cp.onrender.com";
@@ -25,34 +24,23 @@
     <div class="app-container">
         <aside class="sidebar">
             <div class="logo">
-                <span class="logo-icon">▲</span>
+                <span class="logo-icon">💠</span>
                 <span class="logo-text">SRE.SPACE</span>
             </div>
             <nav class="nav-menu">
-                <div class="nav-item active">
-                    <span class="icon">📊</span> Dashboard
-                </div>
-                <div class="nav-item">
-                    <span class="icon">🤖</span> Agent Fleet
-                </div>
-                <div class="nav-item">
-                    <span class="icon">📚</span> Knowledge Base
-                </div>
-                <div class="nav-item">
-                    <span class="icon">⚙️</span> Settings
-                </div>
+                <div class="nav-item active">📊 Dashboard</div>
+                <div class="nav-item">📡 Agent Traces</div>
+                <div class="nav-item">📂 Post-Mortems</div>
+                <div class="nav-item">🛠️ Inject Chaos</div>
             </nav>
             <div class="agent-status-card">
-                <h3>Agent Health</h3>
+                <h3>Agent Fleet Status</h3>
                 <div class="agent-list">
                     <div class="agent-status online">
-                        <span class="dot"></span> Scout <span class="tag">ACTIVE</span>
+                        <span class="dot"></span> Scout <span class="tag">POLLING</span>
                     </div>
                     <div class="agent-status online">
                         <span class="dot"></span> Brain <span class="tag">ACTIVE</span>
-                    </div>
-                    <div class="agent-status online">
-                        <span class="dot"></span> Memory <span class="tag">ACTIVE</span>
                     </div>
                     <div class="agent-status online">
                         <span class="dot"></span> Fixer <span class="tag">READY</span>
@@ -62,50 +50,59 @@
         </aside>
 
         <main class="main-content">
-            <header class="main-header">
+            <header class="glass-panel main-header">
                 <div class="header-left">
                     <h1>Mission Control</h1>
-                    <div class="flex items-center gap-3">
-                        <p class="subtitle">Autonomous Reliability Management Platform</p>
-                        <span id="env-badge"
-                            class="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-white/5">Syncing...</span>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                        <p class="subtitle">Distributed SRE Monorepo v4.7</p>
+                        <span id="env-badge" class="px-2 py-0.5"
+                            style="background: white; border-radius: 4px; font-size: 10px; font-weight: 800; padding: 2px 6px;">SYNCING...</span>
                     </div>
                 </div>
                 <div class="header-right">
-                    <div class="status-badge live">LIVE FEED</div>
+                    <div class="status-badge">
+                        <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></span>
+                        LIVE ORBITAL FEED
+                    </div>
                 </div>
             </header>
 
             <section class="metrics-grid">
                 <div class="metric-card">
-                    <span class="metric-label">MTTR (Auto)</span>
+                    <span class="metric-label">System MTTR</span>
                     <span class="metric-value">4.2m</span>
-                    <span class="metric-delta pos">↓ 12%</span>
                 </div>
                 <div class="metric-card">
-                    <span class="metric-label">Auto-Mitigations</span>
-                    <span class="metric-value">124</span>
-                    <span class="metric-delta pos">↑ 24%</span>
+                    <span class="metric-label">Success Rate</span>
+                    <span class="metric-value">99.8%</span>
                 </div>
                 <div class="metric-card">
-                    <span class="metric-label">Accuracy (Brain)</span>
-                    <span class="metric-value">98.4%</span>
-                    <span class="metric-delta pos">↑ 0.5%</span>
+                    <span class="metric-label">Active G-PRs</span>
+                    <span id="active-prs" class="metric-value">0</span>
                 </div>
             </section>
 
-            <section class="incident-feed">
-                <div class="feed-header">
-                    <h2>Recent Incidents</h2>
-                    <button class="btn-ghost">View All</button>
-                </div>
-                <div class="feed-list" id="incident-list">
-                    <!-- Incidents will be injected here -->
-                    <div class="incident-item loading">
-                        Connecting to Agent Stream...
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Real-Time OODA Logs -->
+                <section class="glass-panel logs-container">
+                    <div class="feed-header">
+                        <h2 style="font-size: 18px; font-weight: 800;">Real-Time Agent Logs</h2>
                     </div>
-                </div>
-            </section>
+                    <div class="logs-feed" id="logs-feed">
+                        <div class="log-entry">Waiting for agentic sensory intake...</div>
+                    </div>
+                </section>
+
+                <!-- GitHub Veracity Feed -->
+                <section class="glass-panel incident-feed">
+                    <div class="feed-header">
+                        <h2 style="font-size: 18px; font-weight: 800;">GitOps Veracity Feed</h2>
+                    </div>
+                    <div class="feed-list" id="incident-list">
+                        <div class="incident-item">Polling GitHub refs...</div>
+                    </div>
+                </section>
+            </div>
         </main>
     </div>
 
