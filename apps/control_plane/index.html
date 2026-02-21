@@ -56,12 +56,13 @@
                     class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                     Insurance Platform
                 </h1>
-                <p class="text-slate-400 mt-2 text-lg">Autonomous Reliability Engine v3.0 | <span
-                        class="text-blue-400">LangGraph Powered</span></p>
+                <p class="text-slate-400 mt-2 text-lg">Autonomous Reliability Engine v4.5 | <span
+                        class="text-blue-400">Multi-Cloud Orchestrated</span></p>
             </div>
             <div class="hidden md:flex items-center gap-3 glass px-5 py-2">
                 <div class="w-3 h-3 bg-green-500 rounded-full pulse"></div>
-                <span class="text-sm font-semibold text-green-400 uppercase tracking-widest">System Stable</span>
+                <span id="system-status" class="text-sm font-semibold text-green-400 uppercase tracking-widest">System
+                    Stable</span>
             </div>
         </header>
 
@@ -167,8 +168,22 @@
             };
         }
 
-        function triggerChaos() {
-            processQuote('Chaos Mode', true);
+        async function triggerChaos() {
+            addLog("System: Injecting synthetic chaos via API...");
+            try {
+                const res = await fetch('/demo/inject-failure', { method: 'POST' });
+                const data = await res.json();
+                addLog(`Chaos: ${data.message}`);
+
+                // Switch status badge
+                document.getElementById('system-status').innerText = 'ANOMALY DETECTED';
+                document.getElementById('system-status').style.color = '#ef4444';
+
+                // Follow the stream
+                processQuote('Chaos Remediation', true);
+            } catch (err) {
+                addLog("Error injecting chaos.");
+            }
         }
     </script>
 </body>
