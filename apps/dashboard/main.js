@@ -32,6 +32,8 @@ function connectToAgentStream() {
     };
 }
 
+const lastSync = document.getElementById('last-sync');
+
 // Block 3: GitHub Integrity Feed
 async function fetchGitVeracity() {
     try {
@@ -40,13 +42,14 @@ async function fetchGitVeracity() {
 
         if (data && !data.error) {
             activePRsCount.innerText = data.length;
+            lastSync.innerText = new Date().toLocaleTimeString();
             incidentList.innerHTML = data.map(pr => `
                 <div class="incident-card" onclick="window.open('${pr.html_url}', '_blank')">
                     <div class="incident-info">
                         <h4>PR #${pr.number} - ${pr.title}</h4>
                         <p style="font-family: 'JetBrains Mono'; font-size: 10px;">SHA: ${pr.head.sha.substring(0, 7)} | 👤 ${pr.user.login}</p>
                     </div>
-                    <div class="status-badge" style="background: ${pr.state === 'open' ? '#dcfce7' : '#f1f5f9'}; color: ${pr.state === 'open' ? '#10b981' : '#64748b'};">
+                    <div class="status-badge ${pr.state}">
                         ${pr.state.toUpperCase()}
                     </div>
                 </div>
