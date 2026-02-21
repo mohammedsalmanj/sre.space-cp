@@ -1,28 +1,57 @@
 <div align="center">
-  <h1>📡 SRE-Space</h1>
+  <h1>SRE-Space</h1>
   <p><i><b>Autonomous Reliability Engineering for Distributed Systems</b></i></p>
 
   <p>
-    <a href="https://sre-space-cp.vercel.app/apps/dashboard" target="_blank">
-      <img src="https://img.shields.io/badge/Orbital_Control-Dashboard-black?style=for-the-badge&logo=vercel" alt="SRE Dashboard">
-    </a>
-    <a href="https://sre-space-cp.onrender.com/" target="_blank">
-      <img src="https://img.shields.io/badge/Control_Loop-Backend-46E3B7?style=for-the-badge&logo=render" alt="Control Loop Backend">
-    </a>
+    <img src="https://img.shields.io/badge/ORBITAL_CONTROL-DASHBOARD-black?style=for-the-badge&logo=vercel" alt="Dashboard">
+    <img src="https://img.shields.io/badge/CONTROL_LOOP-BACKEND-46E3B7?style=for-the-badge&logo=render" alt="Backend">
   </p>
 
   <p>
-    <img src="https://img.shields.io/badge/Status-Self_Healing-brightgreen?style=for-the-badge" alt="Status">
-    <img src="https://img.shields.io/badge/AI-LangGraph_Agents-blueviolet?style=for-the-badge" alt="AI">
-    <img src="https://img.shields.io/badge/Architecture-Event_Driven-orange?style=for-the-badge" alt="Architecture">
-    <img src="https://img.shields.io/badge/Enterprise-Ready-informational?style=for-the-badge" alt="Enterprise">
+    <img src="https://img.shields.io/badge/STATUS-SELF_HEALING-brightgreen?style=for-the-badge" alt="Status">
+    <img src="https://img.shields.io/badge/AI-LANGGRAPH_AGENTS-blueviolet?style=for-the-badge" alt="AI">
+    <img src="https://img.shields.io/badge/ARCHITECTURE-EVENT_DRIVEN-orange?style=for-the-badge" alt="Architecture">
+    <img src="https://img.shields.io/badge/ENTERPRISE-READY-informational?style=for-the-badge" alt="Enterprise">
   </p>
 </div>
 
 <br/>
 
+<div align="center">
+  <h3>🛠️ Comprehensive Tech Stack</h3>
+  
+  <p>
+    <img src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54" alt="Python">
+    <img src="https://img.shields.io/badge/fastapi-109989?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
+    <img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
+    <img src="https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5">
+    <img src="https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3">
+  </p>
+
+  <p>
+    <img src="https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white" alt="OpenAI">
+    <img src="https://img.shields.io/badge/LangChain-121212?style=for-the-badge&logo=chainlink&logoColor=white" alt="LangChain">
+    <img src="https://img.shields.io/badge/ChromaDB-000000?style=for-the-badge&logo=google-cloud&logoColor=white" alt="ChromaDB">
+    <img src="https://img.shields.io/badge/Redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white" alt="Redis">
+    <img src="https://img.shields.io/badge/Apache%20Kafka-000000?style=for-the-badge&logo=apachekafka&logoColor=white" alt="Kafka">
+  </p>
+
+  <p>
+    <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
+    <img src="https://img.shields.io/badge/OpenTelemetry-000000?style=for-the-badge&logo=opentelemetry&logoColor=white" alt="OTel">
+    <img src="https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white" alt="Prometheus">
+    <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
+    <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel">
+    <img src="https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Render">
+  </p>
+</div>
+
+---
+
 ## 📜 Executive Summary
 **SRE-Space** is an autonomous SRE platform designed to close the gap between observability and remediation. It leverages a multi-agent **OODA loop** (Observe, Orient, Decide, Act) to detect, diagnose, and fix infrastructure failures in real-time. By transforming passive telemetry into active self-healing operations, SRE-Space ensures that distributed systems maintain high availability without manual intervention.
+
+Unlike traditional monitors that merely alert humans, SRE-Space acts as a "Digital First Responder," capable of performing root-cause analysis (RCA) via generative AI and executing GitOps-based patches automatically.
 
 ---
 
@@ -205,7 +234,7 @@ Error: {error_msg}
 | :--- | :--- | :--- |
 | **Vanilla CSS** | Styling | Hardware-accelerated glassmorphism. |
 | **EventSource API** | Interaction | Real-time SSE streaming for live logs. |
-| **TailwindCSS** | Utilities | Rapid responsive layout scaling. |
+| **TailwindCSS** | Layout utilities | Rapid responsive layout scaling. |
 
 ### Infrastructure / Connectivity
 | Tech | Role | Capability |
