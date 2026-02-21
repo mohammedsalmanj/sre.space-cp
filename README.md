@@ -90,17 +90,34 @@ SRE-Space automates the **OODA Loop** (Observe, Orient, Decide, Act) using speci
 
 ---
 
-## 📂 Monorepo Structure
+## 📂 Monorepo Structure (Deep-Dive)
 ```text
 .
 ├── apps/
-│   ├── control_plane/   # FastAPI Logic, HUD UI, SRE Graph
-│   └── dashboard/       # Vercel-optimized Liquid Glass Monitor
+│   ├── control_plane/        # High-Performance Backend (Mind)
+│   │   ├── main.py           # FastAPI Entry, Logic Streaming, Memory Guard
+│   │   ├── langgraph_logic.py# SRE-OODA State Machine & Graph Compilation
+│   │   ├── config.py         # Env-Aware Config (Cloud vs Local)
+│   │   └── index.html        # Cognitive HUD / Playground UI
+│   └── dashboard/            # High-Fidelity Frontend (Eye)
+│       ├── index.html        # Liquid Glass Dashboard Interface
+│       ├── main.js           # SSE Telemetry & GitHub Veracity Logic
+│       └── style.css         # Orbital Indigo / Glassmorphism Design
 ├── packages/
-│   ├── agents/          # Specialized SRE Agent Squad (Scout, Brain, Fixer, etc.)
-│   └── shared/          # Reusable Git, GitHub, Event Bus, & Reporting utilities
-├── docker-compose.yml   # Unified Local Infrastructure
-└── vercel.json          # Deployment Routing
+│   ├── agents/               # Cognitive Agent Squad Nodes
+│   │   ├── scout.py          # OTel Sensory Detection
+│   │   ├── brain.py          # RAG-based RCA & Reasoning (GPT-4o)
+│   │   ├── fixer.py          # GitOps Patch Execution
+│   │   ├── guardrail.py      # Safety & Policy Enforcer 
+│   │   └── jules.py          # Architectural Layer-3 Specialist
+│   └── shared/               # Distributed Utilities & Services
+│       ├── github_service.py # GitHub API Client (Issues/PRs/Files)
+│       ├── event_bus/        # Pluggable Messaging (Kafka/Redis)
+│       ├── git_utils.py      # GitOps traceability logic
+│       └── reporting.py      # Rich Markdown Post-Mortem Formatting
+├── docker-compose.yml        # Infrastructure: Kafka, ChromaDB, Jaeger
+├── vercel.json               # Monorepo Routing & Static Deployment
+└── requirements.txt          # Shared Dependency Management
 ```
 
 ---
