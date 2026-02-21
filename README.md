@@ -376,9 +376,32 @@ I am building SRE-Space to solve real-world operational problems through AIOps. 
 
 ---
 
+## 📝 The Automated Post-Mortem Lifecycle
+
+Every successful remediation in SRE-Space concludes with the generation of a high-fidelity **Post-Mortem**. This document is not just a static record; it is the fuel for the system's "Institutional Memory."
+
+### Phase 1: Data Synthesis
+Once the **Fixer Agent** confirms the PR is merged or the health check returns to GREEN, the **Curator Agent** aggregates:
+- **The Trigger Trace**: The exact Jaeger/OTEL span sequence that initialization the OODA loop.
+- **The Reasoning Chain**: The raw thoughts and technical trade-offs weighed by the **Brain Agent**.
+- **The Patch Diff**: The code-level change that resolved the incident.
+
+### Phase 2: Knowledge Encoding
+The aggregated data is passed through an LLM (GPT-4o) to generate a structured post-mortem including:
+1. **Executive Summary**: A high-level description for management.
+2. **Technical RCA**: The "Five Whys" analyzed via telemetry.
+3. **Resolution**: The specific patch applied.
+4. **Permanent Prevention**: Recommendations for long-term architectural hardening.
+
+### Phase 3: Vector Indexing (RAG Bridge)
+The final document is embedded into **ChromaDB**. The next time a similar failure occurs, the **Brain Agent** will find this document in less than 300ms, allowing it to bypass expensive reasoning and execute a "Known Fix" instantly.
+
+---
+
 ## 📜 DEEP ARCHITECTURAL GLOSSARY
 
 ### A
+- **Alert Fatigue**: The desensitization of engineers due to excessive low-priority notifications. SRE-Space eliminates this by autonomously triaging 90% of noise.
 - **Anomaly Frequency**: The rate at which error spans occur within a 60-second window.
 - **Asynchronous Execution**: Using non-blocking I/O to handle thousands of telemetry streams simultaneously.
 
@@ -389,30 +412,44 @@ I am building SRE-Space to solve real-world operational problems through AIOps. 
 ### C
 - **Chain of Thought (CoT)**: A technique where the LLM explains its logic step-by-step before providing a final answer.
 - **ChromaDB**: A vector database used for semantic search of incident post-mortems.
+- **Cognitive Load**: The mental effort required for an engineer to understand a system. SRE-Space reduces this by providing 1-click RCA.
 
 ### D
 - **Directed Acyclic Graph (DAG)**: The underlying structure of the LangGraph agent state machine.
 - **Dual-Mode Architecture**: The ability to switch between heavy (local) and lean (cloud) infrastructure stacks.
 
 ### E
+- **Error Budget**: The maximum allowable amount of unreliability in a service without impacting customers.
 - **Event Bus**: The messaging backbone (Kafka or Redis) that connects sensors to agents.
 - **Executive Summary**: A high-level overview of the incident generated for management.
+
+### F
+- **Fault Injection**: The deliberate introduction of errors to test system resilience (Chaos Lab).
 
 ### G
 - **GitOps**: Storing infrastructure and application state in Git for automated deployments.
 - **GPT-4o**: The latest high-reasoning model from OpenAI used for SRE diagnosis.
+
+### I
+- **Incident Lifecycle**: The end-to-end journey of a fault from detection to permanent closure.
+- **Institutional Memory**: The collective knowledge of a team. Curator codifies this into the vector store.
 
 ### L
 - **LangGraph**: A library for building stateful, multi-actor applications with LLMs.
 - **Liquid Glass**: The design system name for the SRE-Space dashboard.
 
 ### M
+- **Mean Time Between Failures (MTBF)**: The average time a system operates without failure.
 - **Mean Time to Remediation (MTTR)**: The average time taken to detect and fix an incident.
 - **Monorepo**: A repository layout containing multiple apps and shared packages.
 
 ### O
+- **Observed State vs. Desired State**: The core conflict in GitOps that SRE-Space resolves automatically.
 - **OODA Loop**: Observe, Orient, Decide, Act. The core mental model for the agents.
 - **OpenTelemetry (OTel)**: A vendor-neutral framework for telemetry collection.
+
+### P
+- **Post-Mortem**: A detailed technical review of an incident to prevent recurrence.
 
 ### R
 - **Retrieval-Augmented Generation (RAG)**: Providing the LLM with relevant historical documents to ground its response.
@@ -420,6 +457,8 @@ I am building SRE-Space to solve real-world operational problems through AIOps. 
 
 ### S
 - **Server-Sent Events (SSE)**: A technology for streaming real-time updates from the server to the browser.
+- **Service Level Indicator (SLI)**: A specific measure (like latency) of a service's performance.
+- **Service Level Objective (SLO)**: A target value for an SLI (e.g., latency < 200ms for 99.9% of requests).
 - **Simulation State**: The synthetic reality used to ground agent sensory intake.
 
 ### V
@@ -428,6 +467,6 @@ I am building SRE-Space to solve real-world operational problems through AIOps. 
 
 ---
 
-*Document Version: 5.1.0 | Last Updated: 2026-02-21*
+*Document Version: 5.1.0 | Last Updated: 2026-02-22*
 *Stability: PRODUCTION-READY*
 *Ownership: Salman | Open to community contributions to solve OPS problems using AIOps in the Control Loop. Built with a vision for open source.*
