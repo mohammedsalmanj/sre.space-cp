@@ -1,113 +1,190 @@
 /**
- * SRE.SPACE | Mission Control Logic v4.7
- * Handles real-time telemetry streaming and GitHub veracity synchronization.
+ * SRE.SPACE | Mission Control Logic v5.0
+ * Handles real-time telemetry streaming, navigation, and failure injections.
  */
 
-// Deployment Bridge: Automatic detection of backend location
+// --- Deployment Bridge ---
 const API_BASE_URL = window.NEXT_PUBLIC_API_URL;
 
+// --- DOM Elements ---
 const logsFeed = document.getElementById('logs-feed');
 const incidentList = document.getElementById('incident-list');
 const activePRsCount = document.getElementById('active-prs');
 const envBadge = document.getElementById('env-badge');
 const lastSync = document.getElementById('last-sync');
+const pageTitle = document.getElementById('page-title');
+
+// Health Dots
+const healthScout = document.getElementById('health-scout');
+const healthBrain = document.getElementById('health-brain');
+const healthFixer = document.getElementById('health-fixer');
 
 /**
- * Block 1: Real-Time Veracity (Server-Sent Events)
- * Connects to the backend OODA stream to visualize agent reasoning in real-time.
+ * Navigation Logic: Tab Switching
  */
-function connectToAgentStream() {
-    console.log("🔗 Connecting to Orbital Control Plane...");
-    // anomaly=false ensures the loop only triggers detection, not hard mutation during boot
-    const eventSource = new EventSource(`${API_BASE_URL}/api/sre-loop?anomaly=false`);
+function switchTab(tab) {
+    // Update Nav UI
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById(`nav-${tab}`)?.classList.add('active');
 
-    eventSource.onmessage = function (event) {
-        const data = JSON.parse(event.data);
-        const entry = document.createElement('div');
-        entry.className = 'log-entry';
+    // Update Panes
+    document.querySelectorAll('.tab-panel').forEach(el => el.classList.add('hidden'));
 
-        // Semantic color coding for the OODA stages (Observe, Orient, Decide, Act)
-        if (data.message.includes('[OBSERVE]')) entry.classList.add('observe');
-        if (data.message.includes('[ORIENT]')) entry.classList.add('orient');
-        if (data.message.includes('[DECIDE]')) entry.classList.add('decide');
-        if (data.message.includes('[ACT]')) entry.classList.add('act');
-
-        entry.innerText = data.message;
-        logsFeed.appendChild(entry);
-
-        // Auto-scroll to keep the latest agent reasoning in view
-        logsFeed.scrollTop = logsFeed.scrollHeight;
-    };
-
-    eventSource.onerror = function () {
-        console.warn("Telemetry stream interrupted. Re-bridging in 5s...");
-        eventSource.close();
-        setTimeout(connectToAgentStream, 5000);
-    };
+    if (['dashboard', 'chaos'].includes(tab)) {
+        document.getElementById(`tab-${tab}`).classList.remove('hidden');
+        pageTitle.innerText = tab.charAt(0).toUpperCase() + tab.slice(1) + " Control";
+        document.getElementById('metrics-bar').classList.remove('hidden');
+    } else {
+        document.getElementById('tab-placeholder').classList.remove('hidden');
+        document.getElementById('placeholder-title').innerText = tab.charAt(0).toUpperCase() + tab.slice(1);
+        pageTitle.innerText = tab.charAt(0).toUpperCase() + tab.slice(1);
+        document.getElementById('metrics-bar').classList.add('hidden');
+    }
 }
 
 /**
- * Block 3: GitHub Integrity Feed
- * Cross-references agent logs with ground-truth reality on GitHub.
+ * Telemetry Stream (SSE)
+ */
+let currentEventSource = null;
+
+function connectToAgentStream(isAnomaly = false) {
+    if (currentEventSource) currentEventSource.close();
+
+    console.log(`🔗 Connecting to SRE Loop (Anomaly: ${isAnomaly})...`);
+    currentEventSource = new EventSource(`${API_BASE_URL}/api/sre-loop?anomaly=${isAnomaly}`);
+
+    currentEventSource.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        addLog(data.message);
+
+        // Update Health Dots based on active agent
+        updateHealthStatus(data.message);
+
+        if (data.final_state) {
+            currentEventSource.close();
+            resetHealthStatus();
+            fetchGitVeracity(); // Sync PRs after a possible fix
+        }
+    };
+
+    currentEventSource.onerror = function () {
+        currentEventSource.close();
+        setTimeout(() => connectToAgentStream(false), 10000);
+    };
+}
+
+function addLog(message) {
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+
+    if (message.includes('[SCOUT]')) entry.classList.add('observe');
+    if (message.includes('[BRAIN]')) entry.classList.add('orient');
+    if (message.includes('[GUARDRAIL]')) entry.classList.add('decide');
+    if (message.includes('[FIXER]')) entry.classList.add('act');
+    if (message.includes('[CURATOR]')) entry.classList.add('decide');
+
+    entry.innerText = message;
+    logsFeed.appendChild(entry);
+    logsFeed.scrollTop = logsFeed.scrollHeight;
+}
+
+function clearLogs() {
+    logsFeed.innerHTML = '<div class="log-entry italic">Logs cleared. Awaiting sensory intake...</div>';
+}
+
+/**
+ * Health Indicators logic
+ */
+function updateHealthStatus(msg) {
+    if (msg.includes('[SCOUT]')) {
+        healthScout.className = 'status-dot ONLINE';
+    } else if (msg.includes('[BRAIN]')) {
+        healthBrain.className = 'status-dot ONLINE';
+    } else if (msg.includes('[FIXER]')) {
+        healthFixer.className = 'status-dot ONLINE';
+    }
+}
+
+function resetHealthStatus() {
+    healthScout.className = 'status-dot ONLINE';
+    healthBrain.className = 'status-dot ONLINE';
+    healthFixer.className = 'status-dot IDLE';
+}
+
+/**
+ * GitHub Veracity Sync
  */
 async function fetchGitVeracity() {
     try {
         const res = await fetch(`${API_BASE_URL}/api/git-activity`);
         const data = await res.json();
 
-        if (data && !data.error) {
-            // Update HUD metrics
+        if (Array.isArray(data)) {
             activePRsCount.innerText = data.length;
             lastSync.innerText = new Date().toLocaleTimeString();
 
-            // Generate interactive PR cards
             incidentList.innerHTML = data.map(pr => `
-                <div class="incident-card" onclick="window.open('${pr.html_url}', '_blank')" title="View SRE Post-Mortem on GitHub">
+                <div class="incident-card" onclick="window.open('${pr.html_url}', '_blank')">
                     <div class="incident-info">
                         <h4>PR #${pr.number} - ${pr.title}</h4>
-                        <p style="font-family: 'JetBrains Mono'; font-size: 10px; color: #94a3b8;">
-                            REF: ${pr.head.sha.substring(0, 7)} | 🕵️ ${pr.user.login}
-                        </p>
+                        <p>REF: ${pr.head.sha.substring(0, 7)} | 🕵️ ${pr.user.login}</p>
                     </div>
-                    <div class="status-badge ${pr.state}">
-                        ${pr.state.toUpperCase()}
-                    </div>
+                    <div class="status-badge ${pr.state}">${pr.state}</div>
                 </div>
             `).join('');
+        } else {
+            activePRsCount.innerText = "0";
+            incidentList.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-secondary);">No active PRs found. System stable.</div>';
         }
     } catch (err) {
-        console.error("Veracity synchronization failed:", err);
+        console.error("Git Veracity Error:", err);
+        activePRsCount.innerText = "ERR";
     }
 }
 
 /**
- * Block 2: System Health & Environment Detection
- * Displays the hosting environment (CLOUD/LOCAL) and RAM health.
+ * Chaos Engineering
  */
-async function updateSystemState() {
+async function triggerChaos(type) {
+    addLog(`/// INITIATING CHAOS: ${type.toUpperCase()} ///`);
     try {
-        const res = await fetch(`${API_BASE_URL}/system/health`);
-        const data = await res.json();
+        const res = await fetch(`${API_BASE_URL}/demo/inject-failure`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type })
+        });
 
-        if (data.env) {
-            envBadge.innerText = data.env.toUpperCase();
-            // Color branding for different deployment nodes
-            envBadge.style.background = data.env === 'cloud' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(245, 158, 11, 0.2)';
-            envBadge.style.color = data.env === 'cloud' ? '#38bdf8' : '#f59e0b';
-        }
+        switchTab('dashboard');
+        connectToAgentStream(true);
+
+        // Visual indicator on metrics
+        document.getElementById('metric-resilience').innerText = "84.2%";
+        document.getElementById('metric-resilience').style.color = "var(--danger)";
+
+        setTimeout(() => {
+            document.getElementById('metric-resilience').innerText = "99.8%";
+            document.getElementById('metric-resilience').style.color = "var(--success)";
+        }, 30000);
+
     } catch (err) {
-        envBadge.innerText = "OFFLINE";
-        envBadge.style.background = "rgba(244, 63, 94, 0.2)";
-        envBadge.style.color = "#f43f5e";
+        addLog(`[SYSTEM] Chaos injection failed: ${err.message}`);
     }
 }
 
-// --- Lifecycle Initialization ---
-// Start all veracity loops immediately on page load
-connectToAgentStream();
-fetchGitVeracity();
-updateSystemState();
+/**
+ * MTTR Drift (Makes it feel real)
+ */
+function simulateMetricDrift() {
+    const mttr = (4.0 + Math.random() * 0.5).toFixed(1);
+    document.getElementById('metric-mttr').innerText = `${mttr}m`;
+}
 
-// Periodic synchronization (10s for Git, 5s for Health)
-setInterval(fetchGitVeracity, 10000);
-setInterval(updateSystemState, 5000);
+// Initializing
+window.switchTab = switchTab;
+window.triggerChaos = triggerChaos;
+window.clearLogs = clearLogs;
+
+connectToAgentStream(false);
+fetchGitVeracity();
+setInterval(fetchGitVeracity, 30000);
+setInterval(simulateMetricDrift, 15000);

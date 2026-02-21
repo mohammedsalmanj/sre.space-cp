@@ -430,3 +430,38 @@ body::before {
 ::-webkit-scrollbar-track {
     background: transparent;
 }
+
+.hidden {
+    display: none !important;
+}
+
+.tab-panel {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.status-dot.ONLINE {
+    background: var(--success) !important;
+    box-shadow: 0 0 12px var(--success);
+}
+
+.status-dot.IDLE {
+    background: var(--warning) !important;
+    box-shadow: 0 0 12px var(--warning);
+}
+
+.status-dot.OFFLINE {
+    background: var(--danger) !important;
+    box-shadow: 0 0 12px var(--danger);
+}

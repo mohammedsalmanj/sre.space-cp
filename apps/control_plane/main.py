@@ -79,19 +79,25 @@ async def system_health():
     }
 
 @app.post("/demo/inject-failure")
-async def inject_failure():
+async def inject_failure(request: Request):
     """
     Simulate a production incident. 
     Triggers: 1. Global state change 2. Background SRE agent loop via LangGraph.
     """
-    logger.info("🔥 [CHAOS] Synthetic DB pool exhaustion injected into policy-service.")
+    try:
+        body = await request.json()
+        chaos_type = body.get("type", "db_pool_exhaustion")
+    except:
+        chaos_type = "db_pool_exhaustion"
+
+    logger.info(f"🔥 [CHAOS] Synthetic {chaos_type.replace('_', ' ')} injected into policy-service.")
     SYSTEM_STATE["is_anomaly"] = True
-    SYSTEM_STATE["failure_type"] = "db_pool_exhaustion"
+    SYSTEM_STATE["failure_type"] = chaos_type
     
     # Fire and forget: SRE loop starts detecting the trace immediately
     asyncio.create_task(run_sre_loop(is_anomaly=True))
     
-    return {"message": "Failure injected. SRE Loop triggered.", "type": "db_pool_exhaustion"}
+    return {"status": "success", "message": f"Failure injected: {chaos_type}", "type": chaos_type}
 
 @app.get("/quote")
 async def get_quote(user_id: str = "unknown"):

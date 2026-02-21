@@ -29,29 +29,30 @@
                 <span class="logo-text">SRE.SPACE</span>
             </div>
             <nav class="nav-menu">
-                <div class="nav-item active">📊 Dashboard</div>
-                <div class="nav-item">📡 Agent Traces</div>
-                <div class="nav-item">📂 Post-Mortems</div>
-                <div class="nav-item">🧪 Chaos Lab</div>
-                <div class="nav-item">⚙️ Config</div>
-            </nav>
-            <div class="agent-status-card">
-                <h3>Agent Health</h3>
-                <div class="agent-list">
-                    <div class="agent-status">
-                        <span class="status-dot"></span> Scout <span
-                            style="margin-left: auto; font-size: 10px; color: var(--success);">ONLINE</span>
-                    </div>
-                    <div class="agent-status">
-                        <span class="status-dot"></span> Brain <span
-                            style="margin-left: auto; font-size: 10px; color: var(--success);">READY</span>
-                    </div>
-                    <div class="agent-status">
-                        <span class="status-dot"></span> Fixer <span
-                            style="margin-left: auto; font-size: 10px; color: var(--warning);">IDLE</span>
+                <nav class="nav-menu">
+                    <div id="nav-dashboard" class="nav-item active" onclick="switchTab('dashboard')">📊 Dashboard</div>
+                    <div id="nav-traces" class="nav-item" onclick="switchTab('traces')">📡 Agent Traces</div>
+                    <div id="nav-postmortems" class="nav-item" onclick="switchTab('postmortems')">📂 Post-Mortems</div>
+                    <div id="nav-chaos" class="nav-item" onclick="switchTab('chaos')">🧪 Chaos Lab</div>
+                    <div id="nav-config" class="nav-item" onclick="switchTab('config')">⚙️ Config</div>
+                </nav>
+                <div class="agent-status-card">
+                    <h3>Agent Health</h3>
+                    <div class="agent-list">
+                        <div class="agent-status">
+                            <span id="health-scout" class="status-dot ONLINE"></span> Scout <span
+                                style="margin-left: auto; font-size: 10px; color: var(--success);">ONLINE</span>
+                        </div>
+                        <div class="agent-status">
+                            <span id="health-brain" class="status-dot ONLINE"></span> Brain <span
+                                style="margin-left: auto; font-size: 10px; color: var(--success);">READY</span>
+                        </div>
+                        <div class="agent-status">
+                            <span id="health-fixer" class="status-dot IDLE"></span> Fixer <span
+                                style="margin-left: auto; font-size: 10px; color: var(--warning);">IDLE</span>
+                        </div>
                     </div>
                 </div>
-            </div>
         </aside>
 
         <!-- Main Content -->
@@ -59,7 +60,7 @@
             <!-- Header Panel -->
             <header class="glass-panel main-header">
                 <div class="header-title">
-                    <h1>Mission Control</h1>
+                    <h1 id="page-title">Mission Control</h1>
                     <div class="subtitle">
                         Orbital Reliability Layer v4.7
                         <span id="env-badge" class="deployment-badge"
@@ -68,21 +69,21 @@
                 </div>
                 <div class="header-actions">
                     <div class="live-indicator">
-                        <span class="live-dot"></span>
-                        LIVE ENGINE FEED
+                        <span id="live-dot" class="live-dot"></span>
+                        <span id="live-text">LIVE ENGINE FEED</span>
                     </div>
                 </div>
             </header>
 
             <!-- Metrics Grid -->
-            <section class="metrics-grid">
+            <section id="metrics-bar" class="metrics-grid">
                 <div class="glass-panel metric-card">
                     <span class="metric-label">Mean Time to Fix</span>
-                    <span class="metric-value">4.2m</span>
+                    <span id="metric-mttr" class="metric-value">4.2m</span>
                 </div>
                 <div class="glass-panel metric-card">
                     <span class="metric-label">Auto-Resilience</span>
-                    <span class="metric-value">99.8%</span>
+                    <span id="metric-resilience" class="metric-value">99.8%</span>
                 </div>
                 <div class="glass-panel metric-card">
                     <span class="metric-label">Active Git-PRs</span>
@@ -90,33 +91,68 @@
                 </div>
             </section>
 
-            <!-- Dashboard Content -->
-            <div class="dashboard-grid">
-                <!-- Log Stream -->
-                <section class="glass-panel logs-container">
-                    <div class="feed-header">
-                        <h2>Agentic OODA Loop</h2>
-                        <button
-                            style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-secondary); padding: 4px 12px; border-radius: 8px; font-size: 11px; cursor: pointer;">Clear
-                            Logs</button>
-                    </div>
-                    <div class="logs-feed" id="logs-feed">
-                        <div class="log-entry">Awaiting sensory intake from backend sensors...</div>
-                    </div>
-                </section>
+            <!-- Tab: Dashboard -->
+            <div id="tab-dashboard" class="tab-panel">
+                <div class="dashboard-grid">
+                    <!-- Log Stream -->
+                    <section class="glass-panel logs-container">
+                        <div class="feed-header">
+                            <h2>Agentic OODA Loop</h2>
+                            <button onclick="clearLogs()"
+                                style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-secondary); padding: 4px 12px; border-radius: 8px; font-size: 11px; cursor: pointer;">Clear
+                                Logs</button>
+                        </div>
+                        <div class="logs-feed" id="logs-feed">
+                            <div class="log-entry">Awaiting sensory intake from backend sensors...</div>
+                        </div>
+                    </section>
 
-                <!-- Git Veracity Feed -->
-                <section class="glass-panel veracity-container">
-                    <div class="feed-header">
-                        <h2>GitOps Veracity</h2>
-                        <span style="font-size: 11px; color: var(--text-secondary);">Last sync: <span
-                                id="last-sync">Just now</span></span>
+                    <!-- Git Veracity Feed -->
+                    <section class="glass-panel veracity-container">
+                        <div class="feed-header">
+                            <h2>GitOps Veracity</h2>
+                            <span style="font-size: 11px; color: var(--text-secondary);">Last sync: <span
+                                    id="last-sync">Just now</span></span>
+                        </div>
+                        <div class="incident-list" id="incident-list">
+                            <div
+                                style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 13px;">
+                                Polling GitHub repositories...</div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Tab: Chaos Lab -->
+            <div id="tab-chaos" class="tab-panel hidden">
+                <div class="glass-panel" style="padding: 40px; text-align: center;">
+                    <div style="font-size: 40px; margin-bottom: 20px;">🔥</div>
+                    <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 10px;">Synthetic Failure Injection</h2>
+                    <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 30px;">
+                        Trigger controlled chaos within the Policy Service to observe the autonomous SRE loop's
+                        remediation capabilities.
+                    </p>
+                    <div class="chaos-controls"
+                        style="display: grid; grid-template-cols: 1fr 1fr; gap: 20px; max-width: 600px; margin: 0 auto;">
+                        <button onclick="triggerChaos('db_pool_exhaustion')" class="glass-panel"
+                            style="padding: 20px; cursor: pointer; border: 1px solid rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.05); color: #f43f5e; font-weight: 700;">
+                            INJECT: DB POOL EXHAUSTION
+                        </button>
+                        <button onclick="triggerChaos('latency_spike')" class="glass-panel"
+                            style="padding: 20px; cursor: pointer; border: 1px solid rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.05); color: #f59e0b; font-weight: 700;">
+                            INJECT: LATENCY SPIKE (5s)
+                        </button>
                     </div>
-                    <div class="incident-list" id="incident-list">
-                        <div style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 13px;">
-                            Polling GitHub repositories...</div>
-                    </div>
-                </section>
+                </div>
+            </div>
+
+            <!-- Tab: Placeholder (Traces, PostMortems, Config) -->
+            <div id="tab-placeholder" class="tab-panel hidden">
+                <div class="glass-panel" style="padding: 100px; text-align: center; color: var(--text-secondary);">
+                    <div style="font-size: 40px; margin-bottom: 20px;">🏗️</div>
+                    <h2 id="placeholder-title">Under Construction</h2>
+                    <p>Live telemetry stream provides the primary veracity feed for this tier.</p>
+                </div>
             </div>
         </main>
     </div>
