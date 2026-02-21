@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# SRE Mission Control - Verification Utilities
+# SRE Control Loop - Verification Utilities
 
 function verify-jules-pr() {
-    echo "🚀 [Mission Control] Verifying Jules PR..."
+    echo "🚀 [Control Loop] Verifying Jules PR..."
     
     # 1. Fetch the latest code
     echo "   -> Pulling latest changes..."
@@ -22,7 +22,7 @@ function verify-jules-pr() {
     python trigger_chaos.py oom
     python trigger_chaos.py conversion
     
-    echo "✅ [Mission Control] Verification Complete. Status: GREEN"
+    echo "✅ [Control Loop] Verification Complete. Status: GREEN"
 }
 
 # Check argument

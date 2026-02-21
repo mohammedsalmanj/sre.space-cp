@@ -1,5 +1,5 @@
 /**
- * SRE.SPACE | Mission Control Logic v5.0
+ * AEGIS | Orbital Control Logic v5.0
  * Handles real-time telemetry streaming, navigation, and failure injections.
  */
 

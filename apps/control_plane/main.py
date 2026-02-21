@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] [SRE
 logger = logging.getLogger("sre.control_plane")
 
 # App Initialization with dynamic title based on the deployment mode
-app = FastAPI(title=f"SRE.Space | {ENV.upper()} Control Plane v4.5")
+app = FastAPI(title=f"Aegis SRE-Space | {ENV.upper()} Control Loop v5.0")
 
 # --- Security & Connectivity (CORS) ---
 # Enable Cross-Origin Resource Sharing to allow the Vercel-hosted dashboard 

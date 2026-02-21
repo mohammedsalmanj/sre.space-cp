@@ -52,7 +52,7 @@ This guide outlines five high-impact scenarios to demonstrate the **Autonomous R
 
 1. **Reset State**: Ensure all active PRs are merged or closed.
 2. **Inject Chaos**: Use the **Insurance Playground** (Cyber-HUD) and click **🔥 INJECT CHAOS**.
-3. **Monitor**: Open the **Mission Control Dashboard** (Liquid Glass) to watch the OODA stream live.
+3. **Monitor**: Open the **Control Loop Dashboard** (Liquid Glass) to watch the OODA stream live.
 4. **Verify Veracity**: Click the PR card in the dashboard to view the generated SRE Post-Mortem on GitHub.
 
 ---

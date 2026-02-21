@@ -1,16 +1,16 @@
 :root {
-    --bg-main: #0f172a;
-    --sidebar-bg: rgba(15, 23, 42, 0.8);
-    --card-bg: rgba(30, 41, 59, 0.4);
-    --accent: #38bdf8;
-    --accent-glow: rgba(56, 189, 248, 0.3);
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --success: #10b981;
-    --danger: #f43f5e;
-    --warning: #f59e0b;
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    --bg-main: #f8fafc;
+    --sidebar-bg: rgba(255, 255, 255, 0.6);
+    --card-bg: rgba(255, 255, 255, 0.4);
+    --accent: #0ea5e9;
+    --accent-glow: rgba(14, 165, 233, 0.2);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --success: #059669;
+    --danger: #e11d48;
+    --warning: #d97706;
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -35,7 +35,7 @@ body::before {
     left: 50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(56, 189, 248, 0.05) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.03) 0%, transparent 70%);
     transform: translate(-50%, -50%);
     animation: rotate 20s linear infinite;
     pointer-events: none;
@@ -101,7 +101,7 @@ body::before {
     font-size: 20px;
     font-weight: 800;
     letter-spacing: 2px;
-    background: linear-gradient(to right, #fff, #94a3b8);
+    background: linear-gradient(to right, #0f172a, #475569);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -283,7 +283,8 @@ body::before {
     height: calc(100% - 40px);
     overflow-y: auto;
     padding: 16px;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--glass-border);
     border-radius: 20px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
@@ -304,23 +305,23 @@ body::before {
 }
 
 .log-entry.observe {
-    border-color: #38bdf8;
-    color: #7dd3fc;
+    border-color: #0ea5e9;
+    color: #0369a1;
 }
 
 .log-entry.orient {
-    border-color: #fbbf24;
-    color: #fcd34d;
+    border-color: #f59e0b;
+    color: #b45309;
 }
 
 .log-entry.decide {
-    border-color: #34d399;
-    color: #6ee7b7;
+    border-color: #10b981;
+    color: #047857;
 }
 
 .log-entry.act {
-    border-color: #f87171;
-    color: #fca5a5;
+    border-color: #f43f5e;
+    color: #be123c;
 }
 
 .incident-list {

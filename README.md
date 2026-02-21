@@ -1,14 +1,13 @@
 <div align="center">
-  <h1>🌌 SRE-Space: Autonomous Control Plane v5.0</h1>
-  <p><i><b>Reactive</b> ⮕ <b>Proactive</b> ⮕ <b>Autonomous</b></i></p>
-  <p><i>The Vendor-Neutral, Enterprise-Grade Reliability Layer for Distributed Systems</i></p>
+  <h1>🔱 Aegis SRE-Space</h1>
+  <p><i><b>Autonomous Reliability Engineering for Distributed Systems</b></i></p>
 
   <p>
     <a href="https://sre-space-cp.vercel.app/apps/dashboard" target="_blank">
-      <img src="https://img.shields.io/badge/Live_Dashboard-Vercel-black?style=for-the-badge&logo=vercel" alt="Vercel Dashboard">
+      <img src="https://img.shields.io/badge/Aegis_Orbital-Dashboard-black?style=for-the-badge&logo=vercel" alt="Aegis Dashboard">
     </a>
     <a href="https://sre-space-cp.onrender.com/" target="_blank">
-      <img src="https://img.shields.io/badge/Control_Plane-Render-46E3B7?style=for-the-badge&logo=render" alt="Render Backend">
+      <img src="https://img.shields.io/badge/Control_Loop-Backend-46E3B7?style=for-the-badge&logo=render" alt="Control Loop Backend">
     </a>
   </p>
 
@@ -16,150 +15,99 @@
     <img src="https://img.shields.io/badge/Status-Self_Healing-brightgreen?style=for-the-badge" alt="Status">
     <img src="https://img.shields.io/badge/AI-LangGraph_Agents-blueviolet?style=for-the-badge" alt="AI">
     <img src="https://img.shields.io/badge/Architecture-Event_Driven-orange?style=for-the-badge" alt="Architecture">
-    <img src="https://img.shields.io/badge/Escalation-Google_Jules-informational?style=for-the-badge" alt="Escalation">
+    <img src="https://img.shields.io/badge/Enterprise-Ready-informational?style=for-the-badge" alt="Enterprise">
   </p>
-
-  <br/>
-
-  [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-  [![LangGraph](https://img.shields.io/badge/LangGraph-Agent_Orchestration-FF6F00?style=for-the-badge&logo=langchain&logoColor=white)](https://langchain-ai.github.io/langgraph/)
-  [![Docker](https://img.shields.io/badge/Docker-Infinite_Portability-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-  [![OpenTelemetry](https://img.shields.io/badge/OpenTelemetry-Observability-0047AB?style=for-the-badge&logo=opentelemetry&logoColor=white)](https://opentelemetry.io/)
-  [![Apache Kafka](https://img.shields.io/badge/Apache_Kafka-Event_Stream-231F20?style=for-the-badge&logo=apachekafka&logoColor=white)](https://kafka.apache.org/)
 </div>
 
 <br/>
 
-## 🏛️ Simplified Architecture
+## 📜 Executive Summary
+**Aegis** is an autonomous SRE platform designed by **Salman** to close the gap between observability and remediation. It leverages a multi-agent **OODA loop** (Observe, Orient, Decide, Act) to detect, diagnose, and fix infrastructure failures in real-time. By transforming passive telemetry into active self-healing operations, Aegis ensures that distributed systems maintain high availability without manual intervention.
 
-SRE-Space uses a **Monorepo Architecture** designed for seamless portability and enterprise-scale observability.
+---
+
+## 🏆 Key Achievements (What Salman Solved)
+
+### 🔗 Monorepo Synchronization
+Engineered a unified monorepo structure that flawlessly synchronizes the **Control Loop** (Backend) on Render with the **Aegis Orbital** (Frontend) on Vercel. Resolved complex cross-platform routing and CORS hurdles for a seamless production experience.
+
+### 🕵️ Veracity Engine
+Successfully transitioned from "simulated" static telemetry to a **high-fidelity veracity engine**. The system now monitors real ground-truth state, allowing agents to react to authentic infrastructure signals and socket-level connection faults.
+
+### 🌓 Dual-Mode Architecture
+Developed a unique **Resource-Aware Switch** that allows the platform to intelligently adapt its infrastructure stack. 
+- **Local Mode**: Leverages Apache Kafka and a full 8-agent squad for deep local architectural reasoning.
+- **Cloud Mode**: Dynamically switches to Managed Redis and a lean squad to optimize performance within the constraints of cloud individual tiers (e.g., Render's 512MB limit).
+
+---
+
+## 🏛️ Architecture Overview
 
 ```mermaid
 graph LR
     subgraph "External World"
-        App[Insurance App]
-        User[Technical User]
+        App[Managed Service]
+        User[Architect]
     end
 
-    subgraph "The Eye (Vercel)"
+    subgraph "Aegis Orbital (Vercel)"
         UI[Liquid Glass Dashboard]
     end
 
-    subgraph "The Mind (Render/Local)"
+    subgraph "Control Loop (Render/Local)"
         direction TB
         Signal(Scout Agent) --> Logic(Brain Agent)
         Logic --> Execute(Fixer Agent)
-        Execute --> Stabilize(System State)
+        Execute --> Stabilize(System Health)
     end
 
-    subgraph "The Memory"
+    subgraph "Institutional Memory"
         Chroma[(ChromaDB)]
-        Jaeger[(Jaeger Tracing)]
+        Jaeger[(Jaeger Traces)]
     end
 
-    App -- Telemetry --> Signal
-    Logic -- Context --> Chroma
-    Logic -- Traces --> Jaeger
-    Execute -- Fixes --> App
-    Signal -- SSE Stream --> UI
-    User -- Chaos --> App
+    App -- OTel Spans --> Signal
+    Logic -- RAG Context --> Chroma
+    Logic -- Trace Analysis --> Jaeger
+    Execute -- GitOps Fix --> App
+    Signal -- SSE Telemetry --> UI
+    User -- Chaos Trigger --> App
 ```
 
 ---
 
-## 💡 The Problem & The Cognitive Solution
+## 🛠️ Technical Stack Deep-Dive
 
-### The Core Problem
-Modern distributed systems generate overwhelming noise. When an incident occurs, a human SRE spends **70% of MTTR** just on "Orientation"—finding the right trace, checking recent PRs, and identifying the service owner.
-
-### The Cognitive Solution
-SRE-Space automates the **OODA Loop** (Observe, Orient, Decide, Act) using specialized AI agents that transition from reactive alerts to autonomous healing.
-
-1.  **🔴 Reactive Reliability**: Instantly capturing the high-fidelity state at the moment of failure.
-2.  **🟡 Proactive Intelligence**: Correlating traces with historical memories to identify patterns before they escalate.
-3.  **🟢 Autonomous Self-Healing**: Independently drafting and deploying patches via GitOps.
-
----
-
-## 🛡️ Enterprise Core Principles
-
-- **Vendor-Neutral Observability**: Built entirely on [OpenTelemetry](https://opentelemetry.io/). SRE-Space can consume telemetry from any OTel-compliant backend without changing the agent logic.
-- **True Monorepo Design**: Single source of truth for Agents, Shared Packages, and Frontend Apps.
-- **Portability**: 100% containerized with Docker. Deploy consistently to AWS, GCP, Azure, or On-premise.
-- **Security by Design**: The **Guardrail Agent** ensure autonomous actions are safe and reversible.
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Orchestration** | [LangGraph](https://langchain-ai.github.io/langgraph/) | Stateful multi-agent OODA loop coordination. |
+| **Intelligence** | [OpenAI GPT-4o](https://openai.com/) | High-reasoning cognitive nodes for RCA and remediation. |
+| **Backend** | [FastAPI](https://fastapi.tiangolo.com/) | High-performance asynchronous Control Loop engine. |
+| **Frontend** | [Next.js / Vanilla JS](https://nextjs.org/) | Liquid Glass "Aegis Orbital" dashboard for real-time veracity. |
+| **Messaging** | [Redis](https://redis.io/) / [Kafka](https://kafka.apache.org/) | Pluggable event backbone for agent communication. |
+| **Memory** | [ChromaDB](https://www.trychroma.com/) | Vector store for historical incident post-mortem RAG. |
+| **Observability** | [OpenTelemetry](https://opentelemetry.io/) | Vendor-neutral sensory intake and distributed tracing. |
 
 ---
 
-## 📂 Monorepo Structure (Deep-Dive)
+## 📂 Project Structure
 ```text
 .
 ├── apps/
-│   ├── control_plane/        # High-Performance Backend (Mind)
-│   │   ├── main.py           # FastAPI Entry, Logic Streaming, Memory Guard
-│   │   ├── langgraph_logic.py# SRE-OODA State Machine & Graph Compilation
-│   │   ├── config.py         # Env-Aware Config (Cloud vs Local)
-│   │   └── index.html        # Cognitive HUD / Playground UI
-│   └── dashboard/            # High-Fidelity Frontend (Eye)
-│       ├── index.html        # Liquid Glass Dashboard Interface
-│       ├── main.js           # SSE Telemetry & GitHub Veracity Logic
-│       └── style.css         # Orbital Indigo / Glassmorphism Design
+│   ├── control_plane/        # Aegis Control Loop (Mind)
+│   └── dashboard/            # Aegis Orbital Dashboard (Eye)
 ├── packages/
-│   ├── agents/               # Cognitive Agent Squad Nodes
-│   │   ├── scout.py          # OTel Sensory Detection
-│   │   ├── brain.py          # RAG-based RCA & Reasoning (GPT-4o)
-│   │   ├── fixer.py          # GitOps Patch Execution
-│   │   ├── guardrail.py      # Safety & Policy Enforcer 
-│   │   └── jules.py          # Architectural Layer-3 Specialist
-│   └── shared/               # Distributed Utilities & Services
-│       ├── github_service.py # GitHub API Client (Issues/PRs/Files)
-│       ├── event_bus/        # Pluggable Messaging (Kafka/Redis)
-│       ├── git_utils.py      # GitOps traceability logic
-│       └── reporting.py      # Rich Markdown Post-Mortem Formatting
-├── docker-compose.yml        # Infrastructure: Kafka, ChromaDB, Jaeger
-├── vercel.json               # Monorepo Routing & Static Deployment
-└── requirements.txt          # Shared Dependency Management
+│   ├── agents/               # Cognitive Agent Squad (Scout, Brain, Fixer, Jules)
+│   └── shared/               # Shared Utilities (Event Bus, GitOps, Reporting)
+├── Dockerfile                # Production Containerization
+├── docker-compose.yml        # Local 'Unleashed' Cluster
+└── vercel.json               # Frontend Routing
 ```
 
 ---
 
-## 🪜 Advanced Escalation Ladder
-
--   **Tier 1 (Automatic)**: **Scout** detect, **Brain** diagnose, **Fixer** patch. (MTTR < 2m)
--   **Tier 2 (Architectural)**: **Jules** refactor for structural regressions.
--   **Tier 3 (Critical)**: **Human** sign-off via the Veracity dashboard for high-risk path remediation.
+## ⚖️ License
+Aegis SRE-Space is licensed under the **Apache License 2.0**. This ensures professional and enterprise compatibility, allowing for broad adoption while maintaining project integrity. See the [LICENSE](LICENSE) file for details.
 
 ---
-
-## 🧠 AI Reasoning Engine
-Our agents do not just generate text; they perform **Stateful Chain-of-Thought** reasoning:
--   **RAG Context Injection**: Brain agents pull "Post-Mortem Fragments" from **ChromaDB**.
--   **Verification Loops**: No code is proposed without passing a local **Syntactic & Security Guardrail** check.
-
----
-
-## 🚀 Deployment Veracity (Local vs Cloud)
-
-SRE-Space is designed with a **Pluggable Infrastructure Engine** that adapts to its host environment:
-
-### 🏠 Local Unleashed (Enterprise Mode)
-- **Engine**: `docker-compose.yml` orchestrates the full squad.
-- **Messaging**: Apache Kafka for distributed event streaming.
-- **Usage**: Run `mission-control.sh` to spin up the local cluster.
-
-### ☁️ Cloud Managed (Render & Vercel)
-- **Backend (Mind)**: Deployed on **Render** via the unified `Dockerfile`.
-  - *Dynamic Port Binding*: Automatically respects Render's `$PORT`.
-  - *Lean Squad*: Adjusts to 512MB RAM by switching to Managed Redis.
-- **Frontend (Eye)**: Deployed on **Vercel** for global low-latency metric visualization.
-
----
-
-## 🛠️ Tech Stack & Links
-- **[LangGraph](https://langchain-ai.github.io/langgraph/)**: Stateful Multi-Agent Workflows.
-- **[OpenAI GPT-4o](https://openai.com/)**: High-reasoning node logic.
-- **[Apache Kafka](https://kafka.apache.org/)**: High-throughput event processing.
-- **[ChromaDB](https://www.trychroma.com/)**: Semantic vector store.
-- **[Jaeger](https://www.jaegertracing.io/)**: Distributed tracing.
-
----
-**🌌 SRE-Space: Transforming Anomalies into Veracity and Veracity into Uptime.** 🚀
+**🌌 Aegis SRE-Space: Engineering Autonomy. Delivering Veracity.** 🚀
