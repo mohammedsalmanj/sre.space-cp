@@ -1,21 +1,19 @@
 {
     "version": 2,
-    "name": "sre-space-dashboard",
-    "builds": [
-        {
-            "src": "apps/dashboard/**",
-            "use": "@vercel/static"
-        }
-    ],
+    "public": true,
+    "cleanUrls": true,
     "rewrites": [
         {
             "source": "/",
             "destination": "/apps/dashboard/index.html"
         },
         {
+            "source": "/(style\\.css|main\\.js)",
+            "destination": "/apps/dashboard/$1"
+        },
+        {
             "source": "/(.*)",
             "destination": "/apps/dashboard/$1"
         }
-    ],
-    "cleanUrls": true
+    ]
 }
