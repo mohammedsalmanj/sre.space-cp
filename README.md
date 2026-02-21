@@ -25,62 +25,123 @@
 
 <br/>
 
-**SRE-Space** is an autonomous, agentic reliability platform designed to transform "Alert-and-Wait" operations into "Detect-and-Heal" automation. It uses a stateful multi-agent system (LangGraph) to observe, diagnose, and remediate production incidents in real-time.
+**SRE-Space** is a state-of-the-art, autonomous reliability platform. It moves beyond traditional monitoring by implementing a **Cognitive Control Plane** that don't just alert humans—it reasons, plans, and executes remediations independently. Built on a monorepo architecture, it synchronizes high-fidelity local orchestration with a global observability window.
 
 ---
 
-## 💡 The Problem We Solve
-Traditional SRE operations are slowed down by:
-1.  **Observability Fatigue**: Thousands of logs/traces that require human hours to correlate.
-2.  **Repetitive Remediation**: Solving the same configuration or resource issues over and over.
-3.  **High MTTR**: Response times depend on human availability and context-switching.
+## 🏛️ System Architecture
 
-**SRE-Space solves this by providing a Cognitive Control Plane**:
--   **Autonomous Correlation**: Agents connect [OpenTelemetry](https://opentelemetry.io/) traces to root causes in seconds using [Jaeger](https://www.jaegertracing.io/).
--   **Institutional Memory**: Uses RAG (Retrieval-Augmented Generation) powered by [ChromaDB](https://www.trychroma.com/) to recall past fixes.
--   **Self-Healing GitOps**: Automatically opens PRs on [GitHub](https://github.com/) and triggers redeployments via [Render](https://render.com/) or Local [Docker](https://www.docker.com/).
+SRE-Space operates on a **Split-Brain Design**, separating the "Eye" (Observability) from the "Mind" (Execution).
+
+```mermaid
+graph TD
+    subgraph Vercel_Eye [Vercel: The Eye]
+        Dashboard[Liquid Glass Dashboard]
+        SSE_Listener[SSE Telemetry Listener]
+        Git_Veracity[GitHub Veracity Sync]
+    end
+
+    subgraph Mind_Execution [Render/Local: The Mind]
+        API[FastAPI Control Plane]
+        Agent_Sub[LangGraph Agent Orchestrator]
+        Monitor[Memory Guard Middleware]
+        
+        subgraph Agent_Squad [The Agent Squad]
+            Scout[Scout: Detector]
+            Brain[Brain: Analyst]
+            Fixer[Fixer: Engineer]
+            Guardrail[Guardrail: Policy]
+        end
+    end
+
+    subgraph Infra_Layer [The Foundation]
+        Bus[Event Bus: Kafka/Redis]
+        Memory[Vector Store: ChromaDB]
+        Trace[Distributed Tracing: Jaeger]
+    end
+
+    Dashboard -- SSE --> API
+    API -- Triggers --> Agent_Sub
+    Agent_Sub -- Orchestrates --> Agent_Squad
+    Agent_Squad -- RAG Query --> Memory
+    Agent_Squad -- Trace Analysis --> Trace
+    Agent_Squad -- Events --> Bus
+    Agent_Squad -- GitOps --> GitHub[(GitHub)]
+    GitHub -- Polling --> Git_Veracity
+```
 
 ---
 
-## 🚀 Dual-Deployment Framework
-Optimized for the modern cloud/local hybrid development lifecycle.
+## 💡 The Problem & The Cognitive Solution
 
--   **Eye (Monitoring - [Vercel](https://vercel.com/))**: The **Liquid Glass Dashboard** provides a high-fidelity window into the agent's OODA loop through real-time telemetry streaming.
--   **Mind (Execution - [Render](https://render.com/))**: The **Control Plane** hosted on [FastAPI](https://fastapi.tiangolo.com/) orchestrates the Agent Squad using [LangGraph](https://langchain-ai.github.io/langgraph/).
+### The Core Problem
+Modern distributed systems generate overwhelming noise. When an incident occurs, a human SRE spends **70% of MTTR (Mean Time To Recovery)** just on "Orientation"—finding the right trace, checking recent PRs, and identifying the service owner.
 
----
+### The Cognitive Solution: Autonomous OODA Loop
+SRE-Space automates the **OODA Loop** (Observe, Orient, Decide, Act) using specialized AI agents:
 
-## 🛠️ Tech Stack & Links
--   **Orchestration**: [LangGraph](https://langchain-ai.github.io/langgraph/) - Stateful Multi-Agent Workflows.
--   **Intelligence Backend**: [OpenAI GPT-4o](https://openai.com/) - High-reasoning agentic decision making.
--   **Observability**: [OpenTelemetry](https://opentelemetry.io/) & [Jaeger](https://www.jaegertracing.io/) - Distributed tracing backbone.
--   **Storage**: [ChromaDB](https://www.trychroma.com/) - Vector persistence for incident memory.
--   **Messaging**: [Apache Kafka](https://kafka.apache.org/) (Local) / [Redis](https://redis.io/) (Cloud).
--   **Runtime**: [Docker Compose](https://www.docker.com/) for unified local orchestration.
+1.  **Observe**: **Scout** identifies anomalies in [OpenTelemetry](https://opentelemetry.io/) spans or [Kafka](https://kafka.apache.org/) throughput lags.
+2.  **Orient**: **Brain** correlates these spans with current system state, performs Root Cause Analysis (RCA), and queries **ChromaDB** for historical precedents.
+3.  **Decide**: **Guardrail** validates the plan against security policies. **Human** intervention is requested only for high-risk path escalations.
+4.  **Act**: **Fixer** executes the fix via GitOps (automated PRs) or direct Docker orchestration.
 
 ---
 
-## 🏁 Quick Start: Local Mode
+## 🚀 Key Features
+
+- **Liquid Glass Observability**: A premium, real-time dashboard with grainy glassmorphism, delivering telemetric insights via Server-Sent Events (SSE).
+- **Institutional Memory**: Every recovery cycle is indexed in a vector store. The system literally *learns* from its own failures.
+- **Environment Awareness**: Seamlessly toggles between **Local-Power** (Full 8-agent squad, Kafka) and **Cloud-Optimized** (Core 5-agent squad, Redis, Memory Guard).
+- **Veracity Verification**: Real-time cross-referencing between agent logs and GitHub PR statuses ensures the dashboard reflects reality, not just intent.
+
+---
+
+## 🛠️ Technical deep-dive
+
+### Agent Squad Configuration
+| Agent | Role | Capability |
+| :--- | :--- | :--- |
+| **🕵️ Scout** | Detector | Monitors OTel thresholds & Kafka lag. Signals the loop start. |
+| **🧠 Brain** | Analyst | Performs deep trace diagnosis and RAG-based RCA generation. |
+| **🛠️ Fixer** | Engineer | Writes code patches, manages branches, and handles PR lifecycle. |
+| **🛡️ Guardrail**| Policy | Ensures remediations stay within defined safe boundaries. |
+| **🤖 Jules** | Architect | Handles deep structural refactoring for Tier-3 escalations. |
+
+### Data Flow & Persistence
+- **Traces**: Captured via OTLP and visualized in [Jaeger](https://www.jaegertracing.io/).
+- **Memory**: [ChromaDB](https://www.trychroma.com/) stores Post-Mortems as dense vectors, enabling sub-second similarity searches for new incidents.
+- **Communication**: [FastAPI](https://fastapi.tiangolo.com/) serves as the bridge, with persistent SSE connections for real-time frontend updates.
+
+---
+
+## 🏁 Setup & Deployment
+
+### Local "Unleashed" Mode (Recommended for Demo)
+Requires Docker Desktop. This mode enables the full architectural suite.
 ```bash
-# 1. Start the infrastructure (Kafka, ChromaDB, Jaeger)
+# 1. Spin up the infrastructure
 docker-compose up -d
 
-# 2. Configure Environment
-# Ensure GITHUB_PERSONAL_ACCESS_TOKEN and OPENAI_API_KEY are set
+# 2. Add Keys to .env
+# GITHUB_PERSONAL_ACCESS_TOKEN and OPENAI_API_KEY are required
 cp .env.example .env
 
-# 3. Launch the Control Plane Engine
+# 3. Launch the Mind
 pip install -r requirements.txt
 python apps/control_plane/main.py
 ```
 
-## 📊 Deployment Tiers
-| Feature | Local (Unleashed) | Cloud (Optimized) |
-| :--- | :--- | :--- |
-| **Agent Count** | 8 Agents (Squad) | 5 Agents (Core) |
-| **Memory** | 2048MB (Uncapped) | 450MB Guardrail |
-| **Event Bus** | Apache Kafka | Managed Redis |
-| **Remediation** | Local Docker / Git | Github PR + Deploy Hooks |
+### Cloud "Optimized" Mode
+Designed for 512MB RAM constraints (Render/Vercel).
+- Uses **Redis** for lightweight messaging.
+- Activates **Memory Guard** middleware to prevent OOM kills.
+- Scaling: Limits to 2 parallel LLM reasoning threads.
 
 ---
+
+## 📅 Future Roadmap
+- [ ] **Multi-Repo Sensory Intake**: Expanding visibility across multiple monorepo neighbors.
+- [ ] **Grafana Integration**: Exporting agent-reasoning-metrics to standard Grafana dashboards.
+- [ ] **Self-Benchmark**: Automatic generation of "Resilience Score" based on successful autonomous recoveries.
+
 **Build for 100% Uptime. Operated by Intelligence.** 🚀
