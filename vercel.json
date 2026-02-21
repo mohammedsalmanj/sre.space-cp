@@ -4,16 +4,27 @@
     "cleanUrls": true,
     "rewrites": [
         {
+            "source": "/api/:path*",
+            "destination": "https://sre-space-cp.onrender.com/api/:path*"
+        },
+        {
             "source": "/",
             "destination": "/apps/dashboard/index.html"
         },
         {
-            "source": "/(style\\.css|main\\.js)",
-            "destination": "/apps/dashboard/$1"
-        },
-        {
             "source": "/(.*)",
             "destination": "/apps/dashboard/$1"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "Access-Control-Allow-Origin",
+                    "value": "*"
+                }
+            ]
         }
     ]
 }
