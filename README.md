@@ -42,7 +42,7 @@ graph TD
         Graph[LangGraph: Multi-Agent State Machine]
         
         subgraph Agents [The Agent Squad]
-            Direction TB
+            direction TB
             Scout[🕵️ Scout: Detection & Observation]
             Brain[🧠 Brain: Root Cause Analysis]
             Guardrail[🛡️ Guardrail: Policy & Safety]
@@ -115,6 +115,22 @@ The **Autonomous** stage is the pinnacle of the SRE-Space journey. The **Fixer A
 | **Memory** | [ChromaDB](https://www.trychroma.com/) | Semantic vector store for long-term operational memory. |
 | **Tracing** | [Jaeger](https://www.jaegertracing.io/) | Distributed span storage and visualization. |
 | **UI** | [Vanilla CSS/JS](https://developer.mozilla.org/en-US/) | Real-time "Liquid Glass" and "Cyber-HUD" dashboards. |
+
+---
+
+## 🪜 Advanced Escalation Ladder
+
+SRE-Space follows a strict tier-based escalation model to ensure that human intervention is only requested for high-value strategic decisions:
+
+-   **Tier 1 (Automatic)**: **Scout** detect, **Brain** diagnose, **Fixer** patch. (MTTR < 2m)
+-   **Tier 2 (Architectural)**: **Jules** refactor for structural regressions.
+-   **Tier 3 (Critical)**: **Human** sign-off via the Veracity dashboard for high-risk path remediation.
+
+## 🧠 AI Reasoning Engine
+Our agents do not just generate text; they perform **Stateful Chain-of-Thought** reasoning:
+-   **Multi-Step OODA**: Every agent follows the Observe-Orient-Decide-Act cycle within their specific node.
+-   **RAG Context Injection**: Brain agents automatically pull "Post-Mortem Fragments" from **ChromaDB** to ensure new fixes are consistent with previous organizational knowledge.
+-   **Verification Loops**: No code is proposed without passing a local **Syntactic & Security Guardrail** check.
 
 ---
 
