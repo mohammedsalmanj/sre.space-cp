@@ -1,50 +1,107 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 import json
 import uvicorn
-from dotenv import load_dotenv
+import requests
+import psutil
+import logging
 import os
+import sys
+from dotenv import load_dotenv
 
 load_dotenv()
 
-import sys
-import os
 # Add project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 from apps.control_plane.langgraph_logic import run_sre_loop
+from apps.control_plane.config import ENV, MEMORY_LIMIT_MB
 
-from fastapi.middleware.cors import CORSMiddleware
+# Configure Logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
+logger = logging.getLogger("sre.control_plane")
 
-app = FastAPI(title="SRE.Space | Local-Power Orchestration Engine v4.0")
+app = FastAPI(title=f"SRE.Space | {ENV.upper()} Control Plane v4.5")
 
-# Block 2: CORS Bridge for Vercel Observability
+# Block 1: Multi-Cloud CORS Logic
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Allow all origins for the bridge
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Update templates path to be relative to the file location
+# Block 4: Operational Hardening (Memory Guard)
+@app.middleware("http")
+async def memory_guard_middleware(request: Request, call_next):
+    process = psutil.Process()
+    mem_info = process.memory_info().rss / (1024 * 1024) # MB
+    if mem_info > MEMORY_LIMIT_MB:
+        logger.warning(f"🔴 [MEMORY GUARD] Critical RAM Usage: {mem_info:.2f}MB. Limit: {MEMORY_LIMIT_MB}MB.")
+    return await call_next(request)
+
 templates = Jinja2Templates(directory=os.path.dirname(__file__))
+
+# Global System State for Demo
+SYSTEM_STATE = {
+    "is_anomaly": False,
+    "failure_type": None
+}
 
 @app.get("/", response_class=HTMLResponse)
 async def get_dashboard(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+@app.get("/system/health")
+async def system_health():
+    """Endpoint for Vercel Dashboard to read environment and status."""
+    process = psutil.Process()
+    return {
+        "status": "healthy",
+        "env": ENV,
+        "memory_usage_mb": round(process.memory_info().rss / (1024 * 1024), 2),
+        "memory_limit_mb": MEMORY_LIMIT_MB,
+        "version": "4.5.0"
+    }
+
+@app.post("/demo/inject-failure")
+async def inject_failure():
+    """Trigger a synthetic failure for the SRE demo loop."""
+    logger.info("🔥 [CHAOS] Injecting synthetic failure into policy-service...")
+    SYSTEM_STATE["is_anomaly"] = True
+    SYSTEM_STATE["failure_type"] = "db_pool_exhaustion"
+    
+    # Block 2: Detect failure -> Trigger chain
+    asyncio.create_task(run_sre_loop(is_anomaly=True))
+    
+    return {"message": "Failure injected. SRE loop triggered.", "type": "db_pool_exhaustion"}
+
 @app.get("/quote")
 async def get_quote(user_id: str = "unknown"):
     """Mock Quote Service endpoint for chaos testing."""
     import random
-    # Simulate random failure
-    if random.random() < 0.2 or user_id == "attacker":
-        from fastapi import HTTPException
+    from fastapi import HTTPException
+    if SYSTEM_STATE["is_anomaly"] and SYSTEM_STATE["failure_type"] == "db_pool_exhaustion":
+        raise HTTPException(status_code=500, detail="Database connection pool exhausted")
+    elif random.random() < 0.2 or user_id == "attacker":
         raise HTTPException(status_code=500, detail="Database connection pool exhausted")
     return {"quote_id": f"Q-{random.randint(1000, 9999)}", "price": random.randint(100, 500), "status": "success"}
+
+@app.get("/api/git-activity")
+async def get_git_activity():
+    """Fetches real PR activity for the dashboard."""
+    from packages.shared.github_service import GitHubService
+    gh = GitHubService()
+    try:
+        url = f"{gh.base_url}/repos/{gh.owner}/{gh.repo}/pulls?state=all&per_page=5"
+        res = requests.get(url, headers=gh.headers, timeout=10)
+        return res.json()
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/api/sre-loop")
 async def sre_loop_stream(anomaly: bool = False):
@@ -55,19 +112,6 @@ async def sre_loop_stream(anomaly: bool = False):
             await asyncio.sleep(0.4)
         yield f"data: {json.dumps({'message': '--- END OF LOOP ---', 'final_state': result['status']})}\n\n"
     return StreamingResponse(event_generator(), media_type="text/event-stream")
-
-# --- Daily Architectural Review Task (Simulated) ---
-async def schedule_jules_daily_scan():
-    """Simulates Jules running at 09:30 AM GMT+5:30"""
-    while True:
-        # In a real app, use a proper scheduler like APScheduler
-        # Here we just log the presence of the Tier-3 Authority
-        print(f"[SYSTEM] Jules Tier-3 Review Service: Waiting for 09:30 AM GMT+5:30 window...")
-        await asyncio.sleep(3600) # Check every hour
-
-@app.on_event("startup")
-async def startup_event():
-    asyncio.create_task(schedule_jules_daily_scan())
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8001))

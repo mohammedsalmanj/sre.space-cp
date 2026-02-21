@@ -8,21 +8,19 @@ def get_event_bus() -> EventBusInterface:
     if _instance is not None:
         return _instance
 
-    from apps.control_plane.runtime_config import EVENT_BUS as BUS_TYPE
+    from apps.control_plane.config import EVENT_BUS as BUS_TYPE, KAFKA_BOOTSTRAP_SERVERS, REDIS_URL
     
     if BUS_TYPE == "kafka":
         try:
             from .kafka_bus import KafkaEventBus
-            bootstrap = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
-            _instance = KafkaEventBus(bootstrap)
+            _instance = KafkaEventBus(KAFKA_BOOTSTRAP_SERVERS)
         except:
             from .local_bus import LocalEventBus
             _instance = LocalEventBus()
     elif BUS_TYPE == "redis":
         try:
             from .redis_bus import RedisEventBus
-            url = os.getenv("REDIS_URL", "redis://localhost:6379")
-            _instance = RedisEventBus(url)
+            _instance = RedisEventBus(REDIS_URL)
         except:
             from .local_bus import LocalEventBus
             _instance = LocalEventBus()

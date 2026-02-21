@@ -12,11 +12,11 @@
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <script>
-        // Block 2: Bridge to Local Control Plane
-        // REPLACE with your Ngrok/LocalTunnel URL for production observability
-        window.NEXT_PUBLIC_API_URL = window.location.origin === "http://localhost:8001"
+        // Block 1: Vercel Dashboard Bridge
+        // Defaults to Render for Cloud deployment, local for development
+        window.NEXT_PUBLIC_API_URL = window.location.origin.includes("localhost")
             ? "http://localhost:8001"
-            : "https://your-sre-tunnel.ngrok.io";
+            : "https://sre-space-cp.onrender.com";
     </script>
 </head>
 
@@ -65,7 +65,11 @@
             <header class="main-header">
                 <div class="header-left">
                     <h1>Mission Control</h1>
-                    <p class="subtitle">Autonomous Reliability Management Platform</p>
+                    <div class="flex items-center gap-3">
+                        <p class="subtitle">Autonomous Reliability Management Platform</p>
+                        <span id="env-badge"
+                            class="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-white/5">Syncing...</span>
+                    </div>
                 </div>
                 <div class="header-right">
                     <div class="status-badge live">LIVE FEED</div>
