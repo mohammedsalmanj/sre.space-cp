@@ -430,4 +430,4 @@ We welcome contributions to the SRE-Space ecosystem.
 
 *Document Version: 5.1.0 | Last Updated: 2026-02-21*
 *Stability: PRODUCTION-READY*
-*Ownership: Salman | Open to community contributions to solve OPS problems with AI*
+*Ownership: Salman | Open to community contributions to solve OPS problems using AIOps in the Control Loop. Built with a vision for open source.*
