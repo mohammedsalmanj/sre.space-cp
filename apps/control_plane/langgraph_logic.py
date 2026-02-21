@@ -1,13 +1,13 @@
 from typing import TypedDict, List, Dict, Any, Literal
 from langgraph.graph import StateGraph, END
 import os
-
 import sys
-import os
-# Add project root to sys.path
+
+# Ensure shared packages are discoverable
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-# Import Agents from the packages/agents
+# --- Agent Imports ---
+# Every node in the graph is a specialized SRE agent
 from packages.agents.scout import scout_agent
 from packages.agents.cag import cag_agent
 from packages.agents.brain import brain_agent
@@ -17,32 +17,29 @@ from packages.agents.jules import jules_agent
 from packages.agents.curator import curator_agent
 from packages.agents.human import human_agent
 
-# --- State Definition ---
+# --- Pipeline State ---
+# This dictionary is passed between agents, representing the memory of the current recovery cycle.
 class SREState(TypedDict):
-    """The state of our autonomous SRE engine."""
-    error_spans: List[Dict[str, Any]]
-    root_cause: str
-    remediation: str
-    circuit_breaker_active: bool
-    status: str
-    logs: List[str]
-    is_anomaly: bool
-    historical_context: str
-    cache_hit: bool
-    confidence_score: float
-    decision: str
-    guardrail_reason: str
-    service: str
-    namespace: str
-    env: str
-    anomaly_frequency: int
+    error_spans: List[Dict[str, Any]]    # OpenTelemetry trace data
+    root_cause: str                     # Found by Brain agent
+    remediation: str                   # Proposed fix
+    status: str                        # Current state (Stable/Fixing)
+    logs: List[str]                    # OODA loop logs for UI streaming
+    is_anomaly: bool                   # Trigger flag
+    anomaly_frequency: int             # Escalation counter
+    decision: str                      # Guardrail 'ALLOW' or 'DENY'
+    service: str                       # Targeting which service?
+    namespace: str                     # K8s/Docker namespace
+    env: str                           # Production/Staging
 
-# --- Graph Logic ---
+# --- The Agentic Graph (LangGraph) ---
 def create_sre_graph():
+    """Builds the state machine that governs autonomous SRE reasoning."""
     from apps.control_plane.config import ACTIVE_AGENTS
+    
     workflow = StateGraph(SREState)
     
-    # Add Nodes
+    # 1. Register Agents as Nodes
     workflow.add_node("scout", scout_agent)
     workflow.add_node("cag", cag_agent)
     workflow.add_node("brain", brain_agent)
@@ -52,30 +49,39 @@ def create_sre_graph():
     workflow.add_node("curator", curator_agent)
     workflow.add_node("human", human_agent)
     
-    # Define Transitions
+    # 2. Define the Transitions (OODA Flow)
     workflow.set_entry_point("scout")
     
+    # --- Dynamic Flow Logic ---
+    # These functions decide which agent to invoke next based on the system state
+    # and whether the agent is 'Active' in the current environment (Cloud vs Local).
+
     def scout_next(s):
+        # High-frequency anomalies require human intervention
         if s["anomaly_frequency"] >= 3: return "human"
         if not s["is_anomaly"]: return END
+        # Skip CAG (Cognitive Agent Guide) in Cloud mode to save token budget
         return "cag" if "cag" in ACTIVE_AGENTS else "brain"
 
     def cag_next(s):
-        if s["cache_hit"]:
-            return "guardrail" if "guardrail" in ACTIVE_AGENTS else "fixer"
+        # Brain handles logic, CAG provides architectural standards
         return "brain"
 
     def brain_next(s):
+        # Guardrail must validate every proposed fix for safety
         return "guardrail" if "guardrail" in ACTIVE_AGENTS else "fixer"
 
     def guardrail_next(s):
+        # Fixer only runs if Guardrail grants 'ALLOW'
         if s["decision"] == "ALLOW":
             return "fixer"
         return "jules" if "jules" in ACTIVE_AGENTS else "curator"
 
     def fixer_next(s):
+        # Jules performs architectural deep clean after a hotfix
         return "jules" if "jules" in ACTIVE_AGENTS else "curator"
 
+    # 3. Connect the Nodes
     workflow.add_conditional_edges("scout", scout_next)
     workflow.add_conditional_edges("cag", cag_next)
     workflow.add_conditional_edges("brain", brain_next)
@@ -89,16 +95,16 @@ def create_sre_graph():
     return workflow.compile()
 
 async def run_sre_loop(is_anomaly: bool = False):
+    """Entry point to trigger the autonomous control plane."""
     graph = create_sre_graph()
     initial_state = {
-        "error_spans": [], "root_cause": "", "remediation": "", "circuit_breaker_active": False,
-        "status": "Starting", "logs": [], "is_anomaly": is_anomaly, "historical_context": "",
-        "cache_hit": False, "confidence_score": 0.0, "decision": "", "guardrail_reason": "",
-        "service": "", "namespace": "", "env": "", "anomaly_frequency": 0
+        "error_spans": [], "root_cause": "", "remediation": "", 
+        "status": "Starting", "logs": [], "is_anomaly": is_anomaly,
+        "anomaly_frequency": 0, "decision": "", "service": "policy-service", 
+        "namespace": "default", "env": "prod"
     }
     
-    # Simulate a frequency surge for testing if anomaly is true
     if is_anomaly:
-        initial_state["anomaly_frequency"] = 1 # Lowered for full loop testing
+        initial_state["anomaly_frequency"] = 1
 
     return await graph.ainvoke(initial_state)

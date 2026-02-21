@@ -1,51 +1,59 @@
-# 🌌 SRE-Space: Orbital Demo Guide
+# � SRE-Space: Orbital Demonstration Guide
 
-Follow these steps to demonstrate the **Autonomous Reliability Engine v4.7** in action.
-
-## 🏁 Phase 1: Environment Setup
-Ensure your local or cloud infrastructure is active.
-
-1. **Launch Stack (Local)**:
-   ```bash
-   docker-compose up -d
-   python apps/control_plane/main.py
-   ```
-2. **Access Dashboard**:
-   - Open your Vercel URL or `apps/dashboard/index.html`.
-   - Verify the **Deployment Mode** badge (LOCAL or CLOUD).
+This guide outlines five high-impact scenarios to demonstrate the **Autonomous Reliability Engine v4.8**.
 
 ---
 
-## 🎭 Phase 2: The "Chaos Incident" Simulation
+## 🏗️ Demo Scenarios
 
-### Step 1: Inject Failure
-You can trigger a failure via the API or the Render/Local UI.
-```bash
-# Using curl (Replace with local/render URL)
-curl -X POST http://localhost:8001/demo/inject-failure
-```
+### 1. The "DB Pool Exhaustion" Remediation
+*   **The Problem**: The insurance app starts spiking with HTTP 500s due to database connection leaks.
+*   **Agent Logic**: 
+    - **Scout** detects the sudden drop in success metrics.
+    - **Brain** identifies the specific "Pool Exceeded" trace in Jaeger.
+    - **Fixer** creates a PR increasing the `DB_POOL_SIZE` and adds a connection-timeout guard.
+*   **Verification**: The Dashboard badge turns Green, and the PR appears in the Veracity feed.
 
-### Step 2: Watch the OODA Loop Live
-Switch to the **Mission Control Dashboard**:
-- **[OBSERVE]**: The Scout agent detects the DB Pool Exhaustion trace.
-- **[ORIENT]**: The Brain agent analyzes the impact and consultations ChromaDB memory.
-- **[DECIDE]**: Guardrail validates the remediation policy.
-- **[ACT]**: Fixer agent creates a timestamped GitHub PR.
+### 2. Semantic Memory Retrieval (Avoid Duplicated Work)
+*   **The Problem**: A known "Redis Timeout" issue occurs for the second time.
+*   **Agent Logic**: 
+    - **Brain** queries **ChromaDB** with the current trace fingerprint.
+    - It finds a previous Post-Mortem and realizes the fix is already known.
+    - Instead of re-analyzing, it immediately executes the proven fix.
+*   **Verification**: Show the "Memory Hit" log in the OODA Loop stream.
 
-### Step 3: Verify on GitHub
-- Go to the repository PRs tab.
-- Show the automatically opened PR with the **SRE Post-Mortem**.
-- *Note*: In Cloud Mode, the Fixer will also trigger the **Render Deploy Hook** to restart the service with the new configuration.
+### 3. Resource-Aware Guardrail (Memory Safety)
+*   **The Problem**: The agents are performing heavy reasoning, and the system nears the 512MB RAM limit on Render.
+*   **Agent Logic**: 
+    - **Memory Guard Middleware** triggers a log warning.
+    - The **Guardrail Agent** detects the resource pressure.
+    - It pauses non-essential background tasks (like Jules' deep clean) to prioritize the active hotfix.
+*   **Verification**: Show the "Critical RAM" warning in the real-time logs.
+
+### 4. GitOps Approval Flow (Human-in-the-Loop)
+*   **The Problem**: A high-risk architectural change is proposed by Jules.
+*   **Agent Logic**: 
+    - The **Decision Node** classifies the fix as "HIGH_RISK".
+    - It transitions the state to the **Human Agent** node.
+    - The loop waits for a manual label on the GitHub Issue before proceeding.
+*   **Verification**: The Dashboard shows "Awaiting Human Consent" and transitions only after approval.
+
+### 5. Multi-Cloud Failover Demo
+*   **The Problem**: Deployment happens in "Local Mode" but needs to simulate "Cloud" constraints.
+*   **Agent Logic**: 
+    - Toggle the `ENV` variable in `.env`.
+    - Watch as the **Scout Agent** automatically switches from polling Kafka to polling the Health API.
+    - Observe the fleet scaling down from 8 to 5 agents dynamically.
+*   **Verification**: The "Deployment Badge" on the dashboard changes from Amber (LOCAL) to Blue (CLOUD).
 
 ---
 
-## 🏛️ Technical Transparency
-| Component | Cloud Mode (Optimized) | Local Mode (Unleashed) |
-| :--- | :--- | :--- |
-| **Event Bus** | Redis | Apache Kafka |
-| **Logic** | 5 Core Agents | 8-Agent High-Availability Squad |
-| **Memory** | 450MB Guardrail | Uncapped (up to 2GB) |
-| **Concurrency**| 2 LLM Threads | 5 LLM Threads |
+## 🏁 Execution Steps
+
+1. **Reset State**: Ensure all active PRs are merged or closed.
+2. **Inject Chaos**: Use the **Insurance Playground** (Cyber-HUD) and click **🔥 INJECT CHAOS**.
+3. **Monitor**: Open the **Mission Control Dashboard** (Liquid Glass) to watch the OODA stream live.
+4. **Verify Veracity**: Click the PR card in the dashboard to view the generated SRE Post-Mortem on GitHub.
 
 ---
-**🌌 Built for the Future of Autonomous Operations.**
+**Build for Resilience. Verified by Veracity.** 🚀

@@ -12,21 +12,26 @@ import os
 import sys
 from dotenv import load_dotenv
 
+# Initialize Environment Variables
 load_dotenv()
 
-# Add project root to sys.path
+# Add project root to sys.path to allow absolute imports from any directory
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 from apps.control_plane.langgraph_logic import run_sre_loop
 from apps.control_plane.config import ENV, MEMORY_LIMIT_MB
 
-# Configure Logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
+# --- Observability & Logging Setup ---
+# Standardizing logs for the OODA loop (Observe-Orient-Decide-Act)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] [SRE-SPACE] %(message)s')
 logger = logging.getLogger("sre.control_plane")
 
+# App Initialization with dynamic title based on the deployment mode
 app = FastAPI(title=f"SRE.Space | {ENV.upper()} Control Plane v4.5")
 
-# Block 1: Multi-Cloud CORS Logic
+# --- Security & Connectivity (CORS) ---
+# Enable Cross-Origin Resource Sharing to allow the Vercel-hosted dashboard 
+# to communicate with the Render-hosted backend smoothly.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -35,18 +40,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Block 4: Operational Hardening (Memory Guard)
+# --- Operational Hardening: Memory Guard ---
+# Render's free tier has a 512MB limit. This middleware monitors the process RSS memory
+# and warns the system if it nears the limit, allowing for proactive sensory failover.
 @app.middleware("http")
 async def memory_guard_middleware(request: Request, call_next):
     process = psutil.Process()
     mem_info = process.memory_info().rss / (1024 * 1024) # MB
     if mem_info > MEMORY_LIMIT_MB:
-        logger.warning(f"🔴 [MEMORY GUARD] Critical RAM Usage: {mem_info:.2f}MB. Limit: {MEMORY_LIMIT_MB}MB.")
+        logger.warning(f"🔴 [MEMORY GUARD] Critical RAM Usage: {mem_info:.2f}MB. Threshold: {MEMORY_LIMIT_MB}MB.")
     return await call_next(request)
 
+# Template configuration for serving the Insurance Playground UI
 templates = Jinja2Templates(directory=os.path.dirname(__file__))
 
-# Global System State for Demo
+# --- Global Orchestration State ---
+# Represents the simulated state of the external "Policy Service"
 SYSTEM_STATE = {
     "is_anomaly": False,
     "failure_type": None
@@ -54,46 +63,55 @@ SYSTEM_STATE = {
 
 @app.get("/", response_class=HTMLResponse)
 async def get_dashboard(request: Request):
+    """Serve the cyber-insurance playground UI."""
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/system/health")
 async def system_health():
-    """Endpoint for Vercel Dashboard to read environment and status."""
+    """Health check for the Vercel Monitor to visualize environment settings."""
     process = psutil.Process()
     return {
         "status": "healthy",
         "env": ENV,
-        "memory_usage_mb": round(process.memory_info().rss / (1024 * 1024), 2),
+        "memory_usage_mb": round(psutil.Process().memory_info().rss / (1024 * 1024), 2),
         "memory_limit_mb": MEMORY_LIMIT_MB,
-        "version": "4.5.0"
+        "version": "4.5.1"
     }
 
 @app.post("/demo/inject-failure")
 async def inject_failure():
-    """Trigger a synthetic failure for the SRE demo loop."""
-    logger.info("🔥 [CHAOS] Injecting synthetic failure into policy-service...")
+    """
+    Simulate a production incident. 
+    Triggers: 1. Global state change 2. Background SRE agent loop via LangGraph.
+    """
+    logger.info("🔥 [CHAOS] Synthetic DB pool exhaustion injected into policy-service.")
     SYSTEM_STATE["is_anomaly"] = True
     SYSTEM_STATE["failure_type"] = "db_pool_exhaustion"
     
-    # Block 2: Detect failure -> Trigger chain
+    # Fire and forget: SRE loop starts detecting the trace immediately
     asyncio.create_task(run_sre_loop(is_anomaly=True))
     
-    return {"message": "Failure injected. SRE loop triggered.", "type": "db_pool_exhaustion"}
+    return {"message": "Failure injected. SRE Loop triggered.", "type": "db_pool_exhaustion"}
 
 @app.get("/quote")
 async def get_quote(user_id: str = "unknown"):
-    """Mock Quote Service endpoint for chaos testing."""
+    """Mock Quote Endpoint that reacts to chaos injections."""
     import random
     from fastapi import HTTPException
+    
+    # Check if the system is currently under simulated failure
     if SYSTEM_STATE["is_anomaly"] and SYSTEM_STATE["failure_type"] == "db_pool_exhaustion":
         raise HTTPException(status_code=500, detail="Database connection pool exhausted")
-    elif random.random() < 0.2 or user_id == "attacker":
-        raise HTTPException(status_code=500, detail="Database connection pool exhausted")
+    
+    # Simulated 20% random noise failure for higher baseline observability
+    if random.random() < 0.2:
+        raise HTTPException(status_code=500, detail="Sensory noise timeout")
+        
     return {"quote_id": f"Q-{random.randint(1000, 9999)}", "price": random.randint(100, 500), "status": "success"}
 
 @app.get("/api/git-activity")
 async def get_git_activity():
-    """Fetches real PR activity for the dashboard."""
+    """Interface for the dashboard to show real GitHub PR veracity data."""
     from packages.shared.github_service import GitHubService
     gh = GitHubService()
     try:
@@ -105,14 +123,16 @@ async def get_git_activity():
 
 @app.get("/api/sre-loop")
 async def sre_loop_stream(anomaly: bool = False):
+    """Streaming endpoint (SSE) to visualize agent OODA reasoning in the UI."""
     async def event_generator():
         result = await run_sre_loop(is_anomaly=anomaly)
         for log in result["logs"]:
             yield f"data: {json.dumps({'message': log})}\n\n"
-            await asyncio.sleep(0.4)
+            await asyncio.sleep(0.4) # Control flow for readable demo visualization
         yield f"data: {json.dumps({'message': '--- END OF LOOP ---', 'final_state': result['status']})}\n\n"
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 if __name__ == "__main__":
+    # Standard Uvicorn entry point
     port = int(os.getenv("PORT", 8001))
     uvicorn.run(app, host="0.0.0.0", port=port)
