@@ -18,13 +18,21 @@ def scout_agent(state):
     # Simulation Logic: If an anomaly is injected, Scout translates the raw 
     # signal into a structured state for the Brain agent to analyze.
     if state.get("is_anomaly"):
-        # In a real system, this would be a query to Jaeger/Prometheus
+        # Simulated high-fidelity error message matching user's 'real' experience
+        error_msg = ("policy-service: DOWN (HTTPConnectionPool(host='policy-service', port=8002): "
+                     "Max retries exceeded with url: /health "
+                     "(Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc73dbd4a60>: "
+                     "Failed to establish a new connection: [Errno 111] Connection refused')))")
+        
         state["error_spans"] = [
-            {"exception.message": "HTTP 500: Database connection pool exhausted", "severity": "CRITICAL"}
+            {"exception.message": error_msg, "severity": "CRITICAL", "category": "Latency/Saturation"}
         ]
-        # Frequency tracking for escalation logic (Human-in-the-loop)
-        state["anomaly_frequency"] = 1 
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] Alert: Critical threshold breach detected in policy-service.")
+        state["anomaly_frequency"] = state.get("anomaly_frequency", 0) + 1
+        
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] [ALERT] SRE Scout Alert: Infrastructure Signal Triggered.")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] Error: {error_msg}")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] Category: Latency/Saturation | Conversion: 0.0%")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] Decision: Brain Analysis Required.")
     else:
         # State remains clean if no anomaly is active
         state["error_spans"] = []

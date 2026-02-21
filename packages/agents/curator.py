@@ -7,7 +7,7 @@ def curator_agent(state):
     logs = state.get("logs", [])
     if state["decision"] != "ALLOW" or state["cache_hit"]: return state
 
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] Incident unique. Archiving Knowledge into ChromaDB.")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] [ACT] Incident Resolved. Transforming Ops-Data into Institutional Knowledge.")
     
     try:
         import os
@@ -16,15 +16,17 @@ def curator_agent(state):
         client = chromadb.HttpClient(host=host, port=port)
         collection = client.get_or_create_collection(name="sre_incident_memory")
         if collection:
-            doc_id = f"inc-{random.randint(1000, 9999)}"
+            doc_id = f"PM-{datetime.now().strftime('%S%M')}"
             collection.add(
-                documents=[f"Issue: {state['root_cause']} | Fix: {state['remediation']}"],
+                documents=[f"RCA: {state['root_cause']} | Mitigation: {state['remediation']}"],
+                metadatas=[{"solution": state['remediation']}],
                 ids=[doc_id]
             )
-            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] Indexing complete ID: {doc_id}")
+            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] [ACT] Knowledge Base Update: Post-Mortem {doc_id} archived.")
     except:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] Memory Layer unreachable.")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] [ACT] Warning: Knowledge Layer offline. Skipping persistence.")
 
     state["status"] = "Stable"
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] [ACT] Remediation Cycle Bridged Successfully. Verifying Veracity...")
     state["logs"] = logs
     return state
