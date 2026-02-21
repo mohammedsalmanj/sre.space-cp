@@ -365,10 +365,11 @@ See [LICENSE](LICENSE) for the full text.
 ---
 
 ## 🤝 Contributing
-We welcome contributions to the SRE-Space ecosystem. 
-1.  Fork the repo.
-2.  Create your feature branch.
-3.  Submit a PR with a detailed description of the agent logic changes.
+I am building SRE-Space to solve real-world operational problems through AIOps. Join the mission:
+
+1.  **Fork** the repo.
+2.  **Create** your feature branch.
+3. **Submit** a PR with a detailed description of how your agent logic changes solve real operational challenges.
 
 ---
 
