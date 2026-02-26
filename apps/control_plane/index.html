@@ -238,7 +238,7 @@
                         </div>
                         <p class="text-xs text-slate-500 mb-3">Requires AWS_ACCESS_KEY_ID attached with
                             SRE-Space-ControlPlane IAM Role.</p>
-                        <button onclick="mockProvisioningLeft('aws')" id="prov-btn-aws"
+                        <button onclick="deployControlPlanePlatform('aws')" id="prov-btn-aws"
                             class="w-full btn-primary py-2 text-xs flex justify-center gap-2 items-center">Provision EC2
                             + Install Control Plane</button>
                     </div>
@@ -252,7 +252,7 @@
                             <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="gcp-stack"
                                     class="accent-blue-600"> GKE</label>
                         </div>
-                        <button onclick="mockProvisioningLeft('gcp')" id="prov-btn-gcp"
+                        <button onclick="deployControlPlanePlatform('gcp')" id="prov-btn-gcp"
                             class="w-full btn-primary py-2 text-xs flex justify-center gap-2 items-center">Provision VM
                             + Install Control Plane</button>
                     </div>
@@ -861,6 +861,12 @@
                 badgeLocal.classList.add('hidden');
                 adapterVal.innerText = val.toUpperCase();
             }
+        }
+
+        function deployControlPlanePlatform(platform) {
+            selectDeploy(platform);
+            goToStep(2);
+            document.getElementById('deploy-overlay').classList.remove('hidden');
         }
 
         function deployControlPlane() {
