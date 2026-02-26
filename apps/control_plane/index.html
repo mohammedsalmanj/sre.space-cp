@@ -653,6 +653,8 @@ WantedBy=multi-user.target</pre>
 
         function skipOnboarding() {
             onboardingModal.classList.add('hidden');
+            document.getElementById('cloud-provider-select').value = 'local';
+            updateStack('local');
             addLog("System: Onboarding bypassed. Running with current environment defaults.");
         }
 
