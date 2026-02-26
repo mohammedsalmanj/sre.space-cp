@@ -161,6 +161,25 @@ async def inject_failure(request: Request) -> dict:
     
     return {"status": "success", "message": f"Failure injected: {chaos_type}", "type": chaos_type}
 
+@app.post("/demo/sandbox/start")
+async def start_sandbox() -> dict:
+    """
+    Activates the sandbox mode by triggering a mock database connection leak.
+    Used for local testing without real cloud infrastructure.
+    """
+    try:
+        # Create a trigger file for the mock-otel-generator container
+        with open("/tmp/inject_leak", "w") as f:
+            f.write("active")
+        logger.info("🧪 [SANDBOX] Mock Database Leak Injected.")
+        
+        # Trigger the OODA loop
+        asyncio.create_task(run_sre_loop(is_anomaly=True, simulation_mode=True))
+        
+        return {"status": "success", "message": "Sandbox active: DB Leak Injected"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 @app.get("/quote")
 async def get_quote(user_id: str = "unknown") -> dict:
     """

@@ -493,6 +493,36 @@ The final document is embedded into **ChromaDB**. The next time a similar failur
 - **Veracity**: The objective truth of the system state, confirmed by telemetry.
 - **Vector Embedding**: A numerical representation of text used for semantic similarity search.
 
+## 🛰️ Deployment Architecture
+
+The SRE-Space Control Plane is designed for high-availability agentic operations.
+
+```mermaid
+graph TD
+    subgraph Target_Infrastructure [Target Cloud / K8s]
+        Apps[Microservices] -- OTLP Spans/Metrics --> OTel[OTel Collector]
+    end
+
+    OTel -- Internet/VPN (Port 4317/4318) --> CP_VM[SRE-Space Control Plane VM]
+
+    subgraph Control_Plane [Control Plane Residency]
+        CP_VM --> Scout[Scout Agent]
+        Scout --> Brain[Brain Agent]
+        Brain --> Memory[(Cloud Memory - Pinecone)]
+        Brain --> Fixer[Fixer Agent]
+    end
+
+    Fixer -- Action APIs --> Target_Infrastructure
+    Fixer -- GitOps --> GitHub[GitHub PRs]
+```
+
+## 📋 Day 1 SRE Checklist
+
+- [ ] **Monitor Memory**: Check the Pinecone console to ensure vector count is growing (Learning Phase).
+- [ ] **Verify Fixer**: Ensure the `GITHUB_TOKEN` has permissions to create pull requests in the target repos.
+- [ ] **OTel Health**: Verify `system-status` in the UI is 'Nominal'. If 'Ghosting', check Port 4318 firewalls.
+- [ ] **Agent Audit**: Periodically review the `Jules` agent architectural reports for long-term drift detection.
+
 ---
 
 *Document Version: 5.1.0 | Last Updated: 2026-02-22*

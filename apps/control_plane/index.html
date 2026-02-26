@@ -166,15 +166,21 @@
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-6">
             <div>
                 <h1 class="text-5xl font-black italic tracking-tighter">
-                    <span class="text-white">INSURANCE</span><span class="text-[#00f2fe]">.SPACE</span>
+                    <span class="text-white">SRE-SPACE</span><span class="text-[#00f2fe]">.CONTROL</span>
                 </h1>
-                <p class="text-slate-500 mt-2 font-semibold">Reliability Playground v4.7 — Agentic Control Loop Active
+                <p class="text-slate-500 mt-2 font-semibold">Reliability Playground v5.0 — Agentic Control Loop Active
                 </p>
             </div>
-            <button onclick="startTour()"
-                class="text-xs font-bold text-blue-400 hover:text-white transition-colors flex items-center gap-1 border border-blue-500/20 px-3 py-1 rounded-full bg-blue-500/5">
-                <span>✨</span> START GUIDED TOUR
-            </button>
+            <div class="flex items-center gap-4">
+                <button onclick="startTour()"
+                    class="text-xs font-bold text-blue-400 hover:text-white transition-colors flex items-center gap-1 border border-blue-500/20 px-3 py-1 rounded-full bg-blue-500/5">
+                    <span>✨</span> START GUIDED TOUR
+                </button>
+                <button onclick="startSandbox()"
+                    class="text-xs font-bold text-purple-400 hover:text-white transition-colors flex items-center gap-1 border border-purple-500/20 px-3 py-1 rounded-full bg-purple-500/5">
+                    <span>🧪</span> START SANDBOX
+                </button>
+            </div>
             <div class="flex items-center gap-6">
                 <div class="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10"
                     id="mode-toggle-container">
@@ -193,6 +199,15 @@
                 </button>
             </div>
         </header>
+
+        <!-- New Tab Navigation -->
+        <div class="flex gap-8 mb-10 border-b border-white/5">
+            <button onclick="showTab('dashboard')" id="tab-dashboard"
+                class="pb-4 text-sm font-black tracking-widest border-b-2 border-blue-500 text-white">DASHBOARD</button>
+            <button onclick="showTab('deploy')" id="tab-deploy"
+                class="pb-4 text-sm font-black tracking-widest border-b-2 border-transparent text-slate-500 hover:text-white transition-all">DEPLOY
+                TO PROD</button>
+        </div>
 
         <!-- Onboarding Modal -->
         <div id="onboarding-modal"
@@ -263,103 +278,184 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            <!-- Marketplace Display -->
-            <div class="lg:col-span-7 space-y-10">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-3xl font-extrabold tracking-tight">Active Policy Tiers</h2>
+        <div id="tab-content-dashboard">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <!-- Marketplace Display -->
+                <div class="lg:col-span-7 space-y-10">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-3xl font-extrabold tracking-tight">Active Policy Tiers</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Premium Life -->
+                        <div class="glass-card p-10 cursor-pointer" onclick="processQuote('Life Premium')">
+                            <div
+                                class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center text-4xl mb-6 border border-blue-500/20">
+                                ❤️</div>
+                            <h3 class="text-2xl font-black mb-3 text-white">Life Elite</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-10">High-fidelity coverage with embedded
+                                autonomous claim verification agents.</p>
+                            <button class="btn-cyber w-full py-4">GET QUOTE</button>
+                        </div>
+
+                        <!-- Cyber Shield -->
+                        <div class="glass-card p-10 cursor-pointer" onclick="processQuote('Cyber Shield')">
+                            <div
+                                class="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-4xl mb-6 border border-purple-500/20">
+                                🛡️</div>
+                            <h3 class="text-2xl font-black mb-3 text-white">Cyber Shield</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-10">Comprehensive protection against
+                                logic
+                                flows and state corruption anomalies.</p>
+                            <button class="btn-cyber w-full py-4">DEPLOY COVER</button>
+                        </div>
+                    </div>
+
+                    <!-- Live Metrics (Dynamic) -->
+                    <div class="glass-card p-8 grid grid-cols-3 gap-8">
+                        <div class="text-center">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">MTTR</span>
+                            <div class="text-2xl font-black mt-1 text-white">4.2m</div>
+                        </div>
+                        <div class="text-center border-x border-white/5">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Resilience</span>
+                            <div class="text-2xl font-black mt-1 text-green-400">99.8%</div>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Active
+                                Threads</span>
+                            <div class="text-2xl font-black mt-1 text-blue-400">124</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Premium Life -->
-                    <div class="glass-card p-10 cursor-pointer" onclick="processQuote('Life Premium')">
+                <!-- Agent Squad Monitor (HUD) -->
+                <div class="lg:col-span-5 flex flex-col">
+                    <h2 class="text-3xl font-extrabold tracking-tight mb-10">Sensory Intake</h2>
+                    <div class="hud-terminal flex-1 flex flex-col overflow-hidden mb-8">
                         <div
-                            class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center text-4xl mb-6 border border-blue-500/20">
-                            ❤️</div>
-                        <h3 class="text-2xl font-black mb-3 text-white">Life Elite</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-10">High-fidelity coverage with embedded
-                            autonomous claim verification agents.</p>
-                        <button class="btn-cyber w-full py-4">GET QUOTE</button>
+                            class="bg-white/5 px-6 py-3 flex justify-between items-center text-[10px] font-black uppercase text-slate-500">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                                STREAMING OODA TELEMETRY
+                            </div>
+                            <div id="loading-spinner" class="hidden">SYNCING...</div>
+                        </div>
+                        <div id="logs" class="p-8 overflow-y-auto flex-1 font-mono text-sm space-y-2 scrollbar-hide">
+                            <div class="text-slate-600 italic">Awaiting sensor data...</div>
+                        </div>
+                        <div class="bg-white/5 p-4 text-[9px] text-center text-slate-600 font-bold tracking-[4px]">
+                            /// COGNITIVE CONTROL PLANE INTERFACE ///
+                        </div>
                     </div>
 
-                    <!-- Cyber Shield -->
-                    <div class="glass-card p-10 cursor-pointer" onclick="processQuote('Cyber Shield')">
-                        <div
-                            class="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-4xl mb-6 border border-purple-500/20">
-                            🛡️</div>
-                        <h3 class="text-2xl font-black mb-3 text-white">Cyber Shield</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-10">Comprehensive protection against logic
-                            flows and state corruption anomalies.</p>
-                        <button class="btn-cyber w-full py-4">DEPLOY COVER</button>
-                    </div>
-                </div>
-
-                <!-- Live Metrics (Dynamic) -->
-                <div class="glass-card p-8 grid grid-cols-3 gap-8">
-                    <div class="text-center">
-                        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">MTTR</span>
-                        <div class="text-2xl font-black mt-1 text-white">4.2m</div>
-                    </div>
-                    <div class="text-center border-x border-white/5">
-                        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Resilience</span>
-                        <div class="text-2xl font-black mt-1 text-green-400">99.8%</div>
-                    </div>
-                    <div class="text-center">
-                        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Active Threads</span>
-                        <div class="text-2xl font-black mt-1 text-blue-400">124</div>
+                    <!-- Chaos Lab Section -->
+                    <div class="glass-card p-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                                <span class="text-rose-500">🛡️</span> Chaos Lab
+                            </h3>
+                            <span id="current-stack"
+                                class="text-[10px] font-black bg-blue-500/10 text-blue-400 px-2 py-1 rounded border border-blue-500/20 uppercase">Stack:
+                                ...</span>
+                        </div>
+                        <div class="grid grid-cols-1 gap-4" id="chaos-lab-buttons">
+                            <button onclick="triggerSimulation('AWS_EC2_DISK_FULL')" id="btn-ec2"
+                                class="text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group">
+                                <span>🚀 [EC2] EBS Volume Exhaustion</span>
+                                <span class="opacity-0 group-hover:opacity-100">RUN →</span>
+                            </button>
+                            <button onclick="triggerSimulation('K8S_POD_CRASH')" id="btn-kubernetes"
+                                class="text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group">
+                                <span>☸️ [K8S] CrashLoopBackOff Injection</span>
+                                <span class="opacity-0 group-hover:opacity-100">RUN →</span>
+                            </button>
+                            <button onclick="triggerSimulation('GCE_CPU_BURN')" id="btn-gce"
+                                class="text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group">
+                                <span>☁️ [GCE] Compute Soft Lockup</span>
+                                <span class="opacity-0 group-hover:opacity-100">RUN →</span>
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-slate-500 mt-4 italic">* SIMULATION_MODE active: Fixer will only
+                            simulate
+                            mutations.</p>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Agent Squad Monitor (HUD) -->
-            <div class="lg:col-span-5 flex flex-col">
-                <h2 class="text-3xl font-extrabold tracking-tight mb-10">Sensory Intake</h2>
-                <div class="hud-terminal flex-1 flex flex-col overflow-hidden mb-8">
-                    <div
-                        class="bg-white/5 px-6 py-3 flex justify-between items-center text-[10px] font-black uppercase text-slate-500">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-                            STREAMING OODA TELEMETRY
-                        </div>
-                        <div id="loading-spinner" class="hidden">SYNCING...</div>
-                    </div>
-                    <div id="logs" class="p-8 overflow-y-auto flex-1 font-mono text-sm space-y-2 scrollbar-hide">
-                        <div class="text-slate-600 italic">Awaiting sensor data...</div>
-                    </div>
-                    <div class="bg-white/5 p-4 text-[9px] text-center text-slate-600 font-bold tracking-[4px]">
-                        /// COGNITIVE CONTROL PLANE INTERFACE ///
-                    </div>
-                </div>
+        <div id="tab-content-deploy" class="hidden space-y-12">
+            <div class="glass-card p-12">
+                <h2 class="text-4xl font-black mb-8 tracking-tighter text-blue-400">PRODUCTION DEPLOYMENT GUIDE</h2>
 
-                <!-- Chaos Lab Section -->
-                <div class="glass-card p-8">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                            <span class="text-rose-500">🛡️</span> Chaos Lab
+                <div class="space-y-10">
+                    <section>
+                        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span
+                                class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-sm font-black text-blue-400 border border-blue-500/30">A</span>
+                            The Host Infrastructure
                         </h3>
-                        <span id="current-stack"
-                            class="text-[10px] font-black bg-blue-500/10 text-blue-400 px-2 py-1 rounded border border-blue-500/20 uppercase">Stack:
-                            ...</span>
-                    </div>
-                    <div class="grid grid-cols-1 gap-4" id="chaos-lab-buttons">
-                        <button onclick="triggerSimulation('AWS_EC2_DISK_FULL')" id="btn-ec2"
-                            class="text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group">
-                            <span>🚀 [EC2] EBS Volume Exhaustion</span>
-                            <span class="opacity-0 group-hover:opacity-100">RUN →</span>
-                        </button>
-                        <button onclick="triggerSimulation('K8S_POD_CRASH')" id="btn-kubernetes"
-                            class="text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group">
-                            <span>☸️ [K8S] CrashLoopBackOff Injection</span>
-                            <span class="opacity-0 group-hover:opacity-100">RUN →</span>
-                        </button>
-                        <button onclick="triggerSimulation('GCE_CPU_BURN')" id="btn-gce"
-                            class="text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group">
-                            <span>☁️ [GCE] Compute Soft Lockup</span>
-                            <span class="opacity-0 group-hover:opacity-100">RUN →</span>
-                        </button>
-                    </div>
-                    <p class="text-[10px] text-slate-500 mt-4 italic">* SIMULATION_MODE active: Fixer will only simulate
-                        mutations.</p>
+                        <div
+                            class="bg-white/5 p-6 rounded-2xl border border-white/5 text-slate-300 leading-relaxed text-sm">
+                            <p class="mb-4">Deploy the SRE-Space Control Plane on a dedicated Linux VM (Ubuntu 22.04
+                                recommended).</p>
+                            <ul class="list-disc ml-6 space-y-2">
+                                <li><strong>AWS:</strong> Instance type `t3.medium` or larger.</li>
+                                <li><strong>GCP:</strong> Instance type `e2-medium` or larger.</li>
+                                <li><strong>Software:</strong> Install `docker` and `docker-compose-v2`.</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span
+                                class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-sm font-black text-blue-400 border border-blue-500/30">B</span>
+                            Network Security & Ingress
+                        </h3>
+                        <div
+                            class="bg-white/5 p-6 rounded-2xl border border-white/5 text-slate-300 leading-relaxed text-sm">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-black/30 p-4 rounded-xl border border-white/5">
+                                    <div class="font-black text-blue-400 text-xs mb-1">Port 8001 (UI)</div>
+                                    <div class="text-slate-500 text-[10px]">Dashboard & API</div>
+                                </div>
+                                <div class="bg-black/30 p-4 rounded-xl border border-white/5">
+                                    <div class="font-black text-rose-400 text-xs mb-1">Port 4317/4318</div>
+                                    <div class="text-slate-500 text-[10px]">OTel Ingest (gRPC/HTTP)</div>
+                                </div>
+                            </div>
+                            <div
+                                class="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl flex gap-3 text-orange-400 italic">
+                                <span>⚠️</span>
+                                <span><strong>Guardrail:</strong> Only allow your office IP or your VPC CIDR to access
+                                    these ports in your Security Group / Firewall.</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span
+                                class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-sm font-black text-blue-400 border border-blue-500/30">C</span>
+                            Agent Residency (Persistence)
+                        </h3>
+                        <div
+                            class="bg-white/5 p-6 rounded-2xl border border-white/5 text-slate-300 leading-relaxed text-sm">
+                            <p class="mb-4">Configure `systemd` to ensure the Control Plane restarts on reboot.</p>
+                            <pre class="bg-black/50 p-4 rounded-xl font-mono text-xs text-blue-300 overflow-x-auto">[Unit]
+Description=SRE-Space Control Plane
+After=docker.service
+
+[Service]
+WorkingDirectory=/opt/sre-space
+ExecStart=/usr/bin/docker-compose up
+Restart=always
+
+[Install]
+WantedBy=multi-user.target</pre>
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>
@@ -506,6 +602,55 @@
                 tourTooltip.classList.add('hidden');
                 addLog("System: Guided Tour complete. Ready for Autonomous Operations.");
             }
+        }
+
+        // --- Tab Management ---
+        function showTab(tab) {
+            const dashboard = document.getElementById('tab-content-dashboard');
+            const deploy = document.getElementById('tab-content-deploy');
+            const tabDash = document.getElementById('tab-dashboard');
+            const tabDeploy = document.getElementById('tab-deploy');
+
+            if (tab === 'dashboard') {
+                dashboard.classList.remove('hidden');
+                deploy.classList.add('hidden');
+                tabDash.className = "pb-4 text-sm font-black tracking-widest border-b-2 border-blue-500 text-white";
+                tabDeploy.className = "pb-4 text-sm font-black tracking-widest border-b-2 border-transparent text-slate-500 hover:text-white transition-all";
+            } else {
+                deploy.classList.remove('hidden');
+                dashboard.classList.add('hidden');
+                tabDeploy.className = "pb-4 text-sm font-black tracking-widest border-b-2 border-blue-500 text-white";
+                tabDash.className = "pb-4 text-sm font-black tracking-widest border-b-2 border-transparent text-slate-500 hover:text-white transition-all";
+            }
+        }
+
+        async function startSandbox() {
+            logContainer.innerHTML = '';
+            addLog("🧪 [SANDBOX] Initializing Reliability Playground...");
+            addLog("System: Spinning up mock microservices: [user-service, quote-service, policy-service]");
+
+            try {
+                const res = await fetch('/demo/sandbox/start', { method: 'POST' });
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    addLog(`[SANDBOX] ${data.message}`);
+                    triggerSSEStream(true);
+                }
+            } catch (err) {
+                addLog("[ERROR] Sandbox initialization failed.");
+            }
+        }
+
+        function triggerSSEStream(isAnomaly) {
+            const eventSource = new EventSource(`/api/sre-loop?anomaly=${isAnomaly}&simulation=true`);
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                addLog(data.message);
+                if (data.final_state) {
+                    eventSource.close();
+                }
+            };
         }
 
         function addLog(msg) {
