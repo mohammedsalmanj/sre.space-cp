@@ -96,15 +96,45 @@ Full-scale residency for active infra management.
 
 ---
 
-## 🧠 Control Plane Architecture
+## 🧠 Agentic Control Loop Architecture
 
-SRE-Space transforms observability from passive dashboards into autonomous operational control.
+SRE-Space transforms observability from passive dashboards into an autonomous 8-Agent operational control loop.
+
+```mermaid
+graph TD
+    A[Scout: Telemetry Intake] --> B[Brain: RCA & Memory]
+    B --> C[Fixer: Action Execution]
+    C --> D[Guardrail: Blast Radius]
+    D --> E[Jules: Code Review]
+    E --> F[Scribe: Post-Mortem]
+    F --> G[Curator: State Memory Indexing]
+    G --> H[Notifier: Team Broadcast]
+    
+    subgraph Observability
+    A
+    end
+    
+    subgraph Reasoning
+    B
+    E
+    end
+    
+    subgraph Action & Safety
+    C
+    D
+    end
+    
+    subgraph Knowledge & Communication
+    F
+    G
+    H
+    end
+```
 
 - **Senses** → OpenTelemetry (Traces/Metrics)
-- **Mind** → Agentic OODA Loop (Cognitive Logic)
-- **Hands** → Infrastructure Adapters (Cloud APIs)
+- **Mind** → 8-Agent Control Loop (Cognitive Logic)
+- **Hands** → Infrastructure Adapters (Cloud APIs / GitOps)
 - **Memory** → Pinecone / ChromaDB (Institutional Context)
-- **Audit** → GitOps PR Engine (Governance)
 
 > **The Analogy**: 
 > Traditional monitoring is a **fire alarm** that waits for a human. 
