@@ -163,42 +163,103 @@
 
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-6">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
             <div>
                 <h1 class="text-5xl font-black italic tracking-tighter">
                     <span class="text-white">SRE-SPACE</span><span class="text-[#00f2fe]">.CONTROL</span>
                 </h1>
-                <p class="text-slate-500 mt-2 font-semibold">Reliability Playground v5.0 — Agentic Control Loop Active
+                <p class="text-slate-500 mt-2 font-semibold flex items-center gap-3">
+                    Reliability Control Plane v5.2.0
+                    <span id="badge-sim"
+                        class="text-[9px] px-2 py-0.5 rounded bg-rose-500/10 text-rose-500 border border-rose-500/20 font-black">🧪
+                        SIMULATION</span>
+                    <span id="badge-live"
+                        class="hidden text-[9px] px-2 py-0.5 rounded bg-green-500/10 text-green-500 border border-green-500/20 font-black">☁️
+                        CLOUD LIVE</span>
+                    <span
+                        class="text-[9px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 font-black">🔒
+                        SAFE MODE active</span>
                 </p>
             </div>
-            <div class="flex items-center gap-4">
-                <button onclick="startTour()"
-                    class="text-xs font-bold text-blue-400 hover:text-white transition-colors flex items-center gap-1 border border-blue-500/20 px-3 py-1 rounded-full bg-blue-500/5">
-                    <span>✨</span> START GUIDED TOUR
-                </button>
-                <button onclick="startSandbox()"
-                    class="text-xs font-bold text-purple-400 hover:text-white transition-colors flex items-center gap-1 border border-purple-500/20 px-3 py-1 rounded-full bg-purple-500/5">
-                    <span>🧪</span> START SANDBOX
-                </button>
-            </div>
+
             <div class="flex items-center gap-6">
-                <div class="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10"
-                    id="mode-toggle-container">
-                    <button onclick="setMode('real')" id="btn-mode-real"
-                        class="px-3 py-1 text-[10px] font-black rounded-lg transition-all">REAL</button>
-                    <button onclick="setMode('demo')" id="btn-mode-demo"
-                        class="px-3 py-1 text-[10px] font-black rounded-lg transition-all bg-blue-500 text-black">DEMO</button>
+                <!-- Cloud Provider Dropdown -->
+                <div class="relative group">
+                    <select id="cloud-provider-select" onchange="updateStack(this.value)"
+                        class="bg-white/5 border border-white/10 text-xs font-black px-4 py-2 rounded-xl outline-none hover:border-blue-500 transition-all appearance-none cursor-pointer pr-10">
+                        <option value="ec2">AWS (EC2/EKS)</option>
+                        <option value="gce">GCP (GCE/GKE)</option>
+                        <option value="kubernetes">KUBERNETES (Universal)</option>
+                        <option value="local">LOCAL (Simulation)</option>
+                    </select>
+                    <div
+                        class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-[10px]">
+                        ▼</div>
                 </div>
-                <div class="text-right">
+
+                <div class="flex items-center gap-4">
+                    <button onclick="startTour()"
+                        class="text-xs font-bold text-blue-400 hover:text-white transition-colors flex items-center gap-1 border border-blue-500/20 px-3 py-1 rounded-full bg-blue-500/5">
+                        <span>✨</span> TOUR
+                    </button>
+                    <button onclick="startSandbox()"
+                        class="text-xs font-bold text-purple-400 hover:text-white transition-colors flex items-center gap-1 border border-purple-500/20 px-3 py-1 rounded-full bg-purple-500/5">
+                        <span>🧪</span> SANDBOX
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-3">
                     <div id="system-status"
-                        class="text-xs font-black text-green-400 uppercase tracking-widest bg-green-400/10 px-3 py-1 rounded-full border border-green-400/20">
+                        class="text-[10px] font-black text-green-400 uppercase tracking-widest bg-green-400/10 px-4 py-2 rounded-full border border-green-400/20">
                         System Nominal</div>
+                    <button onclick="triggerChaos()"
+                        class="btn-chaos px-4 py-2 rounded-xl text-xs flex items-center gap-2">
+                        🔥 INJECT
+                    </button>
                 </div>
-                <button onclick="triggerChaos()" class="btn-chaos px-6 py-3 rounded-xl flex items-center gap-2">
-                    <span class="text-xl">🔥</span> INJECT CHAOS
-                </button>
             </div>
         </header>
+
+        <!-- Infrastructure Capabilities HUD -->
+        <div class="grid grid-cols-4 gap-4 mb-10">
+            <div class="glass-card p-4 flex flex-col justify-center items-center text-center">
+                <span class="text-[9px] font-black text-slate-500 uppercase mb-2">Capabilities</span>
+                <div id="capabilities-list" class="flex gap-2 flex-wrap justify-center">
+                    <span
+                        class="text-[9px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/10">Restart</span>
+                    <span
+                        class="text-[9px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/10">Snapshot</span>
+                    <span
+                        class="text-[9px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/10">Scale</span>
+                </div>
+            </div>
+            <div class="glass-card p-4 flex flex-col justify-center">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-[9px] font-black text-slate-500 uppercase">Blast Radius Limit</span>
+                    <span class="text-[10px] font-black text-blue-400">1 UNIT</span>
+                </div>
+                <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                    <div class="w-1/4 h-full bg-blue-500 shadow-[0_0_10px_#00f2fe]"></div>
+                </div>
+            </div>
+            <div class="glass-card p-4 flex flex-col justify-center">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[9px] font-black text-slate-500 uppercase">Snapshot Mode</span>
+                    <span class="text-[9px] font-black text-green-500 uppercase">ENABLED</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-[9px] font-black text-slate-500 uppercase">Auto Rollback</span>
+                    <span class="text-[9px] font-black text-green-500 uppercase">ENABLED</span>
+                </div>
+            </div>
+            <div class="glass-card p-4 flex flex-col justify-center">
+                <div class="flex justify-between items-center">
+                    <span class="text-[9px] font-black text-slate-500 uppercase">Cognitive Gate</span>
+                    <span class="text-[10px] font-black text-rose-400">> 0.85 Conf</span>
+                </div>
+                <div class="text-[9px] text-slate-600 mt-1 italic italic">Human Escalation active</div>
+            </div>
+        </div>
 
         <!-- New Tab Navigation -->
         <div class="flex gap-8 mb-10 border-b border-white/5">
@@ -512,16 +573,59 @@ WantedBy=multi-user.target</pre>
             try {
                 const res = await fetch('/system/health');
                 const data = await res.json();
-                currentStackType = data.env_stack;
-
-                if (currentStackType) {
-                    document.getElementById('current-stack').innerText = `Stack: ${currentStackType}`;
-                    // Update Chaos Lab Visibility
-                    if (currentStackType !== 'ec2') document.getElementById('btn-ec2').disabled = true, document.getElementById('btn-ec2').classList.add('opacity-30', 'grayscale');
-                    if (currentStackType !== 'kubernetes') document.getElementById('btn-kubernetes').disabled = true, document.getElementById('btn-kubernetes').classList.add('opacity-30', 'grayscale');
-                    if (currentStackType !== 'gce') document.getElementById('btn-gce').disabled = true, document.getElementById('btn-gce').classList.add('opacity-30', 'grayscale');
+                if (data.env_stack) {
+                    currentStackType = data.env_stack;
+                    document.getElementById('cloud-provider-select').value = currentStackType;
+                    updateStack(currentStackType);
                 }
             } catch (e) { }
+        }
+
+        function updateStack(stack) {
+            currentStackType = stack;
+            const capabilitiesList = document.getElementById('capabilities-list');
+            const badgeSim = document.getElementById('badge-sim');
+            const badgeLive = document.getElementById('badge-live');
+
+            // Capabilities mapping
+            const caps = {
+                'ec2': ['Restart', 'Snapshot', 'Scale', 'Patch'],
+                'gce': ['Config Mutation', 'OS-Level Patch'],
+                'kubernetes': ['Pod Restart', 'HPA Scaling', 'GitOps Patch'],
+                'local': ['Full OODA Simulation']
+            };
+
+            // Render caps
+            if (caps[stack]) {
+                capabilitiesList.innerHTML = caps[stack].map(c => `<span class="text-[9px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/10">${c}</span>`).join('');
+            }
+
+            // Set Simulation vs Live badge
+            if (stack === 'local' || isDemoMode) {
+                badgeSim.classList.remove('hidden');
+                badgeLive.classList.add('hidden');
+            } else {
+                badgeSim.classList.add('hidden');
+                badgeLive.classList.remove('hidden');
+            }
+
+            // Toggle Chaos Lab buttons
+            const btnEc2 = document.getElementById('btn-ec2');
+            const btnK8s = document.getElementById('btn-kubernetes');
+            const btnGce = document.getElementById('btn-gce');
+
+            if (btnEc2) {
+                btnEc2.disabled = (stack !== 'ec2' && stack !== 'local');
+                btnEc2.className = btnEc2.disabled ? 'text-sm font-bold bg-white/5 opacity-30 grayscale text-rose-400 p-3 rounded-lg border border-white/5 text-left flex justify-between items-center group cursor-not-allowed' : 'text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group';
+            }
+            if (btnK8s) {
+                btnK8s.disabled = (stack !== 'kubernetes' && stack !== 'local');
+                btnK8s.className = btnK8s.disabled ? 'text-sm font-bold bg-white/5 opacity-30 grayscale text-rose-400 p-3 rounded-lg border border-white/5 text-left flex justify-between items-center group cursor-not-allowed' : 'text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group';
+            }
+            if (btnGce) {
+                btnGce.disabled = (stack !== 'gce' && stack !== 'local');
+                btnGce.className = btnGce.disabled ? 'text-sm font-bold bg-white/5 opacity-30 grayscale text-rose-400 p-3 rounded-lg border border-white/5 text-left flex justify-between items-center group cursor-not-allowed' : 'text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group';
+            }
         }
 
         // --- Onboarding Logic ---

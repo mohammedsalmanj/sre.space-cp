@@ -1,6 +1,7 @@
 <div align="center">
   <h1>SRE-Space</h1>
-  <p><i><b>Autonomous Reliability Engineering for Distributed Systems</b></i></p>
+  <h2>Open-Source Autonomous SRE Control Plane</h2>
+  <p><i>Agentic Reliability for Cloud-Native Distributed Systems</i></p>
 
   <p>
     <a href="https://sre-space-cp.vercel.app/apps/dashboard" target="_blank">
@@ -14,128 +15,125 @@
 
 <br/>
 
-<div align="center">
-  <h3>🛠️ Comprehensive Tech Stack</h3>
-  
-  <p>
-    <img src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54" alt="Python">
-    <img src="https://img.shields.io/badge/fastapi-109989?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
-    <img src="https://img.shields.io/badge/pydantic-E92063?style=for-the-badge&logo=pydantic&logoColor=white" alt="Pydantic">
-    <img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
-    <img src="https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5">
-    <img src="https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3">
-  </p>
-
-  <p>
-    <img src="https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white" alt="OpenAI">
-    <img src="https://img.shields.io/badge/GPT--4o-412991?style=for-the-badge&logo=openai&logoColor=white" alt="GPT-4o">
-    <img src="https://img.shields.io/badge/LangGraph-121212?style=for-the-badge&logo=chainlink&logoColor=white" alt="LangGraph">
-    <img src="https://img.shields.io/badge/ChromaDB-000000?style=for-the-badge&logo=google-cloud&logoColor=white" alt="ChromaDB">
-    <img src="https://img.shields.io/badge/Redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white" alt="Redis">
-    <img src="https://img.shields.io/badge/Apache%20Kafka-000000?style=for-the-badge&logo=apachekafka&logoColor=white" alt="Kafka">
-  </p>
-
-  <p>
-    <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
-    <img src="https://img.shields.io/badge/OpenTelemetry-000000?style=for-the-badge&logo=opentelemetry&logoColor=white" alt="OTel">
-    <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions">
-    <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel">
-    <img src="https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Render">
-    <img src="https://img.shields.io/badge/Mermaid.js-FF69B4?style=for-the-badge&logo=mermaid&logoColor=white" alt="Mermaid">
-  </p>
-</div>
+**SRE-Space** is a production-grade, open-source SRE Control Plane that autonomously detects, diagnoses, remediates, validates, and rolls back operational failures across AWS, GCP, Kubernetes, and hybrid stacks.
 
 ---
 
-## 📜 Executive Summary
-**SRE-Space** is an autonomous SRE platform designed to close the gap between observability and remediation. It leverages a multi-agent **OODA loop** (Observe, Orient, Decide, Act) to detect, diagnose, and fix infrastructure failures in real-time. By transforming passive telemetry into active self-healing operations, SRE-Space ensures that distributed systems maintain high availability without manual intervention.
+## ☁️ Supported Cloud & Infrastructure Stacks
 
-Unlike traditional monitors that merely alert humans, SRE-Space acts as a "Digital First Responder," capable of performing root-cause analysis (RCA) via generative AI and executing GitOps-based patches automatically.
+The Brain remains universal. The Hands (Adapters) are stack-aware.
 
----
-
-## 🎯 Project Mission & Problem Statement
-Infrastructure management in modern cloud-native environments has surpassed human cognitive limits. With microservices generating millions of spans and metrics per second, the time between an anomaly and a human-executed fix (MTTR) is often too high for mission-critical applications.
-
-**SRE-Space solves this by:**
-1.  **Eliminating Human Latency**: Agents operate at machine speed to triage and mitigate.
-2.  **Cognitive Fault Diagnosis**: Moving beyond static thresholds to LLM-driven technical reasoning.
-3.  **Veracity Tracking**: Ensuring every action is grounded in real system state, not just logs.
+| Stack | Coverage | Control Capability |
+| :--- | :--- | :--- |
+| **AWS** | EC2, EKS, Beanstalk | Restart, Scale, Snapshot, Patch |
+| **GCP** | GCE, GKE | Config mutation, OS-level patch |
+| **Kubernetes** | EKS, AKS, GKE, kOps | Pod restart, HPA scaling, GitOps patch |
+| **Hybrid** | On-Prem | Custom adapters |
+| **Local** | Docker Compose | Full OODA Simulation |
 
 ---
 
-## 🏛️ System Architecture: The Control Loop
+## 🛰️ Deployment Modes
 
-SRE-Space follows a strictly decoupled architecture, separating the **Mind** (Agent Logic), the **Eye** (Dashboard), and the **Senses** (Telemetry).
+### 🧪 Local Control Plane (Full Simulation Mode)
+Enables safe testing of the OODA loop without risking production uptime.
+- **Run**: `docker-compose up -d`
+- **Includes**: Kafka, ChromaDB, Jaeger, OTel, Mock Trace Generator.
+- **Capabilities**: Chaos Injection, REAL GitHub PR creation, optional AWS/GCP connectivity.
 
-### 1. The Mind (Control Loop Engine)
-Built with **FastAPI** and **LangGraph**, this is the central nervous system. It orchestrates the flow of data through various cognitive stages. It maintains a stateful view of the incident lifecycle, ensuring that multiple agents can collaborate on a single problem without stepping on each other.
-
-### 2. The Eye (Orbital Dashboard)
-A high-fidelity **Liquid Glass** interface built with Vanilla JS and CSS for maximum performance and low latency. It provides a real-time window into the agent's thoughts via Server-Sent Events (SSE).
-
-### 3. The Senses (OpenTelemetry)
-Standardized sensory intake using OTel. It captures spans and metrics from managed services (e.g., the Quote Service) and feeds them into the **Scout Agent** for anomaly detection.
-
-```mermaid
-graph TD
-    subgraph "External World"
-        App[Managed Microservice]
-        Traffic[User Traffic]
-    end
-
-    subgraph "SRE-Space Control Loop"
-        Scout[Scout: Observation Node]
-        Brain[Brain: Reasoning Node]
-        Fixer[Fixer: Remediation Node]
-        Curator[Curator: Memory Node]
-    end
-
-    Traffic --> App
-    App -- OTel Spans --> Scout
-    Scout -- Anomaly Trace --> Brain
-    Brain -- RCA / Fix Proposal --> Fixer
-    Fixer -- GitOps Pull Request --> App
-    Curator -- Index Fix --> VectorStore[(ChromaDB)]
-    VectorStore -- Historical Context --> Brain
-```
+### ☁️ Cloud Mode (Production Setup)
+Full-scale residency for active infra management.
+- **Backend**: Deploy to Render / EC2 / GKE.
+- **Frontend**: Deploy to Vercel / S3 Static.
+- **Configuration** (`.env`):
+  ```bash
+  ENV=cloud
+  STAGE=production
+  CLOUD_PROVIDER=aws|gcp|k8s
+  SIMULATION_MODE=false
+  ```
 
 ---
 
-## 🚀 Universal Infrastructure Adapter Model
+## 🧠 Control Plane Architecture
 
-SRE-Space is a stack-agnostic control plane. It operates across multiple clouds and architectures via a standardized **Infrastructure Adapter Layer**. This decoupling ensures that while the "Brain" logic remains universal, the "Hands" (Adapters) execute stack-specific actions.
+SRE-Space transforms observability from passive dashboards into autonomous operational control.
 
-### 🔌 Supported Stacks
--   **AWS**: EC2 (SSM + Boto3), Beanstalk (Environment APIs).
--   **Kubernetes**: EKS, GKE, AKS, kOps (GitOps-driven IaC mutations).
--   **GCP**: GCE (OS Config + gcloud).
--   **Hybrid**: On-prem servers via custom adapters.
+- **Senses** → OpenTelemetry (Traces/Metrics)
+- **Mind** → Agentic OODA Loop (Cognitive Logic)
+- **Hands** → Infrastructure Adapters (Cloud APIs)
+- **Memory** → Pinecone / ChromaDB (Institutional Context)
+- **Audit** → GitOps PR Engine (Governance)
 
-### 🛠️ Adapter Architecture
-The architecture is split into two primary interfaces:
-1.  **SensoryAdapter**: Normalizes telemetry (Logs, Metrics, Traces) from stack-specific sources (CloudWatch, Prometheus, Stackdriver) into a unified Internal Schema.
-2.  **RemediationAdapter**: Executes actions (Restart, Scale, Snapshot, Config Patch) using stack-specific tools (SSM, kubectl, gcloud) while enforcing universal guardrails.
-
-### 🛡️ Operational Guardrails (Built-in)
--   **Blast Radius Control**: Never restart more than 1 instance/pod at a time.
--   **Snapshot Safety**: Automatic VM/Disk snapshots before high-risk mutations.
--   **Verification Loop**: Post-execution telemetry validation to ensure MTTR recovery.
--   **Confidence Gate**: Escalation to human operators if Brain confidence < 0.85.
+> **The Analogy**: 
+> Traditional monitoring is a **fire alarm** that waits for a human. 
+> SRE-Space is a **fire alarm + firefighter + incident report writer + architect** preventing the next fire.
 
 ---
 
-## 🤖 Meet the Agent Squad
+## 🛡️ Production Safety Model
 
-Each agent in SRE-Space is a specialized LLM-backed node running within a LangGraph state machine.
+If a fix fails, the system rolls back automatically.
 
-### 🔭 Scout (The Watcher)
--   **Role**: Continuous Observability.
--   **Logic**: High-frequency polling of OpenTelemetry collectors. It uses pattern matching to identify "Error Spans" vs. "Normal Noise."
--   **Telemetry Intake**:
-    -   *Source*: OTLP Exporter (HTTP/gRPC)
-    -   *Polling Interval*: 500ms (Local) / 5s (Cloud)
-    -   *Filtering*: Drop-noise filter for transient 4xx errors.
+### 1️⃣ Pre-Mutation Snapshot
+- Automated EBS/PV snapshots.
+- Volume clones.
+- Git branch isolation for IaC.
+
+### 2️⃣ Post-Action Health Check
+- Live telemetry validation.
+- SLO recovery confirmation (MTTR tracking).
+
+### 3️⃣ Automatic Rollback
+If health remains degraded, error rates exceed thresholds, or resource spikes occur:
+- **Revert** Git PR.
+- **Restore** infrastructure snapshot.
+- **Mark** RCA as a failed attempt to sharpen future memory.
+
+---
+
+## 🔄 Autonomous Remediation Lifecycle
+
+1. **Detect** anomaly in OTel stream.
+2. **Perform** RCA via RAG & LLM.
+3. **Generate** patch (Code or Config).
+4. **Create** Git branch.
+5. **Open** PR with attached telemetry traces.
+6. **Deploy** new version/patch.
+7. **Validate** SLO recovery.
+8. **Rollback** if verification fails.
+9. **Store** post-mortem in vectorized memory.
+
+---
+
+## 🌍 Open-Source Mission
+
+SRE-Space is:
+- **Vendor Neutral**: No lock-in.
+- **Cloud Agnostic**: Runs everywhere.
+- **LLM-Backed**: Extensible reasoning.
+- **Built for Scale**: Designed to eliminate alert fatigue.
+
+> **Note**: This is not a demo bot. This is a programmable reliability control plane.
+
+---
+
+## ⚡ Enterprise-Grade Characteristics
+
+- **Sub-second OODA latency** via logic pre-compilation.
+- **Adapter memoization cache** for high-speed cloud handshakes.
+- **Resource-aware agent throttling**.
+- **Immutable audit trail** via GitOps change control.
+- **Vectorized institutional memory** (Pinecone/Chroma).
+- **Stateless horizontal scaling**.
+
+---
+
+## 💾 Memory Configuration
+
+Configure your persistent memory cluster in `.env`:
+- `VECTOR_DB_PROVIDER=chroma` (Default Local)
+- `VECTOR_DB_PROVIDER=pinecone` (Cloud-Scale Memory)
 
 ### 🧠 Brain (The Architect)
 -   **Role**: Root Cause Analysis & Decision Making.
