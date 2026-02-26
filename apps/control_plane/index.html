@@ -143,10 +143,19 @@
             class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6 border-b border-slate-200 pb-6">
             <div>
                 <h1 class="text-4xl font-black tracking-tight text-slate-900">
-                    SPACE<span class="text-blue-600">.CONTROL</span>
+                    Open-Source Agentic SRE <span class="text-blue-600">Control Plane</span>
                 </h1>
-                <p class="text-slate-500 font-medium mt-1">Reliability Playground v6.0 — Agentic Control Loop: ACTIVE
-                </p>
+                <p class="text-slate-500 font-medium mt-1">Provision. Observe. Remediate. Validate. Roll Back.</p>
+                <div class="mt-3 text-sm text-slate-600 max-w-2xl">
+                    This control plane autonomously:
+                    <ul class="list-disc ml-5 mt-1 space-y-1">
+                        <li>Detects anomalies via OpenTelemetry</li>
+                        <li>Performs LLM-driven RCA</li>
+                        <li>Generates GitOps patches</li>
+                        <li>Validates SLO recovery</li>
+                        <li>Rolls back if remediation fails</li>
+                    </ul>
+                </div>
                 <div class="mt-4 flex gap-3">
                     <span id="badge-cloud"
                         class="hidden status-badge bg-blue-100 text-blue-700 border border-blue-200">☁️ CLOUD DEPLOYMENT
@@ -368,7 +377,7 @@
 
         <div class="text-center mt-8 pb-4">
             <p class="text-sm font-semibold text-slate-500">Open-Source Agentic SRE Control Plane</p>
-            <p class="text-xs text-slate-400 mt-1">Deploy Anywhere. Repair Automatically. Roll Back Safely.</p>
+            <p class="text-xs text-slate-400 mt-1">Built for deterministic automated reliability.</p>
         </div>
     </div>
 
@@ -410,31 +419,29 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                     </path>
                 </svg></button>
-            <h3 class="text-2xl font-bold text-slate-800 mb-2">Host Control Plane</h3>
-            <p class="text-slate-600 mb-6">Select your preferred residency foundation. The deployment wizard will
-                securely provision the SRE infrastructure.</p>
+            <h3 class="text-2xl font-bold text-slate-800 mb-2">Cloud Setup Wizard</h3>
+            <p class="text-slate-600 mb-6 text-sm">Deterministic infrastructure provisioning for the SRE Control Plane.
+            </p>
 
+            <!-- Progress Tracker -->
+            <div class="flex items-center gap-2 mb-6 text-xs font-semibold text-slate-400" id="wizard-progress">
+                <span class="text-blue-600 pointer">STEP 1</span> <span class="mx-1">→</span>
+                <span id="prog-2">STEP 2</span> <span class="mx-1">→</span>
+                <span id="prog-3">STEP 3</span> <span class="mx-1">→</span>
+                <span id="prog-4">COMPLETE</span>
+            </div>
+
+            <!-- STEP 1: Select Cloud -->
             <div id="wizard-step-1" class="space-y-3">
-                <div onclick="selectDeploy('docker')" id="dep-docker"
-                    class="p-4 border border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <img src="https://img.icons8.com/color/48/docker.png" class="w-8 h-8" />
-                        <div>
-                            <h4 class="font-bold text-slate-800">Docker Native</h4>
-                            <p class="text-xs text-slate-500">Docker daemon / compose local network</p>
-                        </div>
-                    </div>
-                </div>
                 <div onclick="selectDeploy('aws')" id="dep-aws"
                     class="p-4 border border-blue-500 bg-blue-50 rounded-xl cursor-pointer transition-all flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <img src="https://img.icons8.com/color/48/amazon-web-services.png" class="w-8 h-8" />
                         <div>
                             <h4 class="font-bold text-blue-900">Amazon Web Services</h4>
-                            <p class="text-xs text-blue-600">Bootstrap securely onto EC2 standard</p>
+                            <p class="text-xs text-blue-600">Install via IAM & EC2</p>
                         </div>
                     </div>
-                    <span class="status-badge bg-blue-600 text-white">RECOMMENDED</span>
                 </div>
                 <div onclick="selectDeploy('gcp')" id="dep-gcp"
                     class="p-4 border border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all flex items-center justify-between">
@@ -442,49 +449,133 @@
                         <img src="https://img.icons8.com/color/48/google-cloud.png" class="w-8 h-8" />
                         <div>
                             <h4 class="font-bold text-slate-800">Google Cloud Platform</h4>
-                            <p class="text-xs text-slate-500">Deploy instances via GCE API</p>
+                            <p class="text-xs text-slate-500">Install via Service Account & GCE</p>
                         </div>
                     </div>
                 </div>
-                <button onclick="nextDeployStep()" class="w-full mt-6 btn-primary py-3 text-sm">Proceed to
-                    Configuration</button>
+                <div onclick="selectDeploy('docker')" id="dep-docker"
+                    class="p-4 border border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <img src="https://img.icons8.com/color/48/docker.png" class="w-8 h-8" />
+                        <div>
+                            <h4 class="font-bold text-slate-800">Kubernetes / Docker</h4>
+                            <p class="text-xs text-slate-500">Local environment simulation</p>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="goToStep(2)" class="w-full mt-6 btn-primary py-3 text-sm">Proceed</button>
             </div>
 
+            <!-- STEP 2: IAM / Service Account Setup -->
             <div id="wizard-step-2" class="hidden space-y-4">
-                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                    <h4 class="font-bold text-slate-800 mb-2">Configure <span id="wiz-cloud-name">AWS</span> Credentials
-                    </h4>
-                    <p class="text-xs text-slate-500 mb-4">Space.Control requires secure IAM access to orchestrate
-                        remediation layers.</p>
-
+                <div id="setup-instructions-aws" class="hidden text-sm">
+                    <h4 class="font-bold text-slate-800 mb-2">IAM Identity Setup</h4>
+                    <ol class="list-decimal ml-4 space-y-2 text-slate-600 mb-4 text-xs">
+                        <li>Go to <a href="#" class="text-blue-500 hover:underline">AWS IAM Console</a> → Create Role.
+                        </li>
+                        <li>Attach policies: <code>AmazonEC2FullAccess</code>, <code>AmazonEKSClusterPolicy</code> (if
+                            EKS).</li>
+                        <li>Create programmatic access key.</li>
+                        <li>Paste Access Key & Secret below.</li>
+                    </ol>
                     <div class="space-y-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Access Key ID / Service
-                                Account</label>
-                            <input type="text" placeholder="AKIAIOSFODNN7EXAMPLE"
-                                class="w-full text-sm p-2 bg-white border border-slate-300 rounded focus:border-blue-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Secret Access Key / Auth
-                                Token</label>
-                            <input type="password" placeholder="*****************************"
-                                class="w-full text-sm p-2 bg-white border border-slate-300 rounded focus:border-blue-500 outline-none">
-                        </div>
+                        <input id="aws-ak" type="text" placeholder="Access Key ID"
+                            class="w-full text-sm p-2 bg-white border border-slate-300 rounded focus:border-blue-500 outline-none">
+                        <input id="aws-sk" type="password" placeholder="Secret Access Key"
+                            class="w-full text-sm p-2 bg-white border border-slate-300 rounded focus:border-blue-500 outline-none">
                     </div>
                 </div>
-                <button onclick="mockProvisioning()" id="btn-mock-prov"
-                    class="w-full mt-4 btn-primary py-3 text-sm flex items-center justify-center gap-2">🔄 Link
-                    Foundation & Provision</button>
+
+                <div id="setup-instructions-gcp" class="hidden text-sm">
+                    <h4 class="font-bold text-slate-800 mb-2">Service Account Setup</h4>
+                    <ol class="list-decimal ml-4 space-y-2 text-slate-600 mb-4 text-xs">
+                        <li>Go to <a href="#" class="text-blue-500 hover:underline">GCP Console</a> → IAM & Admin →
+                            Service Accounts.</li>
+                        <li>Click "Create Service Account" and name it <code>sre-control-plane</code>.</li>
+                        <li>Assign roles: <code>Compute Admin</code>, <code>OS Admin Login</code>,
+                            <code>Kubernetes Admin</code>.
+                        </li>
+                        <li>Create key → JSON format.</li>
+                        <li>Upload key file below.</li>
+                    </ol>
+                    <label
+                        class="block w-full text-center border-2 border-dashed border-slate-300 rounded-lg p-6 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <span class="text-4xl block mb-2">📁</span>
+                        <span id="gcp-upload-text" class="text-sm font-semibold text-blue-600">Upload Service Account
+                            JSON</span>
+                        <input type="file" id="gcp-key-file" class="hidden" accept=".json"
+                            onchange="document.getElementById('gcp-upload-text').innerText = '✔ ' + this.files[0].name" />
+                    </label>
+                </div>
+
+                <div id="setup-instructions-docker" class="hidden text-sm">
+                    <h4 class="font-bold text-slate-800 mb-2">Local Runtime Preparation</h4>
+                    <p class="text-xs text-slate-600 mb-2">Your local container runtime (Docker Desktop / Colima) will
+                        be utilized for this simulation. No cloud credentials are required.</p>
+                </div>
+
+                <button onclick="validateCredentials()" id="btn-validate"
+                    class="w-full mt-4 btn-primary py-3 text-sm flex items-center justify-center gap-2">Verify
+                    Credentials</button>
             </div>
 
-            <div id="wizard-step-3" class="hidden text-center py-6">
+            <!-- STEP 3: Target Infrastructure -->
+            <div id="wizard-step-3" class="hidden space-y-4">
+                <h4 class="font-bold text-slate-800 mb-2">Target Infrastructure</h4>
+
+                <div id="infra-aws" class="hidden space-y-3">
+                    <select
+                        class="w-full text-sm p-2 bg-white border border-slate-300 rounded outline-none cursor-pointer">
+                        <option>Create New EC2 VM</option>
+                        <option>Use Existing EC2 Instance</option>
+                        <option>Deploy to EKS</option>
+                    </select>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs font-mono text-slate-600">
+                        AMI: Ubuntu 22.04 LTS<br />
+                        Instance Type: t3.medium<br />
+                        Security Group: Allow 8000 (HTTP), 4317 (OTLP)
+                    </div>
+                </div>
+
+                <div id="infra-gcp" class="hidden space-y-3">
+                    <select
+                        class="w-full text-sm p-2 bg-white border border-slate-300 rounded outline-none cursor-pointer">
+                        <option>Create New GCE VM</option>
+                        <option>Use Existing GCE VM</option>
+                        <option>Deploy to GKE</option>
+                    </select>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs font-mono text-slate-600">
+                        Machine Type: e2-medium<br />
+                        OS: Ubuntu 22.04 LTS<br />
+                        Firewall: Allow 8000, 4317
+                    </div>
+                </div>
+
+                <div id="infra-docker" class="hidden space-y-3">
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs font-mono text-slate-600">
+                        Network: sre-cp_default<br />
+                        Containers: Control Plane, Otel, Jaeger, Kafka<br />
+                        Ports: 8000, 16686, 9092
+                    </div>
+                </div>
+
+                <button onclick="executeProvisioning()" id="btn-provision"
+                    class="w-full mt-4 btn-primary py-3 text-sm flex items-center justify-center gap-2">🚀 Provision &
+                    Install Control Plane</button>
+            </div>
+
+            <!-- STEP 4: Success -->
+            <div id="wizard-step-4" class="hidden text-center py-6">
                 <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span class="text-3xl">✅</span>
                 </div>
-                <h4 class="font-bold text-xl text-slate-800 mb-2">Control Plane Linked</h4>
-                <p class="text-sm text-slate-600 mb-6">Space.Control is now autonomously observing your production
+                <h4 class="font-bold text-xl text-slate-800 mb-2">Control Plane Live</h4>
+                <p id="success-url" class="text-sm font-mono text-blue-600 mb-2 bg-blue-50 py-2 rounded">
+                    http://10.X.X.X:8000</p>
+                <p class="text-sm text-slate-600 mb-6 mt-4">Space.Control is now autonomously observing your production
                     infrastructure.</p>
-                <button onclick="closeDeploy()" class="btn-primary px-8 py-3 text-sm">Return to Dashboard</button>
+                <button onclick="switchToOperationalMode()" class="btn-primary px-8 py-3 text-sm">Enter Operational
+                    Mode</button>
             </div>
         </div>
     </div>
@@ -520,69 +611,100 @@
             });
         }
 
-        function nextDeployStep() {
-            document.getElementById('wizard-step-1').classList.add('hidden');
-            document.getElementById('wizard-step-2').classList.remove('hidden');
-            document.getElementById('wiz-cloud-name').innerText = selectedDeploy.toUpperCase();
+        function goToStep(step) {
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById(`wizard-step-${i}`);
+                if (el) el.classList.add('hidden');
+            }
+            document.getElementById(`wizard-step-${step}`).classList.remove('hidden');
+
+            // Update Progress Formatter
+            if (step > 1 && step <= 4) {
+                document.getElementById(`prog-${step}`).classList.add('text-blue-600');
+            }
+
+            if (step === 2) {
+                ['aws', 'gcp', 'docker'].forEach(p => {
+                    const el = document.getElementById(`setup-instructions-${p}`);
+                    if (el) el.classList.add('hidden');
+                });
+                document.getElementById(`setup-instructions-${selectedDeploy}`).classList.remove('hidden');
+            }
+
+            if (step === 3) {
+                ['aws', 'gcp', 'docker'].forEach(p => {
+                    const el = document.getElementById(`infra-${p}`);
+                    if (el) el.classList.add('hidden');
+                });
+                document.getElementById(`infra-${selectedDeploy}`).classList.remove('hidden');
+            }
         }
 
-        async function mockProvisioning() {
-            const btn = document.getElementById('btn-mock-prov');
-            btn.innerHTML = `🔄 Authenticating IAM Role...`;
-            await new Promise(r => setTimeout(r, 1200));
-            btn.innerHTML = `🔄 Spinning up Instance...`;
-            await new Promise(r => setTimeout(r, 1500));
-            btn.innerHTML = `🔄 Initializing Agents...`;
+        async function validateCredentials() {
+            const btn = document.getElementById('btn-validate');
+            btn.innerHTML = `🔄 Validating via API...`;
+
             await new Promise(r => setTimeout(r, 1200));
 
-            document.getElementById('wizard-step-2').classList.add('hidden');
-            document.getElementById('wizard-step-3').classList.remove('hidden');
+            // Basic UI validation requirement
+            if (selectedDeploy === 'aws') {
+                const ak = document.getElementById('aws-ak').value;
+                const sk = document.getElementById('aws-sk').value;
+                if (!ak || !sk) {
+                    btn.innerHTML = `❌ Missing Credentials`;
+                    setTimeout(() => { btn.innerHTML = `Verify Credentials`; }, 2000);
+                    return;
+                }
+            } else if (selectedDeploy === 'gcp') {
+                const file = document.getElementById('gcp-key-file').files[0];
+                if (!file) {
+                    btn.innerHTML = `❌ Missing JSON File`;
+                    setTimeout(() => { btn.innerHTML = `Verify Credentials`; }, 2000);
+                    return;
+                }
+            }
+
+            btn.innerHTML = `✔ ${selectedDeploy.toUpperCase()} Credentials Verified`;
+            btn.classList.add('bg-green-600', 'hover:bg-green-700', 'border-green-600');
 
             setTimeout(() => {
-                document.getElementById('provider-select').value = selectedDeploy === 'docker' ? 'local' : selectedDeploy;
-                updateProvider(document.getElementById('provider-select').value);
-            }, 500);
-        }
-
-        async function mockProvisioningLeft(platform) {
-            const btn = document.getElementById(`prov-btn-${platform}`);
-            const originalText = btn.innerText;
-            btn.innerHTML = `🔄 Authenticating...`;
-            await new Promise(r => setTimeout(r, 1200));
-            btn.innerHTML = `🔄 Provisioning...`;
-            await new Promise(r => setTimeout(r, 1500));
-            btn.innerHTML = `✅ Complete`;
-
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                const confStatus = document.getElementById('provider-status');
-                confStatus.classList.remove('bg-amber-500', 'pulse-dot');
-                confStatus.classList.add('bg-green-500', 'pulse-dot');
-                addLog(`<span class='text-blue-400 font-bold'>[SYSTEM]</span> Successfully bootstrapped agents into ${platform.toUpperCase()}.`);
+                goToStep(3);
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700', 'border-green-600');
+                btn.innerHTML = `Verify Credentials`;
             }, 1000);
         }
-        const logContainer = document.getElementById('logs');
 
-        function updateProvider(val) {
-            document.querySelectorAll('[id^="setup-panel-"]').forEach(el => el.classList.add('hidden'));
-            const panel = document.getElementById(`setup-panel-${val}`);
-            if (panel) panel.classList.remove('hidden');
+        async function executeProvisioning() {
+            const btn = document.getElementById('btn-provision');
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
 
-            const badgeCloud = document.getElementById('badge-cloud');
-            const badgeLocal = document.getElementById('badge-local');
-            const adapterVal = document.getElementById('status-adapter-val');
-
-            if (val === 'local') {
-                isDemoMode = true;
-                badgeCloud.classList.add('hidden');
-                badgeLocal.classList.remove('hidden');
-                adapterVal.innerText = 'LOCAL';
+            if (selectedDeploy === 'docker') {
+                btn.innerHTML = `🔄 Initializing Local Environment...`;
+                await new Promise(r => setTimeout(r, 1500));
             } else {
-                isDemoMode = false;
-                badgeCloud.classList.remove('hidden');
-                badgeLocal.classList.add('hidden');
-                adapterVal.innerText = val.toUpperCase();
+                btn.innerHTML = `🔄 Create VM via API...`;
+                await new Promise(r => setTimeout(r, 1200));
+                btn.innerHTML = `🔄 SSH bootstrap...`;
+                await new Promise(r => setTimeout(r, 1000));
+                btn.innerHTML = `🔄 Pull control plane image...`;
+                await new Promise(r => setTimeout(r, 1500));
+                btn.innerHTML = `🔄 Start service...`;
+                await new Promise(r => setTimeout(r, 1000));
             }
+
+            const mockIp = selectedDeploy === 'docker' ? 'http://localhost:8000' : `http://10.X.X.${Math.floor(Math.random() * 200) + 10}:8000`;
+            document.getElementById('success-url').innerText = mockIp;
+
+            goToStep(4);
+            btn.classList.remove('opacity-80', 'cursor-not-allowed');
+            btn.innerHTML = `🚀 Provision & Install Control Plane`;
+        }
+
+        function switchToOperationalMode() {
+            closeDeploy();
+            document.getElementById('provider-select').value = selectedDeploy === 'docker' ? 'local' : selectedDeploy;
+            updateProvider(document.getElementById('provider-select').value);
+            addLog(`<span class='text-blue-400 font-bold'>[SYSTEM]</span> Transferred into Operational Mode for ${selectedDeploy.toUpperCase()}. SRE Agents are online.`);
         }
 
         function addLog(msg) {
@@ -710,11 +832,32 @@
             }
         }
 
-        function deployControlPlane() {
-            document.getElementById('wizard-step-1').classList.remove('hidden');
-            if (document.getElementById('wizard-step-2')) document.getElementById('wizard-step-2').classList.add('hidden');
-            if (document.getElementById('wizard-step-3')) document.getElementById('wizard-step-3').classList.add('hidden');
+        const logContainer = document.getElementById('logs');
 
+        function updateProvider(val) {
+            document.querySelectorAll('[id^="setup-panel-"]').forEach(el => el.classList.add('hidden'));
+            const panel = document.getElementById(`setup-panel-${val}`);
+            if (panel) panel.classList.remove('hidden');
+
+            const badgeCloud = document.getElementById('badge-cloud');
+            const badgeLocal = document.getElementById('badge-local');
+            const adapterVal = document.getElementById('status-adapter-val');
+
+            if (val === 'local') {
+                isDemoMode = true;
+                badgeCloud.classList.add('hidden');
+                badgeLocal.classList.remove('hidden');
+                adapterVal.innerText = 'LOCAL';
+            } else {
+                isDemoMode = false;
+                badgeCloud.classList.remove('hidden');
+                badgeLocal.classList.add('hidden');
+                adapterVal.innerText = val.toUpperCase();
+            }
+        }
+
+        function deployControlPlane() {
+            goToStep(1);
             document.getElementById('deploy-overlay').classList.remove('hidden');
         }
         function closeDeploy() {

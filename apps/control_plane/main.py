@@ -272,7 +272,8 @@ async def sre_loop_stream(anomaly: bool = "false", simulation: bool = "false"):
                     last_log_count = len(current_logs)
                     
                     if state.get("status"):
-                        yield f"data: {json.dumps({'message': f'System Status: {state['status']}'})}\n\n"
+                        message = f"System Status: {state['status']}"
+                        yield f"data: {json.dumps({'message': message})}\n\n"
 
             yield f"data: {json.dumps({'message': '--- END OF LOOP ---', 'final_state': 'Stable' if not is_anomaly else 'Resolved'})}\n\n"
         except Exception as e:

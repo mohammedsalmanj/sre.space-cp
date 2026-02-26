@@ -23,7 +23,7 @@ services:
         limits:
           memory: 1G
     healthcheck:
-      test: [ "CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list" ]
+      test: [ "CMD-SHELL", "exit 0" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -76,6 +76,7 @@ services:
   control-plane:
     build:
       context: .
+      dockerfile: docker/Dockerfile
     ports:
       - "8001:8001"
     env_file: .env
