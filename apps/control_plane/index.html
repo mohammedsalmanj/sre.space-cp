@@ -437,6 +437,18 @@
         // API Base Resolution
         const API_BASE = window.location.origin.includes('localhost') ? 'http://localhost:8001' : 'https://sre-space-cp.onrender.com';
 
+        async function safeFetch(url, options = {}) {
+            try {
+                const res = await fetch(url, options);
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                return await res.json();
+            } catch (err) {
+                console.error("Fetch failed:", err);
+                addLog(`<span class='text-red-400'>[ERROR] Backend unreachable: ${url}</span>`);
+                throw err;  // Re-throw so callers know it failed
+            }
+        }
+
         let isDemoMode = true;
         const logContainer = document.getElementById('logs');
 
@@ -501,13 +513,13 @@
 
             addLog(`System: Injecting ${type}...`);
             try {
-                await fetch(`${API_BASE}/demo/chaos/trigger`, {
+                await safeFetch(`${API_BASE}/demo/chaos/trigger`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ fault: type })
                 });
                 triggerSSEStream(true);
-            } catch (e) { addLog("<span class='text-red-400'>[ERROR] Chaos bridge disconnected. Ensure backend is running.</span>"); }
+            } catch (e) { addLog("<span class='text-red-400'>[ERROR] Chaos bridge disconnected or request failed. Ensure backend is running.</span>"); }
 
             setTimeout(() => {
                 document.getElementById('sys-status-label').className = "text-green-400 uppercase tracking-widest";
@@ -520,7 +532,7 @@
             addLog("<span class='text-indigo-400 font-bold'>[SANDBOX]</span> Starting Mock Environment...");
             addLog("Loading telemetry listeners...");
             try {
-                await fetch(`${API_BASE}/demo/sandbox/start`, { method: 'POST' });
+                await safeFetch(`${API_BASE}/demo/sandbox/start`, { method: 'POST' });
             } catch (e) { }
             triggerSSEStream(false);
         }
@@ -528,8 +540,7 @@
         window.onload = async () => {
             // initial query
             try {
-                const res = await fetch(`${API_BASE}/system/health`);
-                const data = await res.json();
+                const data = await safeFetch(`${API_BASE}/api/health`);
                 if (data.env_stack) {
                     document.getElementById('provider-select').value = data.env_stack;
                     updateProvider(data.env_stack);

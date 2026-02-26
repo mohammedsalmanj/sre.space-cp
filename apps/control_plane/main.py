@@ -69,6 +69,7 @@ async def get_dashboard(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/system/health")
+@app.get("/api/health")
 async def system_health() -> dict:
     """Core health-check endpoint for infrastructure monitoring systems."""
     return {
