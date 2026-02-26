@@ -786,6 +786,11 @@
             // Add initial welcome logs
             addLog("SRE Control Plane initialized.");
             addLog("Connect infrastructure sources to begin streaming telemetry.");
+
+            // Keep Render instance awake while the dashboard is open (every 5 mins)
+            setInterval(() => {
+                fetch(`${API_BASE}/api/health`).catch(() => { });
+            }, 300000);
         };
 
         // --- Guided Tour ---
