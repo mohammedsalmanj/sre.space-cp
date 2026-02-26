@@ -582,7 +582,9 @@
 
     <script>
         // API Base Resolution
-        const API_BASE = window.location.origin.includes('localhost') ? 'http://localhost:8001' : 'https://sre-space-cp.onrender.com';
+        const loc = window.location;
+        const isLocal = loc.hostname === 'localhost' || loc.hostname === '127.0.0.1' || loc.protocol === 'file:';
+        const API_BASE = isLocal ? 'http://localhost:8001' : 'https://sre-space-cp.onrender.com';
 
         async function safeFetch(url, options = {}) {
             try {
