@@ -4,26 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRE.Space | Cyber-Insurance Playground</title>
+    <title>SPACE.CONTROL | Reliability Playground</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --neon-blue: #00f2fe;
-            --neon-purple: #7000ff;
-            --cyber-black: #020205;
+            --electric-blue: #2563EB;
+            --status-green: #10B981;
+            --warning-amber: #F59E0B;
+            --critical-red: #EF4444;
+            --bg-gradient-start: #ffffff;
+            --bg-gradient-end: #eff6ff;
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--cyber-black);
-            color: #fff;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: #0f172a;
             overflow-x: hidden;
-            background-image:
-                radial-gradient(circle at 100% 0%, rgba(112, 0, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 0% 100%, rgba(0, 242, 300, 0.1) 0%, transparent 50%);
             min-height: 100vh;
         }
 
@@ -34,826 +34,561 @@
             width: 100%;
             height: 100%;
             background-image:
-                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+                linear-gradient(rgba(37, 99, 235, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
             pointer-events: none;
             z-index: -1;
         }
 
         .glass-card {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .glass-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 30px rgba(0, 242, 254, 0.2);
-        }
-
-        .btn-cyber {
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
-            color: #000;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-cyber:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
-        }
-
-        .btn-chaos {
-            background: rgba(244, 63, 94, 0.1);
-            border: 1px solid rgba(244, 63, 94, 0.3);
-            color: #f43f5e;
-            font-weight: 800;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-chaos:hover {
-            background: #f43f5e;
-            color: #fff;
-            box-shadow: 0 0 30px rgba(244, 63, 94, 0.4);
+            transform: translateY(-5px);
+            border-color: rgba(37, 99, 235, 0.3);
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1), 0 4px 6px -2px rgba(37, 99, 235, 0.05);
         }
 
         .hud-terminal {
             font-family: 'JetBrains Mono', monospace;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            position: relative;
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 16px;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
         }
 
-        .hud-terminal::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--neon-blue);
-            box-shadow: 0 0 10px var(--neon-blue);
-            border-radius: 2px 2px 0 0;
+        .btn-primary {
+            background-color: var(--electric-blue);
+            color: white;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.2s ease;
         }
 
-        .log-line {
-            padding: 4px 0;
-            font-size: 13px;
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39);
         }
 
-        /* --- Animations --- */
-        @keyframes glitch {
+        .btn-chaos {
+            background-color: #fef2f2;
+            color: var(--critical-red);
+            border: 1px solid #fecaca;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-chaos:hover {
+            background-color: var(--critical-red);
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39);
+        }
+
+        .status-badge {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+
+        .pulse-dot {
+            height: 8px;
+            width: 8px;
+            background-color: var(--status-green);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
             0% {
-                transform: translate(0);
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
             }
 
-            20% {
-                transform: translate(-2px, 2px);
-            }
-
-            40% {
-                transform: translate(-2px, -2px);
-            }
-
-            60% {
-                transform: translate(2px, 2px);
-            }
-
-            80% {
-                transform: translate(2px, -2px);
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
             }
 
             100% {
-                transform: translate(0);
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
             }
         }
 
-        .glitch-active {
-            animation: glitch 0.2s infinite;
-        }
-
-        .glitch-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(244, 63, 94, 0.05);
-            z-index: 1000;
-            pointer-events: none;
+        .scrollbar-hide::-webkit-scrollbar {
             display: none;
         }
     </style>
 </head>
 
-<body class="p-4 md:p-12">
+<body class="p-6 md:p-10">
     <div class="cyber-grid"></div>
-    <div id="glitch-overlay" class="glitch-overlay"></div>
 
-    <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+    <div class="max-w-7xl mx-auto space-y-8">
+        <!-- Top Header Layout -->
+        <header
+            class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6 border-b border-slate-200 pb-6">
             <div>
-                <h1 class="text-5xl font-black italic tracking-tighter">
-                    <span class="text-white">SRE-SPACE</span><span class="text-[#00f2fe]">.CONTROL</span>
+                <h1 class="text-4xl font-black tracking-tight text-slate-900">
+                    SPACE<span class="text-blue-600">.CONTROL</span>
                 </h1>
-                <p class="text-slate-500 mt-2 font-semibold flex items-center gap-3">
-                    Reliability Control Plane v5.2.0
-                    <span id="badge-sim"
-                        class="text-[9px] px-2 py-0.5 rounded bg-rose-500/10 text-rose-500 border border-rose-500/20 font-black">🧪
-                        SIMULATION</span>
-                    <span id="badge-live"
-                        class="hidden text-[9px] px-2 py-0.5 rounded bg-green-500/10 text-green-500 border border-green-500/20 font-black">☁️
-                        CLOUD LIVE</span>
-                    <span
-                        class="text-[9px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 font-black">🔒
-                        SAFE MODE active</span>
-                </p>
+                <p class="text-slate-500 font-medium mt-1">Reliability Playground v6.0 — Agentic OODA Loop: ACTIVE</p>
+                <div class="mt-4 flex gap-3">
+                    <span id="badge-cloud"
+                        class="hidden status-badge bg-blue-100 text-blue-700 border border-blue-200">☁️ CLOUD DEPLOYMENT
+                        MODE</span>
+                    <span id="badge-local" class="status-badge bg-slate-100 text-slate-700 border border-slate-200">🧪
+                        LOCAL CONTROL PLANE (Docker)</span>
+                </div>
             </div>
 
-            <div class="flex items-center gap-6">
-                <!-- Cloud Provider Dropdown -->
-                <div class="relative group">
-                    <select id="cloud-provider-select" onchange="updateStack(this.value)"
-                        class="bg-white/5 border border-white/10 text-xs font-black px-4 py-2 rounded-xl outline-none hover:border-blue-500 transition-all appearance-none cursor-pointer pr-10">
-                        <option value="ec2">AWS (EC2/EKS)</option>
-                        <option value="gce">GCP (GCE/GKE)</option>
-                        <option value="kubernetes">KUBERNETES (Universal)</option>
-                        <option value="local">LOCAL (Simulation)</option>
-                    </select>
-                    <div
-                        class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-[10px]">
-                        ▼</div>
-                </div>
-
-                <div class="flex items-center gap-4">
-                    <button onclick="startTour()"
-                        class="text-xs font-bold text-blue-400 hover:text-white transition-colors flex items-center gap-1 border border-blue-500/20 px-3 py-1 rounded-full bg-blue-500/5">
-                        <span>✨</span> TOUR
-                    </button>
-                    <button onclick="startSandbox()"
-                        class="text-xs font-bold text-purple-400 hover:text-white transition-colors flex items-center gap-1 border border-purple-500/20 px-3 py-1 rounded-full bg-purple-500/5">
-                        <span>🧪</span> SANDBOX
-                    </button>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <div id="system-status"
-                        class="text-[10px] font-black text-green-400 uppercase tracking-widest bg-green-400/10 px-4 py-2 rounded-full border border-green-400/20">
-                        System Nominal</div>
-                    <button onclick="triggerChaos()"
-                        class="btn-chaos px-4 py-2 rounded-xl text-xs flex items-center gap-2">
-                        🔥 INJECT
-                    </button>
-                </div>
+            <div class="flex items-center gap-4">
+                <button onclick="startTour()"
+                    class="px-4 py-2 text-sm font-semibold text-blue-600 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors flex items-center gap-2">
+                    ✨ START GUIDED TOUR
+                </button>
+                <button onclick="startSandbox()"
+                    class="px-4 py-2 text-sm font-semibold text-purple-600 bg-purple-50 border border-purple-200 rounded-xl hover:bg-purple-100 transition-colors flex items-center gap-2">
+                    🧪 START SANDBOX
+                </button>
+                <button onclick="deployControlPlane()"
+                    class="btn-primary px-5 py-2.5 text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20">
+                    🚀 DEPLOY CONTROL PLANE
+                </button>
             </div>
         </header>
 
-        <!-- Infrastructure Capabilities HUD -->
-        <div class="grid grid-cols-4 gap-4 mb-10">
-            <div class="glass-card p-4 flex flex-col justify-center items-center text-center">
-                <span class="text-[9px] font-black text-slate-500 uppercase mb-2">Capabilities</span>
-                <div id="capabilities-list" class="flex gap-2 flex-wrap justify-center">
-                    <span
-                        class="text-[9px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/10">Restart</span>
-                    <span
-                        class="text-[9px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/10">Snapshot</span>
-                    <span
-                        class="text-[9px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/10">Scale</span>
+        <!-- Main Dashboard Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <!-- Environment / Provider Column -->
+            <div class="lg:col-span-4 space-y-6">
+
+                <!-- Environment Config -->
+                <div class="glass-card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-slate-800">Cloud Provider</h2>
+                        <span id="provider-status" class="pulse-dot"></span>
+                    </div>
+
+                    <select id="provider-select" onchange="updateProvider(this.value)"
+                        class="w-full bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-lg block p-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer shadow-sm">
+                        <option value="local">Local (Simulation)</option>
+                        <option value="aws">AWS (Amazon Web Services)</option>
+                        <option value="gcp">GCP (Google Cloud)</option>
+                        <option value="kubernetes">Kubernetes native</option>
+                    </select>
+
+                    <!-- Setup Guide Panel -->
+                    <div id="setup-panel-local" class="mt-6 p-4 bg-slate-50 border border-slate-100 rounded-xl text-sm">
+                        <h3 class="font-semibold text-slate-800 mb-3">Local Setup Guide</h3>
+                        <ol class="list-decimal ml-4 space-y-2 text-slate-600">
+                            <li><code>git clone ...</code></li>
+                            <li><code>cp .env.example .env</code></li>
+                            <li>Add <code>OPENAI_API_KEY</code></li>
+                            <li><code>docker-compose up -d</code></li>
+                        </ol>
+                        <ul class="mt-4 space-y-1 text-xs font-medium">
+                            <li class="flex items-center text-green-600"><svg class="w-4 h-4 mr-1" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg> Agent Services Ready</li>
+                            <li class="flex items-center text-green-600"><svg class="w-4 h-4 mr-1" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg> OTel Collector Connected</li>
+                        </ul>
+                    </div>
+
+                    <div id="setup-panel-aws"
+                        class="hidden mt-6 p-4 bg-slate-50 border border-slate-100 rounded-xl text-sm">
+                        <h3 class="font-semibold text-slate-800 mb-3 block">AWS Target Stack</h3>
+                        <div class="flex gap-2 mb-4">
+                            <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="aws-stack"
+                                    checked class="accent-blue-600"> EC2</label>
+                            <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="aws-stack"
+                                    class="accent-blue-600"> EKS</label>
+                            <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="aws-stack"
+                                    class="accent-blue-600"> Beanstalk</label>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-3">Requires AWS_ACCESS_KEY_ID attached with
+                            SRE-Space-ControlPlane IAM Role.</p>
+                        <button class="w-full btn-primary py-2 text-xs">Provision EC2 + Install Control Plane</button>
+                    </div>
+
+                    <div id="setup-panel-gcp"
+                        class="hidden mt-6 p-4 bg-slate-50 border border-slate-100 rounded-xl text-sm">
+                        <h3 class="font-semibold text-slate-800 mb-3">GCP Target Stack</h3>
+                        <div class="flex gap-2 mb-4">
+                            <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="gcp-stack"
+                                    checked class="accent-blue-600"> GCE</label>
+                            <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="gcp-stack"
+                                    class="accent-blue-600"> GKE</label>
+                        </div>
+                        <button class="w-full btn-primary py-2 text-xs">Provision VM + Install Control Plane</button>
+                    </div>
                 </div>
+
+                <!-- Production Guardrails -->
+                <div class="glass-card p-6">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4">Production Guardrails</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <span class="text-sm font-semibold text-slate-600">🛡 Snapshot First</span>
+                            <span class="status-badge bg-green-100 text-green-700">ENABLED</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <span class="text-sm font-semibold text-slate-600">🔁 Auto Rollback</span>
+                            <span class="status-badge bg-green-100 text-green-700">ENABLED</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <span class="text-sm font-semibold text-slate-600">📦 GitOps PR Only</span>
+                            <span class="status-badge bg-green-100 text-green-700">ENABLED</span>
+                        </div>
+                        <div class="flex justify-between items-center pb-1">
+                            <span class="text-sm font-semibold text-slate-600">⚠ Escalation Gate</span>
+                            <span class="text-xs font-bold text-amber-600">> 0.85 Conf</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-            <div class="glass-card p-4 flex flex-col justify-center">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="text-[9px] font-black text-slate-500 uppercase">Blast Radius Limit</span>
-                    <span class="text-[10px] font-black text-blue-400">1 UNIT</span>
+
+            <!-- Terminal and Actions Column -->
+            <div class="lg:col-span-8 flex flex-col gap-6">
+
+                <!-- Live System Status Board -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div class="glass-card p-4 text-center">
+                        <div class="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Scout</div>
+                        <div class="text-sm font-bold text-green-600 flex items-center justify-center gap-1">
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div> Active
+                        </div>
+                        <div class="text-xs text-slate-400 mt-1">Lat: 450ms</div>
+                    </div>
+                    <div class="glass-card p-4 text-center">
+                        <div class="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider\">Brain</div>
+                        <div class="text-sm font-bold text-green-600 flex items-center justify-center gap-1">
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div> Active
+                        </div>
+                        <div class="text-xs text-slate-400 mt-1">Lat: 1.2s</div>
+                    </div>
+                    <div class="glass-card p-4 text-center">
+                        <div class="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Fixer</div>
+                        <div class="text-sm font-bold text-green-600 flex items-center justify-center gap-1">
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div> Ready
+                        </div>
+                        <div class="text-xs text-slate-400 mt-1">Lat: —</div>
+                    </div>
+                    <div class="glass-card p-4 text-center">
+                        <div class="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Curator</div>
+                        <div class="text-sm font-bold text-green-600 flex items-center justify-center gap-1">
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div> Indexed
+                        </div>
+                        <div class="text-xs text-slate-400 mt-1">120k vectors</div>
+                    </div>
+                    <div class="glass-card p-4 text-center">
+                        <div class="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Adapter</div>
+                        <div id="status-adapter-val"
+                            class="text-sm font-bold text-blue-600 flex items-center justify-center gap-1">LOCAL</div>
+                        <div class="text-xs text-slate-400 mt-1">Connected</div>
+                    </div>
                 </div>
-                <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                    <div class="w-1/4 h-full bg-blue-500 shadow-[0_0_10px_#00f2fe]"></div>
+
+                <!-- OODA Terminal Feed -->
+                <div class="hud-terminal flex-1 flex flex-col overflow-hidden min-h-[350px] shadow-2xl relative">
+                    <div
+                        class="bg-slate-800/80 px-5 py-3 flex justify-between items-center text-xs font-bold text-slate-300 border-b border-slate-700/50">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></span>
+                            STREAMING OODA TELEMETRY
+                        </div>
+                        <div id="sys-status-label" class="text-green-400 uppercase tracking-widest">Nominal</div>
+                    </div>
+                    <div id="logs" class="p-6 overflow-y-auto flex-1 text-sm space-y-3 scrollbar-hide">
+                        <div class="text-slate-500 italic">Awaiting sensor data...</div>
+                    </div>
                 </div>
-            </div>
-            <div class="glass-card p-4 flex flex-col justify-center">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-[9px] font-black text-slate-500 uppercase">Snapshot Mode</span>
-                    <span class="text-[9px] font-black text-green-500 uppercase">ENABLED</span>
+
+                <!-- Chaos Controls -->
+                <div class="glass-card p-6">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <span>🔥</span> Chaos Controls (Agentic Reaction Demo)
+                    </h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="chaos-lab-buttons">
+                        <button onclick="triggerSimulation('AWS_EC2_DISK_FULL')"
+                            class="btn-chaos p-3 text-left w-full flex flex-col gap-1">
+                            <span class="text-sm">Disk Full (EC2)</span>
+                            <span class="text-[10px] font-normal opacity-80 uppercase tracking-wider">Inject
+                                Anomaly</span>
+                        </button>
+                        <button onclick="triggerSimulation('K8S_POD_CRASH')"
+                            class="btn-chaos p-3 text-left w-full flex flex-col gap-1">
+                            <span class="text-sm">Crash Pod (EKS)</span>
+                            <span class="text-[10px] font-normal opacity-80 uppercase tracking-wider">Inject
+                                Anomaly</span>
+                        </button>
+                        <button onclick="triggerSimulation('GCE_CPU_BURN')"
+                            class="btn-chaos p-3 text-left w-full flex flex-col gap-1">
+                            <span class="text-sm">CPU Burn (GCE)</span>
+                            <span class="text-[10px] font-normal opacity-80 uppercase tracking-wider">Inject
+                                Anomaly</span>
+                        </button>
+                        <button onclick="triggerSimulation('APP_MEM_LEAK')"
+                            class="btn-chaos p-3 text-left w-full flex flex-col gap-1">
+                            <span class="text-sm">Memory Leak</span>
+                            <span class="text-[10px] font-normal opacity-80 uppercase tracking-wider">App
+                                Emulation</span>
+                        </button>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-[9px] font-black text-slate-500 uppercase">Auto Rollback</span>
-                    <span class="text-[9px] font-black text-green-500 uppercase">ENABLED</span>
-                </div>
-            </div>
-            <div class="glass-card p-4 flex flex-col justify-center">
-                <div class="flex justify-between items-center">
-                    <span class="text-[9px] font-black text-slate-500 uppercase">Cognitive Gate</span>
-                    <span class="text-[10px] font-black text-rose-400">> 0.85 Conf</span>
-                </div>
-                <div class="text-[9px] text-slate-600 mt-1 italic italic">Human Escalation active</div>
+
             </div>
         </div>
 
-        <!-- New Tab Navigation -->
-        <div class="flex gap-8 mb-10 border-b border-white/5">
-            <button onclick="showTab('dashboard')" id="tab-dashboard"
-                class="pb-4 text-sm font-black tracking-widest border-b-2 border-blue-500 text-white">DASHBOARD</button>
-            <button onclick="showTab('deploy')" id="tab-deploy"
-                class="pb-4 text-sm font-black tracking-widest border-b-2 border-transparent text-slate-500 hover:text-white transition-all">DEPLOY
-                TO PROD</button>
+        <div class="text-center mt-8 pb-4">
+            <p class="text-sm font-semibold text-slate-500">Open-Source Agentic SRE Control Plane</p>
+            <p class="text-xs text-slate-400 mt-1">Deploy Anywhere. Repair Automatically. Roll Back Safely.</p>
         </div>
+    </div>
 
-        <!-- Onboarding Modal -->
-        <div id="onboarding-modal"
-            class="fixed inset-0 z-[2000] hidden flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
-            <div class="glass-card max-w-2xl w-full p-12 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-rose-500">
+    <!-- Tour Overlay -->
+    <div id="tour-overlay"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative">
+            <button onclick="closeTour()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><svg
+                    width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg></button>
+            <div id="tour-icon" class="text-4xl mb-4">🔭</div>
+            <h3 id="tour-title" class="text-2xl font-bold text-slate-800 mb-2">Phase 1: Scout</h3>
+            <p id="tour-desc" class="text-slate-600 leading-relaxed mb-6">"This is the Senses Layer — OpenTelemetry
+                Intake." Scout continuously monitors for anomalous signals, preventing alert fatigue.</p>
+            <div class="flex justify-between items-center">
+                <div class="flex gap-1">
+                    <div id="dot-0" class="w-2 h-2 rounded-full bg-blue-600"></div>
+                    <div id="dot-1" class="w-2 h-2 rounded-full bg-slate-200"></div>
+                    <div id="dot-2" class="w-2 h-2 rounded-full bg-slate-200"></div>
+                    <div id="dot-3" class="w-2 h-2 rounded-full bg-slate-200"></div>
                 </div>
-                <h2 class="text-4xl font-black mb-2 tracking-tighter">ORBITAL ONBOARDING</h2>
-                <p class="text-slate-400 mb-10 font-semibold">Initialize your SRE-Space infrastructure stack.</p>
-
-                <div class="grid grid-cols-2 gap-6 mb-10">
-                    <button onclick="selectStack('aws')"
-                        class="p-6 rounded-2xl border border-white/10 bg-white/5 hover:border-blue-500/50 transition-all text-left group">
-                        <div class="text-3xl mb-4 group-hover:scale-110 transition-transform">🚀</div>
-                        <div class="font-black text-lg">AWS EC2</div>
-                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Cloud Native</div>
-                    </button>
-                    <button onclick="selectStack('kubernetes')"
-                        class="p-6 rounded-2xl border border-white/10 bg-white/5 hover:border-blue-500/50 transition-all text-left group">
-                        <div class="text-3xl mb-4 group-hover:scale-110 transition-transform">☸️</div>
-                        <div class="font-black text-lg">Kubernetes</div>
-                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Orchestration</div>
-                    </button>
-                    <button onclick="selectStack('gce')"
-                        class="p-6 rounded-2xl border border-white/10 bg-white/5 hover:border-blue-500/50 transition-all text-left group">
-                        <div class="text-3xl mb-4 group-hover:scale-110 transition-transform">☁️</div>
-                        <div class="font-black text-lg">Google Compute</div>
-                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Compute Engine</div>
-                    </button>
-                    <button onclick="selectStack('local')"
-                        class="p-6 rounded-2xl border border-white/10 bg-white/5 hover:border-blue-500/50 transition-all text-left group">
-                        <div class="text-3xl mb-4 group-hover:scale-110 transition-transform">🧪</div>
-                        <div class="font-black text-lg">Simulation Mode</div>
-                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Zero Cost / Local</div>
-                    </button>
-                </div>
-
-                <div id="stack-config-form" class="hidden space-y-6">
-                    <div>
-                        <label
-                            class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 block">Pinecone
-                            API Key (Cloud Memory)</label>
-                        <input type="password" id="pinecone-key" placeholder="pcsk_..."
-                            class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none transition-all">
-                    </div>
-                    <button onclick="finalizeOnboarding()"
-                        class="btn-cyber w-full py-4 text-sm tracking-widest">INITIALIZE SYSTEM</button>
-                </div>
-
-                <button onclick="skipOnboarding()"
-                    class="w-full mt-6 text-[10px] font-black text-slate-600 hover:text-white uppercase tracking-[4px] transition-colors">SKIP
-                    ONBOARDING →</button>
-            </div>
-        </div>
-
-        <!-- Tour Tooltip Template -->
-        <div id="tour-tooltip"
-            class="fixed z-[3000] hidden max-w-xs w-full glass-card p-6 shadow-2xl pointer-events-none">
-            <div class="flex items-center gap-3 mb-3">
-                <span id="tour-step-icon" class="text-2xl">🛰️</span>
-                <span id="tour-step-title" class="font-black uppercase tracking-tighter text-blue-400">Step 1</span>
-            </div>
-            <p id="tour-step-desc" class="text-sm font-semibold text-slate-200 mb-6"></p>
-            <div class="flex justify-end">
-                <button onclick="nextTourStep()"
-                    class="text-[10px] font-black text-blue-400 uppercase tracking-widest border border-blue-500/30 px-4 py-2 rounded-lg pointer-events-auto hover:bg-blue-500 hover:text-black transition-all">NEXT
-                    STEP →</button>
-            </div>
-        </div>
-
-        <div id="tab-content-dashboard">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                <!-- Marketplace Display -->
-                <div class="lg:col-span-7 space-y-10">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-3xl font-extrabold tracking-tight">Active Policy Tiers</h2>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <!-- Premium Life -->
-                        <div class="glass-card p-10 cursor-pointer" onclick="processQuote('Life Premium')">
-                            <div
-                                class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center text-4xl mb-6 border border-blue-500/20">
-                                ❤️</div>
-                            <h3 class="text-2xl font-black mb-3 text-white">Life Elite</h3>
-                            <p class="text-slate-400 text-sm leading-relaxed mb-10">High-fidelity coverage with embedded
-                                autonomous claim verification agents.</p>
-                            <button class="btn-cyber w-full py-4">GET QUOTE</button>
-                        </div>
-
-                        <!-- Cyber Shield -->
-                        <div class="glass-card p-10 cursor-pointer" onclick="processQuote('Cyber Shield')">
-                            <div
-                                class="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-4xl mb-6 border border-purple-500/20">
-                                🛡️</div>
-                            <h3 class="text-2xl font-black mb-3 text-white">Cyber Shield</h3>
-                            <p class="text-slate-400 text-sm leading-relaxed mb-10">Comprehensive protection against
-                                logic
-                                flows and state corruption anomalies.</p>
-                            <button class="btn-cyber w-full py-4">DEPLOY COVER</button>
-                        </div>
-                    </div>
-
-                    <!-- Live Metrics (Dynamic) -->
-                    <div class="glass-card p-8 grid grid-cols-3 gap-8">
-                        <div class="text-center">
-                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">MTTR</span>
-                            <div class="text-2xl font-black mt-1 text-white">4.2m</div>
-                        </div>
-                        <div class="text-center border-x border-white/5">
-                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Resilience</span>
-                            <div class="text-2xl font-black mt-1 text-green-400">99.8%</div>
-                        </div>
-                        <div class="text-center">
-                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Active
-                                Threads</span>
-                            <div class="text-2xl font-black mt-1 text-blue-400">124</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Agent Squad Monitor (HUD) -->
-                <div class="lg:col-span-5 flex flex-col">
-                    <h2 class="text-3xl font-extrabold tracking-tight mb-10">Sensory Intake</h2>
-                    <div class="hud-terminal flex-1 flex flex-col overflow-hidden mb-8">
-                        <div
-                            class="bg-white/5 px-6 py-3 flex justify-between items-center text-[10px] font-black uppercase text-slate-500">
-                            <div class="flex items-center gap-2">
-                                <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-                                STREAMING OODA TELEMETRY
-                            </div>
-                            <div id="loading-spinner" class="hidden">SYNCING...</div>
-                        </div>
-                        <div id="logs" class="p-8 overflow-y-auto flex-1 font-mono text-sm space-y-2 scrollbar-hide">
-                            <div class="text-slate-600 italic">Awaiting sensor data...</div>
-                        </div>
-                        <div class="bg-white/5 p-4 text-[9px] text-center text-slate-600 font-bold tracking-[4px]">
-                            /// COGNITIVE CONTROL PLANE INTERFACE ///
-                        </div>
-                    </div>
-
-                    <!-- Chaos Lab Section -->
-                    <div class="glass-card p-8">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                                <span class="text-rose-500">🛡️</span> Chaos Lab
-                            </h3>
-                            <span id="current-stack"
-                                class="text-[10px] font-black bg-blue-500/10 text-blue-400 px-2 py-1 rounded border border-blue-500/20 uppercase">Stack:
-                                ...</span>
-                        </div>
-                        <div class="grid grid-cols-1 gap-4" id="chaos-lab-buttons">
-                            <button onclick="triggerSimulation('AWS_EC2_DISK_FULL')" id="btn-ec2"
-                                class="text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group">
-                                <span>🚀 [EC2] EBS Volume Exhaustion</span>
-                                <span class="opacity-0 group-hover:opacity-100">RUN →</span>
-                            </button>
-                            <button onclick="triggerSimulation('K8S_POD_CRASH')" id="btn-kubernetes"
-                                class="text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group">
-                                <span>☸️ [K8S] CrashLoopBackOff Injection</span>
-                                <span class="opacity-0 group-hover:opacity-100">RUN →</span>
-                            </button>
-                            <button onclick="triggerSimulation('GCE_CPU_BURN')" id="btn-gce"
-                                class="text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group">
-                                <span>☁️ [GCE] Compute Soft Lockup</span>
-                                <span class="opacity-0 group-hover:opacity-100">RUN →</span>
-                            </button>
-                        </div>
-                        <p class="text-[10px] text-slate-500 mt-4 italic">* SIMULATION_MODE active: Fixer will only
-                            simulate
-                            mutations.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="tab-content-deploy" class="hidden space-y-12">
-            <div class="glass-card p-12">
-                <h2 class="text-4xl font-black mb-8 tracking-tighter text-blue-400">PRODUCTION DEPLOYMENT GUIDE</h2>
-
-                <div class="space-y-10">
-                    <section>
-                        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-3">
-                            <span
-                                class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-sm font-black text-blue-400 border border-blue-500/30">A</span>
-                            The Host Infrastructure
-                        </h3>
-                        <div
-                            class="bg-white/5 p-6 rounded-2xl border border-white/5 text-slate-300 leading-relaxed text-sm">
-                            <p class="mb-4">Deploy the SRE-Space Control Plane on a dedicated Linux VM (Ubuntu 22.04
-                                recommended).</p>
-                            <ul class="list-disc ml-6 space-y-2">
-                                <li><strong>AWS:</strong> Instance type `t3.medium` or larger.</li>
-                                <li><strong>GCP:</strong> Instance type `e2-medium` or larger.</li>
-                                <li><strong>Software:</strong> Install `docker` and `docker-compose-v2`.</li>
-                            </ul>
-                        </div>
-                    </section>
-
-                    <section>
-                        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-3">
-                            <span
-                                class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-sm font-black text-blue-400 border border-blue-500/30">B</span>
-                            Network Security & Ingress
-                        </h3>
-                        <div
-                            class="bg-white/5 p-6 rounded-2xl border border-white/5 text-slate-300 leading-relaxed text-sm">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="bg-black/30 p-4 rounded-xl border border-white/5">
-                                    <div class="font-black text-blue-400 text-xs mb-1">Port 8001 (UI)</div>
-                                    <div class="text-slate-500 text-[10px]">Dashboard & API</div>
-                                </div>
-                                <div class="bg-black/30 p-4 rounded-xl border border-white/5">
-                                    <div class="font-black text-rose-400 text-xs mb-1">Port 4317/4318</div>
-                                    <div class="text-slate-500 text-[10px]">OTel Ingest (gRPC/HTTP)</div>
-                                </div>
-                            </div>
-                            <div
-                                class="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl flex gap-3 text-orange-400 italic">
-                                <span>⚠️</span>
-                                <span><strong>Guardrail:</strong> Only allow your office IP or your VPC CIDR to access
-                                    these ports in your Security Group / Firewall.</span>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section>
-                        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-3">
-                            <span
-                                class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-sm font-black text-blue-400 border border-blue-500/30">C</span>
-                            Agent Residency (Persistence)
-                        </h3>
-                        <div
-                            class="bg-white/5 p-6 rounded-2xl border border-white/5 text-slate-300 leading-relaxed text-sm">
-                            <p class="mb-4">Configure `systemd` to ensure the Control Plane restarts on reboot.</p>
-                            <pre class="bg-black/50 p-4 rounded-xl font-mono text-xs text-blue-300 overflow-x-auto">[Unit]
-Description=SRE-Space Control Plane
-After=docker.service
-
-[Service]
-WorkingDirectory=/opt/sre-space
-ExecStart=/usr/bin/docker-compose up
-Restart=always
-
-[Install]
-WantedBy=multi-user.target</pre>
-                        </div>
-                    </section>
-                </div>
+                <button onclick="nextTour()" class="btn-primary px-5 py-2 text-sm">Next Step</button>
             </div>
         </div>
     </div>
 
+    <!-- Deploy Overlay -->
+    <div id="deploy-overlay"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative">
+            <button onclick="closeDeploy()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><svg
+                    width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg></button>
+            <h3 class="text-2xl font-bold text-slate-800 mb-2">Host Control Plane</h3>
+            <p class="text-slate-600 mb-6">Select your preferred residency foundation. The deployment wizard will
+                securely provision the SRE infrastructure.</p>
+
+            <div class="space-y-3">
+                <div
+                    class="p-4 border border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-slate-800">Docker Native</h4>
+                        <p class="text-xs text-slate-500">Docker daemon / compose local network</p>
+                    </div>
+                </div>
+                <div
+                    class="p-4 border border-blue-500 bg-blue-50 rounded-xl cursor-pointer transition-all flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-blue-900">Amazon Web Services</h4>
+                        <p class="text-xs text-blue-600">Bootstrap securely onto EC2 standard</p>
+                    </div>
+                    <span class="status-badge bg-blue-600 text-white">RECOMMENDED</span>
+                </div>
+                <div
+                    class="p-4 border border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-slate-800">Google Cloud Platform</h4>
+                        <p class="text-xs text-slate-500">Deploy instances via GCE API</p>
+                    </div>
+                </div>
+            </div>
+            <button onclick="closeDeploy()" class="w-full mt-6 btn-primary py-3 text-sm">Proceed to Wizard</button>
+        </div>
+    </div>
+
     <script>
-        // Global State & UI Elements
-        const logContainer = document.getElementById('logs');
-        const overlay = document.getElementById('glitch-overlay');
-        const systemStatus = document.getElementById('system-status');
-        const onboardingModal = document.getElementById('onboarding-modal');
-        const stackConfigForm = document.getElementById('stack-config-form');
-        const tourTooltip = document.getElementById('tour-tooltip');
+        // API Base Resolution
+        const API_BASE = window.location.origin.includes('localhost') ? 'http://localhost:8001' : 'https://sre-space-cp.onrender.com';
 
-        let currentStackType = null;
         let isDemoMode = true;
-        let tourStep = 0;
+        const logContainer = document.getElementById('logs');
 
-        const tourData = [
-            {
-                target: 'logs',
-                title: 'Phase 1: Scout (Observation)',
-                desc: 'Scout continuously monitors your OpenTelemetry collectors. It filters out noises and identifies critical health degradations in real-time.',
-                icon: '🔭'
-            },
-            {
-                target: 'logs',
-                title: 'Phase 2: Brain (RCA & RAG)',
-                desc: 'When an anomaly is detected, the Brain performs Root Cause Analysis by retrieving historical solutions from your Cloud Memory (Pinecone).',
-                icon: '🧠'
-            },
-            {
-                target: 'chaos-lab-buttons',
-                title: 'Phase 3: Fixer (Action)',
-                desc: 'Fixer executes the remediation. In Demo Mode, it simulates mutations safely while opening a real Simulation PR in GitHub for governance.',
-                icon: '🛠️'
-            },
-            {
-                target: 'logs',
-                title: 'Phase 4: Jules & Curator',
-                desc: 'Jules reviews the fix for technical debt, and Curator archives the knowledge back to memory, ensuring the system gets smarter every turn.',
-                icon: '📂'
-            }
-        ];
+        function updateProvider(val) {
+            document.querySelectorAll('[id^="setup-panel-"]').forEach(el => el.classList.add('hidden'));
+            const panel = document.getElementById(`setup-panel-${val}`);
+            if (panel) panel.classList.remove('hidden');
 
-        window.onload = async () => {
-            await refreshSystemHealth();
-            if (!currentStackType) {
-                onboardingModal.classList.remove('hidden');
-            }
-        };
+            const badgeCloud = document.getElementById('badge-cloud');
+            const badgeLocal = document.getElementById('badge-local');
+            const adapterVal = document.getElementById('status-adapter-val');
 
-        async function refreshSystemHealth() {
-            try {
-                const res = await fetch('/system/health');
-                const data = await res.json();
-                if (data.env_stack) {
-                    currentStackType = data.env_stack;
-                    document.getElementById('cloud-provider-select').value = currentStackType;
-                    updateStack(currentStackType);
-                }
-            } catch (e) { }
-        }
-
-        function updateStack(stack) {
-            currentStackType = stack;
-            const capabilitiesList = document.getElementById('capabilities-list');
-            const badgeSim = document.getElementById('badge-sim');
-            const badgeLive = document.getElementById('badge-live');
-
-            // Capabilities mapping
-            const caps = {
-                'ec2': ['Restart', 'Snapshot', 'Scale', 'Patch'],
-                'gce': ['Config Mutation', 'OS-Level Patch'],
-                'kubernetes': ['Pod Restart', 'HPA Scaling', 'GitOps Patch'],
-                'local': ['Full OODA Simulation']
-            };
-
-            // Render caps
-            if (caps[stack]) {
-                capabilitiesList.innerHTML = caps[stack].map(c => `<span class="text-[9px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/10">${c}</span>`).join('');
-            }
-
-            // Set Simulation vs Live badge
-            if (stack === 'local' || isDemoMode) {
-                badgeSim.classList.remove('hidden');
-                badgeLive.classList.add('hidden');
+            if (val === 'local') {
+                isDemoMode = true;
+                badgeCloud.classList.add('hidden');
+                badgeLocal.classList.remove('hidden');
+                adapterVal.innerText = 'LOCAL';
             } else {
-                badgeSim.classList.add('hidden');
-                badgeLive.classList.remove('hidden');
+                isDemoMode = false;
+                badgeCloud.classList.remove('hidden');
+                badgeLocal.classList.add('hidden');
+                adapterVal.innerText = val.toUpperCase();
             }
-
-            // Toggle Chaos Lab buttons
-            const btnEc2 = document.getElementById('btn-ec2');
-            const btnK8s = document.getElementById('btn-kubernetes');
-            const btnGce = document.getElementById('btn-gce');
-
-            if (btnEc2) {
-                btnEc2.disabled = (stack !== 'ec2' && stack !== 'local');
-                btnEc2.className = btnEc2.disabled ? 'text-sm font-bold bg-white/5 opacity-30 grayscale text-rose-400 p-3 rounded-lg border border-white/5 text-left flex justify-between items-center group cursor-not-allowed' : 'text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group';
-            }
-            if (btnK8s) {
-                btnK8s.disabled = (stack !== 'kubernetes' && stack !== 'local');
-                btnK8s.className = btnK8s.disabled ? 'text-sm font-bold bg-white/5 opacity-30 grayscale text-rose-400 p-3 rounded-lg border border-white/5 text-left flex justify-between items-center group cursor-not-allowed' : 'text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group';
-            }
-            if (btnGce) {
-                btnGce.disabled = (stack !== 'gce' && stack !== 'local');
-                btnGce.className = btnGce.disabled ? 'text-sm font-bold bg-white/5 opacity-30 grayscale text-rose-400 p-3 rounded-lg border border-white/5 text-left flex justify-between items-center group cursor-not-allowed' : 'text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group';
-            }
-        }
-
-        // --- Onboarding Logic ---
-        let selectedStack = null;
-        function selectStack(stack) {
-            selectedStack = stack;
-            stackConfigForm.classList.remove('hidden');
-            addLog(`System: Preparing onboarding for ${stack.toUpperCase()}...`);
-        }
-
-        async function finalizeOnboarding() {
-            const pineconeKey = document.getElementById('pinecone-key').value;
-            const res = await fetch('/api/config/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ STACK_TYPE: selectedStack, PINECONE_API_KEY: pineconeKey })
-            });
-            const data = await res.json();
-            if (data.status === 'success') {
-                onboardingModal.classList.add('hidden');
-                await refreshSystemHealth();
-                addLog(`System: ${selectedStack.toUpperCase()} stack initialized.`);
-            }
-        }
-
-        function skipOnboarding() {
-            onboardingModal.classList.add('hidden');
-            document.getElementById('cloud-provider-select').value = 'local';
-            updateStack('local');
-            addLog("System: Onboarding bypassed. Running with current environment defaults.");
-        }
-
-        // --- Mode Switching ---
-        function setMode(mode) {
-            isDemoMode = mode === 'demo';
-            const btnReal = document.getElementById('btn-mode-real');
-            const btnDemo = document.getElementById('btn-mode-demo');
-
-            if (isDemoMode) {
-                btnDemo.className = "px-3 py-1 text-[10px] font-black rounded-lg bg-blue-500 text-black";
-                btnReal.className = "px-3 py-1 text-[10px] font-black rounded-lg text-slate-400";
-                addLog("System: DEMO MODE active. Shadow Telemetry enabled.");
-            } else {
-                btnReal.className = "px-3 py-1 text-[10px] font-black rounded-lg bg-green-500 text-black";
-                btnDemo.className = "px-3 py-1 text-[10px] font-black rounded-lg text-slate-400";
-                addLog("System: REAL MODE active. Connected to live infrastructure.");
-            }
-        }
-
-        // --- Guided Tour Logic ---
-        function startTour() {
-            tourStep = 0;
-            showTourStep();
-        }
-
-        function showTourStep() {
-            const step = tourData[tourStep];
-            const target = document.getElementById(step.target);
-            const rect = target.getBoundingClientRect();
-
-            tourTooltip.classList.remove('hidden');
-            document.getElementById('tour-step-title').innerText = `Step ${tourStep + 1}`;
-            document.getElementById('tour-step-desc').innerText = step.desc;
-            document.getElementById('tour-step-icon').innerText = step.icon;
-
-            tourTooltip.style.top = `${rect.top}px`;
-            tourTooltip.style.left = `${rect.left - 350}px`;
-
-            target.classList.add('ring-4', 'ring-blue-500', 'ring-opacity-50', 'transition-all');
-        }
-
-        function nextTourStep() {
-            const prevStep = tourData[tourStep];
-            document.getElementById(prevStep.target).classList.remove('ring-4', 'ring-blue-500', 'ring-opacity-50');
-
-            tourStep++;
-            if (tourStep < tourData.length) {
-                showTourStep();
-            } else {
-                tourTooltip.classList.add('hidden');
-                addLog("System: Guided Tour complete. Ready for Autonomous Operations.");
-            }
-        }
-
-        // --- Tab Management ---
-        function showTab(tab) {
-            const dashboard = document.getElementById('tab-content-dashboard');
-            const deploy = document.getElementById('tab-content-deploy');
-            const tabDash = document.getElementById('tab-dashboard');
-            const tabDeploy = document.getElementById('tab-deploy');
-
-            if (tab === 'dashboard') {
-                dashboard.classList.remove('hidden');
-                deploy.classList.add('hidden');
-                tabDash.className = "pb-4 text-sm font-black tracking-widest border-b-2 border-blue-500 text-white";
-                tabDeploy.className = "pb-4 text-sm font-black tracking-widest border-b-2 border-transparent text-slate-500 hover:text-white transition-all";
-            } else {
-                deploy.classList.remove('hidden');
-                dashboard.classList.add('hidden');
-                tabDeploy.className = "pb-4 text-sm font-black tracking-widest border-b-2 border-blue-500 text-white";
-                tabDash.className = "pb-4 text-sm font-black tracking-widest border-b-2 border-transparent text-slate-500 hover:text-white transition-all";
-            }
-        }
-
-        async function startSandbox() {
-            logContainer.innerHTML = '';
-            addLog("🧪 [SANDBOX] Initializing Reliability Playground...");
-            addLog("System: Spinning up mock microservices: [user-service, quote-service, policy-service]");
-
-            try {
-                const res = await fetch('/demo/sandbox/start', { method: 'POST' });
-                const data = await res.json();
-
-                if (data.status === 'success') {
-                    addLog(`[SANDBOX] ${data.message}`);
-                    triggerSSEStream(true);
-                }
-            } catch (err) {
-                addLog("[ERROR] Sandbox initialization failed.");
-            }
-        }
-
-        function triggerSSEStream(isAnomaly) {
-            const eventSource = new EventSource(`/api/sre-loop?anomaly=${isAnomaly}&simulation=true`);
-            eventSource.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                addLog(data.message);
-                if (data.final_state) {
-                    eventSource.close();
-                }
-            };
         }
 
         function addLog(msg) {
             const div = document.createElement('div');
-            div.className = "log-line opacity-0 transform translate-x-2 transition-all duration-300";
+            div.className = "font-mono leading-relaxed mb-2 opacity-0 transition-opacity duration-300";
 
-            if (msg.includes('[SCOUT]')) div.innerHTML = `<span class="text-blue-400 font-bold">[SCOUT]</span> ${msg.split('[SCOUT]')[1]}`;
-            else if (msg.includes('[BRAIN]')) {
-                let content = msg.split('[BRAIN]')[1];
-                if (content.includes('Memory Agent Context Found') || content.includes('historical match')) {
-                    div.innerHTML = `<span class="text-purple-400 font-bold">[BRAIN]</span> <span class="bg-purple-500/20 border border-purple-500/30 px-2 py-1 rounded text-purple-300">🧠 ${content}</span>`;
-                } else {
-                    div.innerHTML = `<span class="text-purple-400 font-bold">[BRAIN]</span> ${content}`;
-                }
-            }
-            else if (msg.includes('[SIMULATION]')) div.innerHTML = `<span class="text-rose-400 font-bold italic">[SIMULATION]</span> ${msg.split('[SIMULATION]')[1]}`;
-            else if (msg.includes('[FIXER]')) div.innerHTML = `<span class="text-orange-400 font-bold">[FIXER]</span> ${msg.split('[FIXER]')[1]}`;
-            else if (msg.includes('System')) div.innerHTML = `<span class="text-slate-500">///</span> ${msg}`;
-            else div.innerText = msg;
+            // Syntax Highlight Tags
+            let formatted = msg;
+            if (msg.includes('[SCOUT]')) formatted = `<span class="text-blue-400 font-bold">[SCOUT]</span> ${msg.split('[SCOUT]')[1]}`;
+            else if (msg.includes('[BRAIN]')) formatted = `<span class="text-purple-400 font-bold">[BRAIN]</span> ${msg.split('[BRAIN]')[1]}`;
+            else if (msg.includes('[FIXER]')) formatted = `<span class="text-orange-400 font-bold">[FIXER]</span> ${msg.split('[FIXER]')[1]}`;
+            else if (msg.includes('[CURATOR]')) formatted = `<span class="text-emerald-400 font-bold">[CURATOR]</span> ${msg.split('[CURATOR]')[1]}`;
 
+            div.innerHTML = `<span class="text-slate-600 mr-2">></span>${formatted}`;
             logContainer.appendChild(div);
-            requestAnimationFrame(() => {
-                div.classList.remove('opacity-0', 'translate-x-2');
-            });
+
+            // Fade in effect
+            setTimeout(() => div.classList.remove('opacity-0'), 10);
             logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // --- Demo Streaming ---
+        function triggerSSEStream(isAnomaly) {
+            const es = new EventSource(`${API_BASE}/api/sre-loop?anomaly=${isAnomaly}&simulation=${isDemoMode}`);
+            es.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                if (data.message) addLog(data.message);
+                if (data.final_state) es.close();
+            };
+            es.onerror = () => {
+                es.close();
+            };
         }
 
         async function triggerSimulation(type) {
             logContainer.innerHTML = '';
-            addLog(`[SIMULATION] Starting synthetic fault injection: ${type}...`);
-            document.getElementById('loading-spinner').classList.remove('hidden');
+            document.getElementById('sys-status-label').className = "text-amber-500 uppercase tracking-widest font-black flex items-center gap-2";
+            document.getElementById('sys-status-label').innerHTML = "⚠ ANOMALY DETECTED";
 
-            document.body.classList.add('glitch-active');
-            overlay.style.display = 'block';
-            systemStatus.innerText = 'ANOMALY DETECTED';
-            systemStatus.className = 'text-xs font-black text-red-500 uppercase tracking-widest bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20';
-
-            setTimeout(() => {
-                document.body.classList.remove('glitch-active');
-                overlay.style.display = 'none';
-            }, 1000);
-
+            addLog(`System: Injecting ${type}...`);
             try {
-                const res = await fetch('/demo/chaos/trigger', {
+                await fetch(`${API_BASE}/demo/chaos/trigger`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ fault: type })
                 });
+                triggerSSEStream(true);
+            } catch (e) { addLog("<span class='text-red-400'>[ERROR] Chaos bridge disconnected. Ensure backend is running.</span>"); }
 
-                const eventSource = new EventSource(`/api/sre-loop?anomaly=true&simulation=${isDemoMode}`);
-                eventSource.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    addLog(data.message);
-                    if (data.final_state) {
-                        eventSource.close();
-                        document.getElementById('loading-spinner').classList.add('hidden');
-                        if (data.final_state === 'Stable') {
-                            systemStatus.innerText = 'System Nominal';
-                            systemStatus.className = 'text-xs font-black text-green-400 uppercase tracking-widest bg-green-400/10 px-3 py-1 rounded-full border border-green-400/20';
-                        }
-                    }
-                };
-            } catch (err) {
-                addLog("[ERROR] Simulation link severed.");
+            setTimeout(() => {
+                document.getElementById('sys-status-label').className = "text-green-400 uppercase tracking-widest";
+                document.getElementById('sys-status-label').innerHTML = "Nominal";
+            }, 8000);
+        }
+
+        async function startSandbox() {
+            logContainer.innerHTML = '';
+            addLog("<span class='text-indigo-400 font-bold'>[SANDBOX]</span> Starting Mock Environment...");
+            addLog("Loading telemetry listeners...");
+            try {
+                await fetch(`${API_BASE}/demo/sandbox/start`, { method: 'POST' });
+            } catch (e) { }
+            triggerSSEStream(false);
+        }
+
+        window.onload = async () => {
+            // initial query
+            try {
+                const res = await fetch(`${API_BASE}/system/health`);
+                const data = await res.json();
+                if (data.env_stack) {
+                    document.getElementById('provider-select').value = data.env_stack;
+                    updateProvider(data.env_stack);
+                }
+            } catch (e) {
+                // Ignore, running local defaults
+            }
+            // Add initial welcome logs
+            addLog("SRE Control Plane initialized.");
+            addLog("Connect infrastructure sources to begin streaming telemetry.");
+        };
+
+        // --- Guided Tour ---
+        const tourSteps = [
+            { icon: '🔭', title: 'Phase 1: Scout', desc: '"This is the Senses Layer — OpenTelemetry Intake." Scout continuously monitors for anomalous signals across the stack (Traces, Metrics), preventing alert fatigue.' },
+            { icon: '🧠', title: 'Phase 2: Brain', desc: '"This is the Brain — LLM-based RCA." It correlates error patterns with historical fixes stored in Pinecone vector memory to decide on the proper action.' },
+            { icon: '🛠️', title: 'Phase 3: Fixer', desc: '"This is Fixer — GitOps Remediation." Fixer securely executes patches directly into Github via Pull Requests, avoiding manual hot-fixes.' },
+            { icon: '🛡️', title: 'Phase 4: Guardrail', desc: '"This is Guardrail — Blast Radius Control." Before any code is deployed, the system takes a snapshot and verifies SLIs post-remediation, rolling back if degraded.' }
+        ];
+
+        let currentTourStep = 0;
+
+        function startTour() {
+            currentTourStep = 0;
+            renderTourStep();
+            document.getElementById('tour-overlay').classList.remove('hidden');
+        }
+
+        function closeTour() {
+            document.getElementById('tour-overlay').classList.add('hidden');
+        }
+
+        function nextTour() {
+            currentTourStep++;
+            if (currentTourStep >= tourSteps.length) {
+                closeTour();
+            } else {
+                renderTourStep();
             }
         }
 
-        async function processQuote(policy, isChaos = false) {
-            logContainer.innerHTML = '';
-            document.getElementById('loading-spinner').classList.remove('hidden');
-            addLog(`System: Initiating ${policy} analysis...`);
+        function renderTourStep() {
+            const step = tourSteps[currentTourStep];
+            document.getElementById('tour-icon').innerText = step.icon;
+            document.getElementById('tour-title').innerText = step.title;
+            document.getElementById('tour-desc').innerText = step.desc;
 
-            const eventSource = new EventSource(`/api/sre-loop?anomaly=${isChaos}`);
-
-            eventSource.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                addLog(data.message);
-
-                if (data.final_state) {
-                    eventSource.close();
-                    document.getElementById('loading-spinner').classList.add('hidden');
-                    if (data.final_state === 'Stable') {
-                        addLog("System: Anomaly Resolved. State Stable.");
-                        systemStatus.innerText = 'System Nominal';
-                        systemStatus.className = 'text-xs font-black text-green-400 uppercase tracking-widest bg-green-400/10 px-3 py-1 rounded-full border border-green-400/20';
-                    }
-                }
-            };
-
-            eventSource.onerror = () => {
-                eventSource.close();
-                document.getElementById('loading-spinner').classList.add('hidden');
-            };
+            for (let i = 0; i < 4; i++) {
+                document.getElementById(`dot-${i}`).className = i === currentTourStep
+                    ? 'w-2 h-2 rounded-full bg-blue-600'
+                    : 'w-2 h-2 rounded-full bg-slate-200';
+            }
         }
 
-        async function triggerChaos() {
-            triggerSimulation('AWS_EC2_DISK_FULL');
+        function deployControlPlane() {
+            document.getElementById('deploy-overlay').classList.remove('hidden');
+        }
+        function closeDeploy() {
+            document.getElementById('deploy-overlay').classList.add('hidden');
         }
     </script>
 </body>
