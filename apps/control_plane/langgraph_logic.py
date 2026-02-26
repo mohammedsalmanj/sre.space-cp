@@ -113,9 +113,25 @@ def create_sre_graph():
     
     return workflow.compile()
 
+# --- Initial State Factory ---
+def get_initial_state(is_anomaly: bool = False, simulation_mode: bool = False) -> SREState:
+    """Creates a fresh state for a new OODA loop iteration."""
+    return {
+        "error_spans": [], "root_cause": "", "remediation": "", 
+        "status": "Observation Phase", "logs": [], "is_anomaly": is_anomaly,
+        "anomaly_frequency": 1 if is_anomaly else 0, "decision": "", "service": "policy-service", 
+        "namespace": "default", "env": "prod", "confidence_score": 1.0,
+        "blast_radius": 0, "issue_number": 0, "simulation_mode": simulation_mode
+    }
+
+# --- Single Instance Pre-compiled Graph (Optimization) ---
+# Compiling the graph once at module load time prevents overhead during high-frequency telemetry audits.
+_sre_graph = create_sre_graph()
+
 async def run_sre_loop(is_anomaly: bool = False, simulation_mode: bool = False) -> dict:
     """
     Asynchronous entry point to trigger the autonomous control plane loop.
+    Reuses the pre-compiled state machine for optimized performance.
     
     Args:
         is_anomaly (bool): Whether to force initial anomaly detection (default: False).
@@ -123,16 +139,5 @@ async def run_sre_loop(is_anomaly: bool = False, simulation_mode: bool = False) 
     Returns:
         dict: The final state object including audit logs.
     """
-    graph = create_sre_graph()
-    initial_state = {
-        "error_spans": [], "root_cause": "", "remediation": "", 
-        "status": "Starting", "logs": [], "is_anomaly": is_anomaly,
-        "anomaly_frequency": 0, "decision": "", "service": "policy-service", 
-        "namespace": "default", "env": "prod", "confidence_score": 1.0,
-        "blast_radius": 0, "issue_number": 0, "simulation_mode": simulation_mode
-    }
-    
-    if is_anomaly:
-        initial_state["anomaly_frequency"] = 1
-
-    return await graph.ainvoke(initial_state)
+    initial_state = get_initial_state(is_anomaly, simulation_mode)
+    return await _sre_graph.ainvoke(initial_state)

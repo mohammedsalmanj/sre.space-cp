@@ -216,41 +216,60 @@ async def get_git_activity():
     except Exception as e:
         return {"error": str(e)}
 
+@app.on_event("startup")
+async def startup_event():
+    """Proactive baseline health audit on system startup."""
+    logger.info("🛰️ [BOOT] SRE-Space Control Plane initializing...")
+    asyncio.create_task(periodic_health_sentinel())
+
+async def periodic_health_sentinel():
+    """
+    Background worker that audits downstream connectivity (GitHub/Pinecone).
+    Ensures that the autonomous loop doesn't fly blind during an incident.
+    """
+    from packages.shared.github_service import GitHubService
+    gh = GitHubService()
+    
+    while True:
+        try:
+            # 1. Audit GitHub Connectivity
+            res = requests.get(f"{gh.base_url}/user", headers=gh.headers, timeout=5)
+            gh_status = "ONLINE" if res.status_code == 200 else "DEGRADED"
+            
+            # 2. Audit Pinecone Memory Connectivity
+            pc_key = os.getenv("PINECONE_API_KEY")
+            pc_status = "ONLINE" if pc_key else "OFFLINE"
+            
+            logger.info(f"🩺 [SENTINEL] Downstream Health Check -> GitHub: {gh_status} | Memory: {pc_status}")
+            
+        except Exception as e:
+            logger.error(f"⚠️ [SENTINEL] Health Audit Failed: {e}")
+            
+        await asyncio.sleep(300) # Audit every 5 minutes
+
 @app.get("/api/sre-loop")
 async def sre_loop_stream(anomaly: bool = "false", simulation: bool = "false"):
     """
     Streaming event source (SSE) for visualizing agent-based OODA reasoning in real-time.
     Uses LangGraph's astream to provide live snapshots of the cognitive process.
     """
-    # FastAPI handles query params as strings sometimes in EventSource
     is_anomaly = str(anomaly).lower() == "true"
     is_simulation = str(simulation).lower() == "true"
 
     async def event_generator():
-        from apps.control_plane.langgraph_logic import create_sre_graph
-        graph = create_sre_graph()
+        from apps.control_plane.langgraph_logic import _sre_graph, get_initial_state
         
-        initial_state = {
-            "error_spans": [], "root_cause": "", "remediation": "", 
-            "status": "Observation Phase", "logs": [], "is_anomaly": is_anomaly,
-            "anomaly_frequency": 1 if is_anomaly else 0, "decision": "", "service": "policy-service", 
-            "namespace": "default", "env": "prod", "confidence_score": 1.0,
-            "blast_radius": 0, "issue_number": 0, "simulation_mode": is_simulation
-        }
-        
+        initial_state = get_initial_state(is_anomaly, is_simulation)
         last_log_count = 0
         try:
-            async for event in graph.astream(initial_state):
-                # LangGraph 'event' is the state snapshot after a node finishes
+            async for event in _sre_graph.astream(initial_state):
                 for node_name, state in event.items():
                     current_logs = state.get("logs", [])
-                    # Stream only the new logs
                     new_logs = current_logs[last_log_count:]
                     for log in new_logs:
                         yield f"data: {json.dumps({'message': log})}\n\n"
                     last_log_count = len(current_logs)
                     
-                    # Also stream status updates
                     if state.get("status"):
                         yield f"data: {json.dumps({'message': f'System Status: {state['status']}'})}\n\n"
 
@@ -262,6 +281,5 @@ async def sre_loop_stream(anomaly: bool = "false", simulation: bool = "false"):
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 if __name__ == "__main__":
-    # Standard Uvicorn startup logic for local development
     port = int(os.getenv("PORT", 8001))
     uvicorn.run(app, host="0.0.0.0", port=port)

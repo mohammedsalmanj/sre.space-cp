@@ -43,19 +43,30 @@ class AdapterRegistry:
             "gce": GCEAdapter
         }
 
+    _instance_cache = {}
+
     def get_adapter(self):
         """
-        Retrieves the concrete adapter instance for the current operational environment.
+        Retrieves a memoized concrete adapter instance for the current operational environment.
+        Ensures consistent state across multiple agent calls within the same process.
         
         Returns:
             SensoryAdapter/RemediationAdapter: The active stack adapter.
         """
         stack_type = os.getenv("STACK_TYPE", "ec2").lower()
+        
+        if stack_type in self._instance_cache:
+            return self._instance_cache[stack_type]
+            
         adapter_cls = self._adapters.get(stack_type)
         if not adapter_cls:
             # Default to EC2 for safe fallback
-            return AWSEC2Adapter()
-        return adapter_cls()
+            instance = AWSEC2Adapter()
+        else:
+            instance = adapter_cls()
+            
+        self._instance_cache[stack_type] = instance
+        return instance
 
 # Global Singleton instance for effortless agent-layer access
 registry = AdapterRegistry()

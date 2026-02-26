@@ -55,8 +55,12 @@ def brain_agent(state: dict) -> dict:
     # 2. Reasoning Layer: LLM Diagnosis (CoT)
     if not rag_hit:
         api_key = os.getenv("OPENAI_API_KEY")
-        # Force fallback for validation purposes if key is not fully configured
-        use_llm = False 
+        # Auto-detect if we should use the Brain's reasoning cluster or local knowledge
+        use_llm = bool(api_key and not api_key.startswith("your_")) 
+        
+        if state.get("simulation_mode"):
+            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] [SIMULATION] 🛡️ Shadow Reasoning Active. Synthesizing diagnostic proof...")
+            use_llm = False # Keep simulation deterministic
         
         if use_llm:
             try:

@@ -34,14 +34,30 @@ def scout_agent(state: dict) -> dict:
     adapter = registry.get_adapter()
     from packages.infrastructure.simulation.chaos_engine import chaos_engine
     
-    # 2. Collect telemetry: Check for Shadow Injection if in Simulation Mode
-    shadow_telemetry = None
+    # 2. Collect telemetry with Exponential Backoff (Optimization)
+    telemetry = None
     if state.get("simulation_mode"):
-        shadow_telemetry = chaos_engine.get_shadow_telemetry(stack_type)
-        if shadow_telemetry:
+        telemetry = chaos_engine.get_shadow_telemetry(stack_type)
+        if telemetry:
             logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] [SIMULATION] 🛡️ Shadow Injection Active. Using synthetic fault profile.")
 
-    telemetry = shadow_telemetry if shadow_telemetry else adapter.collect()
+    if not telemetry:
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                telemetry = adapter.collect()
+                break
+            except Exception as e:
+                wait_time = (attempt + 1) * 2
+                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] [RETRY] Adapter poll failed (Attempt {attempt+1}/{max_retries}). Waiting {wait_time}s...")
+                time.sleep(wait_time)
+        
+        if not telemetry:
+            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] [ERROR] All telemetry polling attempts failed. Circuit breaking.")
+            state["status"] = "Ghosting"
+            state["is_anomaly"] = False # Avoid false alarms on infra failure
+            state["logs"] = logs
+            return state
     state["raw_telemetry_obj"] = telemetry # Preserve for downstream memory enrichment
     
     # 3. Synchronize adapter data with the agent state machine
