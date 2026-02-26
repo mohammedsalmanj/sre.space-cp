@@ -76,6 +76,7 @@ def scout_agent(state: dict) -> dict:
     is_anomaly = state.get("is_anomaly") or current_sim["is_anomaly"] or (telemetry.status == "CRITICAL")
 
     if is_anomaly:
+        state["is_anomaly"] = True
         # Fallback for synthetic reality if the adapter (simulated) misses a span
         if not state["error_spans"]:
             state["error_spans"] = [
