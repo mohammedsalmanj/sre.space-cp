@@ -217,17 +217,48 @@ async def get_git_activity():
         return {"error": str(e)}
 
 @app.get("/api/sre-loop")
-async def sre_loop_stream(anomaly: bool = False, simulation: bool = False):
+async def sre_loop_stream(anomaly: bool = "false", simulation: bool = "false"):
     """
     Streaming event source (SSE) for visualizing agent-based OODA reasoning in real-time.
-    Enables transparency and auditability for autonomous SRE actions.
+    Uses LangGraph's astream to provide live snapshots of the cognitive process.
     """
+    # FastAPI handles query params as strings sometimes in EventSource
+    is_anomaly = str(anomaly).lower() == "true"
+    is_simulation = str(simulation).lower() == "true"
+
     async def event_generator():
-        result = await run_sre_loop(is_anomaly=anomaly, simulation_mode=simulation)
-        for log in result["logs"]:
-            yield f"data: {json.dumps({'message': log})}\n\n"
-            await asyncio.sleep(0.4) # Visualization pacing for human readability
-        yield f"data: {json.dumps({'message': '--- END OF LOOP ---', 'final_state': result['status']})}\n\n"
+        from apps.control_plane.langgraph_logic import create_sre_graph
+        graph = create_sre_graph()
+        
+        initial_state = {
+            "error_spans": [], "root_cause": "", "remediation": "", 
+            "status": "Observation Phase", "logs": [], "is_anomaly": is_anomaly,
+            "anomaly_frequency": 1 if is_anomaly else 0, "decision": "", "service": "policy-service", 
+            "namespace": "default", "env": "prod", "confidence_score": 1.0,
+            "blast_radius": 0, "issue_number": 0, "simulation_mode": is_simulation
+        }
+        
+        last_log_count = 0
+        try:
+            async for event in graph.astream(initial_state):
+                # LangGraph 'event' is the state snapshot after a node finishes
+                for node_name, state in event.items():
+                    current_logs = state.get("logs", [])
+                    # Stream only the new logs
+                    new_logs = current_logs[last_log_count:]
+                    for log in new_logs:
+                        yield f"data: {json.dumps({'message': log})}\n\n"
+                    last_log_count = len(current_logs)
+                    
+                    # Also stream status updates
+                    if state.get("status"):
+                        yield f"data: {json.dumps({'message': f'System Status: {state['status']}'})}\n\n"
+
+            yield f"data: {json.dumps({'message': '--- END OF LOOP ---', 'final_state': 'Stable' if not is_anomaly else 'Resolved'})}\n\n"
+        except Exception as e:
+            logger.error(f"Error in SRE loop stream: {e}")
+            yield f"data: {json.dumps({'message': f'[ERROR] Loop failed: {str(e)}', 'final_state': 'Error'})}\n\n"
+
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 if __name__ == "__main__":
