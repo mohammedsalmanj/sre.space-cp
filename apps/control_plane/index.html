@@ -171,7 +171,18 @@
                 <p class="text-slate-500 mt-2 font-semibold">Reliability Playground v4.7 — Agentic Control Loop Active
                 </p>
             </div>
+            <button onclick="startTour()"
+                class="text-xs font-bold text-blue-400 hover:text-white transition-colors flex items-center gap-1 border border-blue-500/20 px-3 py-1 rounded-full bg-blue-500/5">
+                <span>✨</span> START GUIDED TOUR
+            </button>
             <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10"
+                    id="mode-toggle-container">
+                    <button onclick="setMode('real')" id="btn-mode-real"
+                        class="px-3 py-1 text-[10px] font-black rounded-lg transition-all">REAL</button>
+                    <button onclick="setMode('demo')" id="btn-mode-demo"
+                        class="px-3 py-1 text-[10px] font-black rounded-lg transition-all bg-blue-500 text-black">DEMO</button>
+                </div>
                 <div class="text-right">
                     <div id="system-status"
                         class="text-xs font-black text-green-400 uppercase tracking-widest bg-green-400/10 px-3 py-1 rounded-full border border-green-400/20">
@@ -182,6 +193,75 @@
                 </button>
             </div>
         </header>
+
+        <!-- Onboarding Modal -->
+        <div id="onboarding-modal"
+            class="fixed inset-0 z-[2000] hidden flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
+            <div class="glass-card max-w-2xl w-full p-12 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-rose-500">
+                </div>
+                <h2 class="text-4xl font-black mb-2 tracking-tighter">ORBITAL ONBOARDING</h2>
+                <p class="text-slate-400 mb-10 font-semibold">Initialize your SRE-Space infrastructure stack.</p>
+
+                <div class="grid grid-cols-2 gap-6 mb-10">
+                    <button onclick="selectStack('aws')"
+                        class="p-6 rounded-2xl border border-white/10 bg-white/5 hover:border-blue-500/50 transition-all text-left group">
+                        <div class="text-3xl mb-4 group-hover:scale-110 transition-transform">🚀</div>
+                        <div class="font-black text-lg">AWS EC2</div>
+                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Cloud Native</div>
+                    </button>
+                    <button onclick="selectStack('kubernetes')"
+                        class="p-6 rounded-2xl border border-white/10 bg-white/5 hover:border-blue-500/50 transition-all text-left group">
+                        <div class="text-3xl mb-4 group-hover:scale-110 transition-transform">☸️</div>
+                        <div class="font-black text-lg">Kubernetes</div>
+                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Orchestration</div>
+                    </button>
+                    <button onclick="selectStack('gce')"
+                        class="p-6 rounded-2xl border border-white/10 bg-white/5 hover:border-blue-500/50 transition-all text-left group">
+                        <div class="text-3xl mb-4 group-hover:scale-110 transition-transform">☁️</div>
+                        <div class="font-black text-lg">Google Compute</div>
+                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Compute Engine</div>
+                    </button>
+                    <button onclick="selectStack('local')"
+                        class="p-6 rounded-2xl border border-white/10 bg-white/5 hover:border-blue-500/50 transition-all text-left group">
+                        <div class="text-3xl mb-4 group-hover:scale-110 transition-transform">🧪</div>
+                        <div class="font-black text-lg">Simulation Mode</div>
+                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Zero Cost / Local</div>
+                    </button>
+                </div>
+
+                <div id="stack-config-form" class="hidden space-y-6">
+                    <div>
+                        <label
+                            class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 block">Pinecone
+                            API Key (Cloud Memory)</label>
+                        <input type="password" id="pinecone-key" placeholder="pcsk_..."
+                            class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none transition-all">
+                    </div>
+                    <button onclick="finalizeOnboarding()"
+                        class="btn-cyber w-full py-4 text-sm tracking-widest">INITIALIZE SYSTEM</button>
+                </div>
+
+                <button onclick="skipOnboarding()"
+                    class="w-full mt-6 text-[10px] font-black text-slate-600 hover:text-white uppercase tracking-[4px] transition-colors">SKIP
+                    ONBOARDING →</button>
+            </div>
+        </div>
+
+        <!-- Tour Tooltip Template -->
+        <div id="tour-tooltip"
+            class="fixed z-[3000] hidden max-w-xs w-full glass-card p-6 shadow-2xl pointer-events-none">
+            <div class="flex items-center gap-3 mb-3">
+                <span id="tour-step-icon" class="text-2xl">🛰️</span>
+                <span id="tour-step-title" class="font-black uppercase tracking-tighter text-blue-400">Step 1</span>
+            </div>
+            <p id="tour-step-desc" class="text-sm font-semibold text-slate-200 mb-6"></p>
+            <div class="flex justify-end">
+                <button onclick="nextTourStep()"
+                    class="text-[10px] font-black text-blue-400 uppercase tracking-widest border border-blue-500/30 px-4 py-2 rounded-lg pointer-events-auto hover:bg-blue-500 hover:text-black transition-all">NEXT
+                    STEP →</button>
+            </div>
+        </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <!-- Marketplace Display -->
@@ -234,7 +314,7 @@
             <!-- Agent Squad Monitor (HUD) -->
             <div class="lg:col-span-5 flex flex-col">
                 <h2 class="text-3xl font-extrabold tracking-tight mb-10">Sensory Intake</h2>
-                <div class="hud-terminal flex-1 flex flex-col overflow-hidden">
+                <div class="hud-terminal flex-1 flex flex-col overflow-hidden mb-8">
                     <div
                         class="bg-white/5 px-6 py-3 flex justify-between items-center text-[10px] font-black uppercase text-slate-500">
                         <div class="flex items-center gap-2">
@@ -250,21 +330,198 @@
                         /// COGNITIVE CONTROL PLANE INTERFACE ///
                     </div>
                 </div>
+
+                <!-- Chaos Lab Section -->
+                <div class="glass-card p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            <span class="text-rose-500">🛡️</span> Chaos Lab
+                        </h3>
+                        <span id="current-stack"
+                            class="text-[10px] font-black bg-blue-500/10 text-blue-400 px-2 py-1 rounded border border-blue-500/20 uppercase">Stack:
+                            ...</span>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4" id="chaos-lab-buttons">
+                        <button onclick="triggerSimulation('AWS_EC2_DISK_FULL')" id="btn-ec2"
+                            class="text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group">
+                            <span>🚀 [EC2] EBS Volume Exhaustion</span>
+                            <span class="opacity-0 group-hover:opacity-100">RUN →</span>
+                        </button>
+                        <button onclick="triggerSimulation('K8S_POD_CRASH')" id="btn-kubernetes"
+                            class="text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group">
+                            <span>☸️ [K8S] CrashLoopBackOff Injection</span>
+                            <span class="opacity-0 group-hover:opacity-100">RUN →</span>
+                        </button>
+                        <button onclick="triggerSimulation('GCE_CPU_BURN')" id="btn-gce"
+                            class="text-sm font-bold bg-white/5 hover:bg-rose-500/20 text-rose-400 p-3 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all text-left flex justify-between items-center group">
+                            <span>☁️ [GCE] Compute Soft Lockup</span>
+                            <span class="opacity-0 group-hover:opacity-100">RUN →</span>
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-slate-500 mt-4 italic">* SIMULATION_MODE active: Fixer will only simulate
+                        mutations.</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Global State & UI Elements
         const logContainer = document.getElementById('logs');
         const overlay = document.getElementById('glitch-overlay');
         const systemStatus = document.getElementById('system-status');
+        const onboardingModal = document.getElementById('onboarding-modal');
+        const stackConfigForm = document.getElementById('stack-config-form');
+        const tourTooltip = document.getElementById('tour-tooltip');
+
+        let currentStackType = null;
+        let isDemoMode = true;
+        let tourStep = 0;
+
+        const tourData = [
+            {
+                target: 'logs',
+                title: 'Phase 1: Scout (Observation)',
+                desc: 'Scout continuously monitors your OpenTelemetry collectors. It filters out noises and identifies critical health degradations in real-time.',
+                icon: '🔭'
+            },
+            {
+                target: 'logs',
+                title: 'Phase 2: Brain (RCA & RAG)',
+                desc: 'When an anomaly is detected, the Brain performs Root Cause Analysis by retrieving historical solutions from your Cloud Memory (Pinecone).',
+                icon: '🧠'
+            },
+            {
+                target: 'chaos-lab-buttons',
+                title: 'Phase 3: Fixer (Action)',
+                desc: 'Fixer executes the remediation. In Demo Mode, it simulates mutations safely while opening a real Simulation PR in GitHub for governance.',
+                icon: '🛠️'
+            },
+            {
+                target: 'logs',
+                title: 'Phase 4: Jules & Curator',
+                desc: 'Jules reviews the fix for technical debt, and Curator archives the knowledge back to memory, ensuring the system gets smarter every turn.',
+                icon: '📂'
+            }
+        ];
+
+        window.onload = async () => {
+            await refreshSystemHealth();
+            if (!currentStackType) {
+                onboardingModal.classList.remove('hidden');
+            }
+        };
+
+        async function refreshSystemHealth() {
+            try {
+                const res = await fetch('/system/health');
+                const data = await res.json();
+                currentStackType = data.env_stack;
+
+                if (currentStackType) {
+                    document.getElementById('current-stack').innerText = `Stack: ${currentStackType}`;
+                    // Update Chaos Lab Visibility
+                    if (currentStackType !== 'ec2') document.getElementById('btn-ec2').disabled = true, document.getElementById('btn-ec2').classList.add('opacity-30', 'grayscale');
+                    if (currentStackType !== 'kubernetes') document.getElementById('btn-kubernetes').disabled = true, document.getElementById('btn-kubernetes').classList.add('opacity-30', 'grayscale');
+                    if (currentStackType !== 'gce') document.getElementById('btn-gce').disabled = true, document.getElementById('btn-gce').classList.add('opacity-30', 'grayscale');
+                }
+            } catch (e) { }
+        }
+
+        // --- Onboarding Logic ---
+        let selectedStack = null;
+        function selectStack(stack) {
+            selectedStack = stack;
+            stackConfigForm.classList.remove('hidden');
+            addLog(`System: Preparing onboarding for ${stack.toUpperCase()}...`);
+        }
+
+        async function finalizeOnboarding() {
+            const pineconeKey = document.getElementById('pinecone-key').value;
+            const res = await fetch('/api/config/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ STACK_TYPE: selectedStack, PINECONE_API_KEY: pineconeKey })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                onboardingModal.classList.add('hidden');
+                await refreshSystemHealth();
+                addLog(`System: ${selectedStack.toUpperCase()} stack initialized.`);
+            }
+        }
+
+        function skipOnboarding() {
+            onboardingModal.classList.add('hidden');
+            addLog("System: Onboarding bypassed. Running with current environment defaults.");
+        }
+
+        // --- Mode Switching ---
+        function setMode(mode) {
+            isDemoMode = mode === 'demo';
+            const btnReal = document.getElementById('btn-mode-real');
+            const btnDemo = document.getElementById('btn-mode-demo');
+
+            if (isDemoMode) {
+                btnDemo.className = "px-3 py-1 text-[10px] font-black rounded-lg bg-blue-500 text-black";
+                btnReal.className = "px-3 py-1 text-[10px] font-black rounded-lg text-slate-400";
+                addLog("System: DEMO MODE active. Shadow Telemetry enabled.");
+            } else {
+                btnReal.className = "px-3 py-1 text-[10px] font-black rounded-lg bg-green-500 text-black";
+                btnDemo.className = "px-3 py-1 text-[10px] font-black rounded-lg text-slate-400";
+                addLog("System: REAL MODE active. Connected to live infrastructure.");
+            }
+        }
+
+        // --- Guided Tour Logic ---
+        function startTour() {
+            tourStep = 0;
+            showTourStep();
+        }
+
+        function showTourStep() {
+            const step = tourData[tourStep];
+            const target = document.getElementById(step.target);
+            const rect = target.getBoundingClientRect();
+
+            tourTooltip.classList.remove('hidden');
+            document.getElementById('tour-step-title').innerText = `Step ${tourStep + 1}`;
+            document.getElementById('tour-step-desc').innerText = step.desc;
+            document.getElementById('tour-step-icon').innerText = step.icon;
+
+            tourTooltip.style.top = `${rect.top}px`;
+            tourTooltip.style.left = `${rect.left - 350}px`;
+
+            target.classList.add('ring-4', 'ring-blue-500', 'ring-opacity-50', 'transition-all');
+        }
+
+        function nextTourStep() {
+            const prevStep = tourData[tourStep];
+            document.getElementById(prevStep.target).classList.remove('ring-4', 'ring-blue-500', 'ring-opacity-50');
+
+            tourStep++;
+            if (tourStep < tourData.length) {
+                showTourStep();
+            } else {
+                tourTooltip.classList.add('hidden');
+                addLog("System: Guided Tour complete. Ready for Autonomous Operations.");
+            }
+        }
 
         function addLog(msg) {
             const div = document.createElement('div');
             div.className = "log-line opacity-0 transform translate-x-2 transition-all duration-300";
 
             if (msg.includes('[SCOUT]')) div.innerHTML = `<span class="text-blue-400 font-bold">[SCOUT]</span> ${msg.split('[SCOUT]')[1]}`;
-            else if (msg.includes('[BRAIN]')) div.innerHTML = `<span class="text-purple-400 font-bold">[BRAIN]</span> ${msg.split('[BRAIN]')[1]}`;
+            else if (msg.includes('[BRAIN]')) {
+                let content = msg.split('[BRAIN]')[1];
+                if (content.includes('Memory Agent Context Found') || content.includes('historical match')) {
+                    div.innerHTML = `<span class="text-purple-400 font-bold">[BRAIN]</span> <span class="bg-purple-500/20 border border-purple-500/30 px-2 py-1 rounded text-purple-300">🧠 ${content}</span>`;
+                } else {
+                    div.innerHTML = `<span class="text-purple-400 font-bold">[BRAIN]</span> ${content}`;
+                }
+            }
+            else if (msg.includes('[SIMULATION]')) div.innerHTML = `<span class="text-rose-400 font-bold italic">[SIMULATION]</span> ${msg.split('[SIMULATION]')[1]}`;
             else if (msg.includes('[FIXER]')) div.innerHTML = `<span class="text-orange-400 font-bold">[FIXER]</span> ${msg.split('[FIXER]')[1]}`;
             else if (msg.includes('System')) div.innerHTML = `<span class="text-slate-500">///</span> ${msg}`;
             else div.innerText = msg;
@@ -274,6 +531,46 @@
                 div.classList.remove('opacity-0', 'translate-x-2');
             });
             logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        async function triggerSimulation(type) {
+            logContainer.innerHTML = '';
+            addLog(`[SIMULATION] Starting synthetic fault injection: ${type}...`);
+            document.getElementById('loading-spinner').classList.remove('hidden');
+
+            document.body.classList.add('glitch-active');
+            overlay.style.display = 'block';
+            systemStatus.innerText = 'ANOMALY DETECTED';
+            systemStatus.className = 'text-xs font-black text-red-500 uppercase tracking-widest bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20';
+
+            setTimeout(() => {
+                document.body.classList.remove('glitch-active');
+                overlay.style.display = 'none';
+            }, 1000);
+
+            try {
+                const res = await fetch('/demo/chaos/trigger', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fault: type })
+                });
+
+                const eventSource = new EventSource(`/api/sre-loop?anomaly=true&simulation=${isDemoMode}`);
+                eventSource.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    addLog(data.message);
+                    if (data.final_state) {
+                        eventSource.close();
+                        document.getElementById('loading-spinner').classList.add('hidden');
+                        if (data.final_state === 'Stable') {
+                            systemStatus.innerText = 'System Nominal';
+                            systemStatus.className = 'text-xs font-black text-green-400 uppercase tracking-widest bg-green-400/10 px-3 py-1 rounded-full border border-green-400/20';
+                        }
+                    }
+                };
+            } catch (err) {
+                addLog("[ERROR] Simulation link severed.");
+            }
         }
 
         async function processQuote(policy, isChaos = false) {
@@ -305,25 +602,7 @@
         }
 
         async function triggerChaos() {
-            // Visual feedback
-            document.body.classList.add('glitch-active');
-            overlay.style.display = 'block';
-            systemStatus.innerText = 'ANOMALY DETECTED';
-            systemStatus.className = 'text-xs font-black text-red-500 uppercase tracking-widest bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20';
-
-            setTimeout(() => {
-                document.body.classList.remove('glitch-active');
-                overlay.style.display = 'none';
-            }, 1000);
-
-            try {
-                const res = await fetch('/demo/inject-failure', { method: 'POST' });
-                const data = await res.json();
-                addLog(`CRITICAL: ${data.type.replace('_', ' ').toUpperCase()}`);
-                processQuote('Emergency Recovery', true);
-            } catch (err) {
-                addLog("Error triggering sensory failover.");
-            }
+            triggerSimulation('AWS_EC2_DISK_FULL');
         }
     </script>
 </body>

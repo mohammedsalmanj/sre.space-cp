@@ -1,49 +1,81 @@
+"""
+File: packages/agents/scout.py
+Layer: Cognitive / Observability
+Purpose: Continuous system monitoring and initial anomaly detection.
+Problem Solved: Identifies health degradations across heterogeneous stacks before they impact end-users.
+Interaction: Polls SensoryAdapters for telemetry; triggers the Brain agent if an anomaly is found.
+Dependencies: packages.infrastructure.registry, packages.shared.sim_state
+Inputs: Current LangGraph state
+Outputs: Updated state with metrics, error spans, and anomaly flags
+"""
 from datetime import datetime
-import random
-
+import os
+from packages.infrastructure.registry import registry
 from packages.shared.sim_state import sim_state
 
-def scout_agent(state):
+def scout_agent(state: dict) -> dict:
     """
-    Agent Node: Scout (The Watcher)
+    Agent Node: Scout
     Phase: OBSERVE
-    Mission: Monitor the system heartbeat and sensory inputs (traces/metrics).
+    Mission: Monitor system health and identify performance anomalies or errors.
+    
+    Args:
+        state (dict): The current LangGraph state containing telemetry logs and discovery flags.
+    Returns:
+        dict: The updated state with fresh metrics and anomaly triggers.
+    Raises:
+        Exception: If the infrastructure adapter fails to poll telemetry.
     """
     logs = state.get("logs", [])
-    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] [OBSERVE] Polling telemetry streams via OpenTelemetry...")
+    stack_type = os.getenv("STACK_TYPE", "ec2")
+    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] [OBSERVE] Polling telemetry via {stack_type} adapter...")
     
-    # Static metadata for the incident context
-    state["service"] = "policy-service"
-    state["namespace"] = "insurance-prod"
-    state["env"] = "production"
+    # 1. Retrieve the universal adapter and simulation engine
+    adapter = registry.get_adapter()
+    from packages.infrastructure.simulation.chaos_engine import chaos_engine
+    
+    # 2. Collect telemetry: Check for Shadow Injection if in Simulation Mode
+    shadow_telemetry = None
+    if state.get("simulation_mode"):
+        shadow_telemetry = chaos_engine.get_shadow_telemetry(stack_type)
+        if shadow_telemetry:
+            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] [SIMULATION] 🛡️ Shadow Injection Active. Using synthetic fault profile.")
 
-    # Veracity Layer: Pull the real ground-truth from the shared simulation state
+    telemetry = shadow_telemetry if shadow_telemetry else adapter.collect()
+    state["raw_telemetry_obj"] = telemetry # Preserve for downstream memory enrichment
+    
+    # 3. Synchronize adapter data with the agent state machine
+    state["service"] = telemetry.service_name
+    state["telemetry_status"] = telemetry.status
+    state["metrics"] = {
+        "error_rate": telemetry.error_rate,
+        "latency_p95": telemetry.latency_p95,
+        "cpu_usage": telemetry.cpu_usage,
+        "memory_usage": telemetry.memory_usage
+    }
+    state["error_spans"] = telemetry.error_spans
+    
+    # 4. Anomaly Detection Logic: Checks metrics, status, and synthetic simulation state
     current_sim = sim_state.get_state()
-    is_anomaly = state.get("is_anomaly") or current_sim["is_anomaly"]
+    is_anomaly = state.get("is_anomaly") or current_sim["is_anomaly"] or (telemetry.status == "CRITICAL")
 
-    # Simulation Logic: If an anomaly is injected, Scout translates the raw 
-    # signal into a structured state for the Brain agent to analyze.
     if is_anomaly:
-        # Simulated high-fidelity error message matching user's 'real' experience
-        error_msg = ("policy-service: DOWN (HTTPConnectionPool(host='policy-service', port=8002): "
-                     "Max retries exceeded with url: /health "
-                     "(Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc73dbd4a60>: "
-                     "Failed to establish a new connection: [Errno 111] Connection refused')))")
+        # Fallback for synthetic reality if the adapter (simulated) misses a span
+        if not state["error_spans"]:
+            state["error_spans"] = [
+                {"exception.message": "Simulated infrastructure failure detected.", "severity": "CRITICAL"}
+            ]
         
-        state["error_spans"] = [
-            {"exception.message": error_msg, "severity": "CRITICAL", "category": "Latency/Saturation"}
-        ]
         state["anomaly_frequency"] = state.get("anomaly_frequency", 0) + 1
         
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] [ALERT] SRE Scout Alert: Infrastructure Signal Triggered.")
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] Error: {error_msg}")
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] Category: Latency/Saturation | Conversion: 0.0%")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] [ALERT] Signal Triggered on {stack_type} stack.")
+        for span in state["error_spans"]:
+            logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] Error: {span.get('exception.message', 'Unknown')}")
+        
         logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] Decision: Brain Analysis Required.")
     else:
-        # State remains clean if no anomaly is active
         state["error_spans"] = []
         logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [SCOUT] Telemetry audit complete. System health: 100%.")
 
-    # Pass the updated logs back to the state for UI streaming
     state["logs"] = logs
     return state

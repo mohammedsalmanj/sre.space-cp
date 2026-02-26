@@ -102,6 +102,29 @@ graph TD
 
 ---
 
+## 🚀 Universal Infrastructure Adapter Model
+
+SRE-Space is a stack-agnostic control plane. It operates across multiple clouds and architectures via a standardized **Infrastructure Adapter Layer**. This decoupling ensures that while the "Brain" logic remains universal, the "Hands" (Adapters) execute stack-specific actions.
+
+### 🔌 Supported Stacks
+-   **AWS**: EC2 (SSM + Boto3), Beanstalk (Environment APIs).
+-   **Kubernetes**: EKS, GKE, AKS, kOps (GitOps-driven IaC mutations).
+-   **GCP**: GCE (OS Config + gcloud).
+-   **Hybrid**: On-prem servers via custom adapters.
+
+### 🛠️ Adapter Architecture
+The architecture is split into two primary interfaces:
+1.  **SensoryAdapter**: Normalizes telemetry (Logs, Metrics, Traces) from stack-specific sources (CloudWatch, Prometheus, Stackdriver) into a unified Internal Schema.
+2.  **RemediationAdapter**: Executes actions (Restart, Scale, Snapshot, Config Patch) using stack-specific tools (SSM, kubectl, gcloud) while enforcing universal guardrails.
+
+### 🛡️ Operational Guardrails (Built-in)
+-   **Blast Radius Control**: Never restart more than 1 instance/pod at a time.
+-   **Snapshot Safety**: Automatic VM/Disk snapshots before high-risk mutations.
+-   **Verification Loop**: Post-execution telemetry validation to ensure MTTR recovery.
+-   **Confidence Gate**: Escalation to human operators if Brain confidence < 0.85.
+
+---
+
 ## 🤖 Meet the Agent Squad
 
 Each agent in SRE-Space is a specialized LLM-backed node running within a LangGraph state machine.
@@ -322,17 +345,22 @@ SRE-Space/
 
 ---
 
-## 🧪 Chaos Engineering Scenarios
+## 🧪 Chaos Lab: The Simulation Engine
+SRE-Space includes a built-in **Simulation Engine** (`packages/infrastructure/simulation/chaos_engine.py`) designed to validate the 8-agent OODA loop without causing actual downtime on your managed resources.
 
-### Injection 1: DB Pool Exhaustion
--   **Trigger**: POST `/demo/inject-failure` with `{ "type": "db_pool_exhaustion" }`.
--   **Anatomy**: The mock "Quote Service" will start throwing `HTTP 500` errors.
--   **Observation**: Scout will logs an ALERT. Brain will diagnose "Resource Saturation". Fixer will create a PR to increase pooling.
+### 🛡️ Simulation vs. Injection
+*   **Standard Injection** (`/demo/inject-failure`): Modifies the local mock service to produce real OTel error spans.
+*   **Chaos Lab Simulation** (`/demo/chaos/trigger`): Shadow-injects a structured **Fault Profile** directly into the Scout Agent's stream. This allows you to test specific stack architectures (EC2 vs. K8s) regardless of where the Control Plane is physically running.
 
-### Injection 2: Latency Spike (Saturation)
--   **Trigger**: POST `/demo/inject-failure` with `{ "type": "latency_spike" }`.
--   **Anatomy**: Requests will take 5000ms+ to complete.
--   **Observation**: The dashboard metrics will turn RED. Brain will analyze the trace to determine if the saturation is CPU or Memory bound.
+### 🎮 How to Run a Simulation
+1.  **Access the HUD**: Open the SRE-Space Dashboard.
+2.  **Select Fault Profile**: In the "Chaos Lab" section, choose a stack-aware fault:
+    *   **🚀 AWS_EC2_DISK_FULL**: Synthetic EBS volume exhaustion.
+    *   **☸️ K8S_POD_CRASH**: CrashLoopBackOff status injection.
+    *   **☁️ GCE_CPU_BURN**: Compute lockup simulation.
+3.  **Trace the Loop**: Watch the "Sensory Intake" HUD show the Scout agent detecting the **Shadow Injection**.
+4.  **Observe RAG**: See the Brain query **Pinecone/Chroma** for historical matches.
+5.  **Dry-Run Fix**: With `SIMULATION_MODE=true`, the Fixer will log exactly what it *would* have executed while still opening a real **Simulation Pull Request** in GitHub to test the GitOps flow.
 
 ---
 

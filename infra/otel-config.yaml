@@ -1,3 +1,14 @@
+# -----------------------------------------------------------------------------
+# File: infra/otel-config.yaml
+# Layer: Infrastructure / Observability
+# Purpose: Configuration for the OpenTelemetry Collector.
+# Problem Solved: Ingests, processes, and exports telemetry (traces, metrics, logs)
+#                 to multiple backends (Jaeger, New Relic) for observability.
+# Interaction: Receives data from instrumented apps via OTLP; exports to backends.
+# Dependencies: OpenTelemetry Collector (Docker/K8s)
+# Inputs: OTLP spans, metrics, and logs
+# Outputs: Telemetry exported to jaeger and newrelic
+# -----------------------------------------------------------------------------
 receivers:
   otlp:
     protocols:

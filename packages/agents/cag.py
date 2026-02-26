@@ -1,3 +1,13 @@
+"""
+File: packages/agents/cag.py
+Layer: Cognitive / Fast-Path Reasoning
+Purpose: Instant pattern matching for known, high-confidence error signatures.
+Problem Solved: Reduces MTTR (Mean Time To Repair) by bypassing expensive and slow LLM reasoning for routine outages.
+Interaction: Sits between Scout and Brain; handles "Fast-Path" resolution; hands off to Brain on cache miss.
+Dependencies: datetime
+Inputs: Error spans from Scout
+Outputs: Instant RCA and remediation plan if a match is found
+"""
 from datetime import datetime
 
 # Block 1: The CAG Fast Cache
@@ -10,18 +20,24 @@ CAG_FAST_CACHE = {
     }
 }
 
-def cag_agent(state):
+def cag_agent(state: dict) -> dict:
     """
     Agent Node: CAG (Cognitive Agent Guide)
     Phase: ORIENT (Fast-Path)
-    Purpose: Instant pattern matching against the most common enterprise failure signatures.
+    Mission: Provide sub-second diagnosis for common enterprise failure signatures.
+    
+    Args:
+        state (dict): The current LangGraph state.
+    Returns:
+        dict: Updated state with cache_hit status and potential diagnosis.
     """
     logs = state.get("logs", [])
-    if not state["error_spans"]: return state
+    if not state.get("error_spans"): return state
 
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] [ORIENT] Analyzing incident signature against Tier-1 Global Cache...")
     msg = state["error_spans"][0]["exception.message"]
     
+    # 1. Pattern Matching: Check if the error is a known quantity
     if msg in CAG_FAST_CACHE:
         known = CAG_FAST_CACHE[msg]
         state["root_cause"] = known["root_cause"]
@@ -32,6 +48,7 @@ def cag_agent(state):
         logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] [ORIENT] 🟢 INSTANT-HIT: Known Infrastructure Pattern Detected.")
         logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] RCA: {state['root_cause']}")
     else:
+        # 2. Hand-off: If unknown, the OODA loop continues to the Brain Agent
         state["cache_hit"] = False
         logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CAG] [ORIENT] Cache Miss. Cognitive escalation required.")
 

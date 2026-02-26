@@ -1,33 +1,42 @@
+"""
+File: apps/control_plane/config.py
+Layer: Application / Configuration
+Purpose: Centralized environment-aware configuration for the SRE-Space control plane.
+Problem Solved: Manages resource constraints (RAM limits), feature flags (active agents), and connectivity strings (Redis/Kafka) across multi-cloud and local environments.
+Interaction: Imported by main.py and langgraph_logic.py to drive runtime behavior.
+Dependencies: os, python-dotenv
+Inputs: Environment variables (.env)
+Outputs: Global configuration constants
+"""
 import os
 from dotenv import load_dotenv
 
+# Initialize basic environment discovery
 load_dotenv()
 
-# --- Environment Configuration ---
-# Detect if the application is running in the cloud (Render) or locally (Docker Desktop).
-# This single variable drives the behavior of the entire infrastructure stack.
-ENV = os.getenv("ENV", "local")  # Values: 'cloud' or 'local'
+# --- Operational Mode ---
+# Drives the behavior of the entire infrastructure stack (Observability & Remediation).
+ENV = os.getenv("ENV", "local")  # Possible Values: 'cloud', 'local'
 
-# --- Agent & Resource Constraints ---
-# We adjust the "brain power" and memory limits based on the hosting environment's capabilities.
+# --- Resource Orchestration & Constraints ---
+# We adjust the "brain power" and RAM limits based on the runtime environment's footprint.
 if ENV == "cloud":
-    # Optimized for Render's Free/Individual Tier (512MB RAM limit)
-    EVENT_BUS = "redis"                                      # Use Managed Redis for low-latency messaging
+    # Optimized for Cloud Hosting (e.g. Render / Heroku / Lambda)
+    EVENT_BUS = "redis"                                      
     REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
-    MAX_LLM_CONCURRENCY = 2                                  # Fewer parallel threads to preserve memory
-    MEMORY_LIMIT_MB = 450                                    # Threshold for the Memory Guard middleware
-    # Use a lean agent squad to ensure stability on cloud resources
+    MAX_LLM_CONCURRENCY = 2                                  
+    MEMORY_LIMIT_MB = 450                                    # Proactive threshold for process protection
+    # Lean AI squad optimized for low-resource stability
     ACTIVE_AGENTS = ["scout", "brain", "fixer", "human", "curator"]
 else:
-    # "Unleashed" mode for local development (no strict RAM limits)
-    EVENT_BUS = os.getenv("EVENT_BUS", "kafka")               # Use full Apache Kafka for enterprise event logic
+    # 'Power-User' mode for local Docker/Kubernetes development
+    EVENT_BUS = os.getenv("EVENT_BUS", "kafka")               
     KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
-    MAX_LLM_CONCURRENCY = 5                                  # Enable high-parallel agent reasoning
-    MEMORY_LIMIT_MB = 2048                                   # 2GB limit for heavy local orchestration
-    # Full 8-agent squad for deep architectural analysis and auto-remediation
+    MAX_LLM_CONCURRENCY = 5                                  
+    MEMORY_LIMIT_MB = 2048                                   # Full local orchestration headroom
+    # The full 8-agent cognitive squad for comprehensive Reliability Engineering
     ACTIVE_AGENTS = ["scout", "cag", "brain", "guardrail", "fixer", "jules", "curator", "human"]
 
-# --- Deployment & CI/CD Hooks ---
-# RENDER_DEPLOY_HOOK: A unique URL provided by Render that, when POSTed to, triggers a fresh deployment.
-# This allows the Fixer agent to "ship" code changes immediately after creating a PR.
+# --- Automated Governance & Deployment Hooks ---
+# Hook URL for triggering CI/CD pipelines (e.g. Render/GitHub Actions) after a GitOps patch.
 RENDER_DEPLOY_HOOK = os.getenv("RENDER_DEPLOY_HOOK", "")

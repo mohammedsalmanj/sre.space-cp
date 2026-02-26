@@ -1,0 +1,41 @@
+{
+    "version": 2,
+    "name": "sre-space-orbital",
+    "builds": [
+        {
+            "src": "apps/dashboard/**",
+            "use": "@vercel/static"
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/",
+            "destination": "/apps/dashboard/index.html"
+        },
+        {
+            "source": "/apps/dashboard",
+            "destination": "/apps/dashboard/index.html"
+        },
+        {
+            "source": "/style.css",
+            "destination": "/apps/dashboard/style.css"
+        },
+        {
+            "source": "/main.js",
+            "destination": "/apps/dashboard/main.js"
+        },
+        {
+            "source": "/api/:path*",
+            "destination": "https://sre-space-cp.onrender.com/api/:path*"
+        },
+        {
+            "source": "/system/:path*",
+            "destination": "https://sre-space-cp.onrender.com/system/:path*"
+        },
+        {
+            "source": "/demo/:path*",
+            "destination": "https://sre-space-cp.onrender.com/demo/:path*"
+        }
+    ],
+    "cleanUrls": true
+}

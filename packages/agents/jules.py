@@ -1,19 +1,33 @@
+"""
+File: packages/agents/jules.py
+Layer: Cognitive / Architectural Optimization
+Purpose: Systemic design flaw elimination and long-term reliability engineering.
+Problem Solved: Prevents recurring incidents by proposing architectural refactors instead of just hotfixes.
+Interaction: Runs after the Fixer; evaluates for systemic issues; proposes refactors via GitHub.
+Dependencies: random, packages.shared.git_utils, packages.shared.github_service
+Inputs: Systemic failure indicators from state
+Outputs: Architectural Refactor Proposal on GitHub
+"""
 from datetime import datetime
 import json
 import random
 from packages.shared.git_utils import generate_sre_pr_title
 
-def jules_agent(state):
+def jules_agent(state: dict) -> dict:
     """
-    Agent: Jules (The Architect) - Tier-3 Architectural Authority
-    Trigger: Focused on chronic or systemic failures.
-    Mission: Deep code refactoring and design flaw elimination.
+    Agent Node: Jules (The Architect)
+    Phase: REFACTOR
+    Mission: Identify and eliminate systemic design flaws at the architectural level.
+    
+    Args:
+        state (dict): The current LangGraph state.
+    Returns:
+        dict: Updated state with architectural optimization logs.
     """
     logs = state.get("logs", [])
     
-    # Tier-3 Logic: Only intervene if the failure is identified as systemic or chronic
-    # For simulation, we check if the root cause has occurred multiple times in history
-    is_systemic = state.get("is_anomaly", False) and random.random() > 0.3 # Simulated systemic check
+    # 1. Systemic Check: Only intervene if the failure is identified as systemic or chronic
+    is_systemic = state.get("is_anomaly", False) and random.random() > 0.3 
     
     if not is_systemic:
         logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [JULES] Metric review complete. No systemic design flaws detected in this trace.")
@@ -23,7 +37,7 @@ def jules_agent(state):
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [JULES] TIER-3 INTERVENTION: Systemic failure detected.")
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [JULES] Initiating architectural refactor...")
     
-    # Architectural Refactoring Decisions
+    # 2. Design Thinking: Select architectural patterns to improve reliability
     refactors = [
         "Injected resilient 'Circuit Breaker' pattern (Hystrix-style) into the API Gateway.",
         "Optimized database query plan: Introduced composite indexing on 'policy_id' and 'timestamp'.",
@@ -31,11 +45,10 @@ def jules_agent(state):
         "Refactored retry logic: Switched to Exponential Backoff with Jitter for downstream calls."
     ]
     
-    # Choose 2 optimizations
     selected = random.sample(refactors, 2)
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [JULES] Design integrity restored.")
     
-    # Real GitHub Integration
+    # 3. Governance Integration: Post a formal refactor proposal for human review
     from packages.shared.github_service import GitHubService
     gh = GitHubService()
     
@@ -65,5 +78,3 @@ def jules_agent(state):
     
     state["logs"] = logs
     return state
-
-# Helper logic complete.

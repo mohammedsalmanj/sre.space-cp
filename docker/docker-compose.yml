@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # --- SRE CONTROL PLANE (THE ENGINE) ---
+  sre-engine:
+    build: .
+    ports:
+      - "8001:8001"
+    environment:
+      - ENV=local
+      - PORT=8001
+      - EVENT_BUS=kafka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - CHROMA_DB_HOST=chromadb
+      - CHROMA_DB_PORT=8000
+      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MAX_LLM_CONCURRENCY=5
+    deploy:
+      resources:
+        limits:
+          memory: 2gb
+    depends_on:
+      - kafka
+      - chromadb
+      - jaeger
+
+  # --- OBSERVABILITY BACKBONE ---
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686" # UI
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    volumes:
+      - ./infra/otel-config.yaml:/etc/otelcol-contrib/config.yaml
+    ports:
+      - "8888:8888" # Prometheus metrics
+      - "13133:13133" # Health check
+    command: [ "--config=/etc/otelcol-contrib/config.yaml" ]
+    depends_on:
+      - jaeger
+
+  # --- EVENT BUS (KAFKA + ZOOKEEPER) ---
+  kafka:
+    image: apache/kafka:latest
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9092
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+
+  # --- VECTOR MEMORY ---
+  chromadb:
+    image: chromadb/chroma:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./chroma_data:/chroma/data

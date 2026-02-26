@@ -1,12 +1,28 @@
+"""
+File: packages/shared/reporting.py
+Layer: Shared / Presentation
+Purpose: Standardizes the visual output of the SRE control plane across all communication channels.
+Problem Solved: Ensures consistent, high-fidelity documentation for human SREs, developers, and stakeholders.
+Interaction: Used by all cognitive agents to format markdown for GitHub Issues, PRs, and Slack/Email notifications.
+Dependencies: datetime
+Inputs: Current OODA loop state
+Outputs: Formatted Markdown strings
+"""
 from datetime import datetime
 
-def format_rca_postmortem(state):
-    """Formats a rich, high-fidelity RCA postmortem body suitable for GitHub and Monitoring HUBs."""
+def format_rca_postmortem(state: dict) -> str:
+    """
+    Formats a comprehensive Root Cause Analysis (RCA) report.
+    
+    Args:
+        state (dict): The OODA loop state containing the diagnosis.
+    Returns:
+        str: A markdown-formatted RCA report.
+    """
     service = state.get('service', 'policy-service')
     error_msg = state.get('error_spans', [{}])[0].get('exception.message', 'Unknown Error')
     root_cause = state.get('root_cause', 'Under deep cognitive analysis...')
     remediation = state.get('remediation', 'System investigation in progress.')
-    confidence = state.get('confidence_score', 0.0)
     category = state.get('error_spans', [{}])[0].get('category', 'Infrastructure')
     
     body = f"""
@@ -14,7 +30,6 @@ def format_rca_postmortem(state):
 **Trigger**: Infrastructure Signal
 **Error**: `{error_msg}`
 **Category**: {category}
-**Current Conversion**: 0.0%
 **Timestamp**: {datetime.now().strftime('%a %b %d %H:%M:%S %Y')}
 
 ---
@@ -23,6 +38,11 @@ def format_rca_postmortem(state):
 
 ### 📊 Root Cause Analysis (RCA)
 {root_cause}
+
+### ⚖️ Operational Context
+- **Blast Radius**: `{state.get('blast_radius', 'Unknown')}/10`
+- **Trace ID**: `{state.get('trace_id', 'N/A')}`
+- **RAG Reference**: `PM-{datetime.now().strftime('%m%d-v2')}`
 
 ### 💡 Recommended Fix
 {remediation}
@@ -48,8 +68,15 @@ def format_rca_postmortem(state):
 """
     return body
 
-def format_human_escalation(state):
-    """Formats a rich escalation body for Human-in-the-Loop."""
+def format_human_escalation(state: dict) -> str:
+    """
+    Formats a critical escalation report for human-in-the-loop scenarios.
+    
+    Args:
+        state (dict): The OODA loop state requiring human review.
+    Returns:
+        str: A markdown-formatted escalation request.
+    """
     frequency = state.get('anomaly_frequency', 0)
     rca_body = format_rca_postmortem(state)
     
@@ -67,8 +94,15 @@ The incident `policy-service:DOWN` has been detected **{frequency}** times.
 """
     return body
 
-def format_patch_deployed(state):
-    """Formats a rich notification for a deployed patch."""
+def format_patch_deployed(state: dict) -> str:
+    """
+    Formats a deployment notification for autonomous Pull Requests.
+    
+    Args:
+        state (dict): The OODA loop state after successful remediation.
+    Returns:
+        str: A markdown-formatted deployment log.
+    """
     remediation = state.get('remediation', 'Standard Patch')
     service = state.get('service', 'policy-service')
     
@@ -78,7 +112,7 @@ def format_patch_deployed(state):
 ### 📝 Operations Log
 - **Action Executed**: `{remediation}`
 - **Service Affected**: `{service}`
-- **Deployment Strategy**: GitOps Push (Render/K8s)
+- **Deployment Strategy**: GitOps Push (Universal Adapter)
 - **Status**: [STABILIZING]
 
 ### ✅ Post-Action Verification
