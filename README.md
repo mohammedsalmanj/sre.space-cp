@@ -1,15 +1,19 @@
 <div align="center">
-  <h1>SRE-Space</h1>
-  <h2>Open-Source Autonomous SRE Control Plane</h2>
+  <h1>SRE Control Plane</h1>
+  <h2>Open-Source Autonomous SRE Engine</h2>
   <p><i>Agentic Reliability for Cloud-Native Distributed Systems</i></p>
 
   <p>
     <a href="https://sre-space-cp.vercel.app/apps/dashboard" target="_blank">
-      <img src="https://img.shields.io/badge/ORBITAL_CONTROL-DASHBOARD-black?style=for-the-badge&logo=vercel" alt="Dashboard">
+      <img src="https://img.shields.io/badge/DASHBOARD-black?style=for-the-badge&logo=vercel" alt="Dashboard">
     </a>
     <a href="https://sre-space-cp.onrender.com/" target="_blank">
-      <img src="https://img.shields.io/badge/CONTROL_LOOP-BACKEND-46E3B7?style=for-the-badge&logo=render" alt="Backend">
+      <img src="https://img.shields.io/badge/BACKEND-46E3B7?style=for-the-badge&logo=render" alt="Backend">
     </a>
+    <img src="https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white" alt="AWS">
+    <img src="https://img.shields.io/badge/GCP-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white" alt="GCP">
+    <img src="https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white" alt="Kubernetes">
+    <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
   </p>
 </div>
 
