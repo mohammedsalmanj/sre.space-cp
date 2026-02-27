@@ -4,106 +4,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About SRE.Space | Cognitive Control Plane</title>
+    <title>About SRE.Space | Reliability Guide</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-<body class="text-slate-200">
-    <div class="max-w-4xl mx-auto px-6 py-12 space-y-12">
+<body class="p-6 md:p-12">
+    <div class="max-w-4xl mx-auto space-y-12 animate-entrance">
         <header class="text-center space-y-4">
-            <a href="/" class="inline-flex items-center text-blue-400 hover:text-white transition-colors mb-8">
-                <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> BACK_TO_DASHBOARD
+            <a href="/"
+                class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors mb-8 text-xs font-bold tracking-widest uppercase">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Dashboard
             </a>
-            <h1 class="text-5xl font-black tracking-tighter text-white uppercase italic">SRE.SPACE</h1>
-            <p class="text-slate-500 font-mono tracking-widest text-xs uppercase">Cognitive Reliability Control Plane
-            </p>
+            <h1 class="text-6xl font-black tracking-tighter text-slate-800 uppercase italic">SRE.SPACE</h1>
+            <p class="text-slate-400 font-mono tracking-widest text-xs uppercase leading-none">Cognitive Reliability
+                Control Plane</p>
         </header>
 
-        <section class="liquid-glass p-8 space-y-6">
-            <h2 class="text-2xl font-bold text-white tracking-tight flex items-center">
-                <i data-lucide="info" class="text-blue-400 w-6 h-6 mr-3"></i> THE_PROBLEM
+        <!-- PROBLEM MATRIX -->
+        <section class="liquid-glass p-10 space-y-8">
+            <h2 class="text-2xl font-black text-slate-800 tracking-tight flex items-center uppercase italic">
+                <i data-lucide="alert-triangle" class="text-red-500 w-6 h-6 mr-3"></i> The Problem Matrix
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="p-4 bg-white/5 rounded-lg border border-white/5">
-                    <h3 class="text-blue-400 font-bold text-xs uppercase mb-2">Operational Amnesia</h3>
-                    <p class="text-xs text-slate-400">Teams fix the same bug twice because institutional knowledge isn't
-                        vectorized.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-6 bg-slate-50/50 rounded-xl border border-slate-200/50 space-y-3">
+                    <h3 class="text-blue-600 font-black text-[10px] uppercase tracking-widest">Operational Amnesia</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">Fixing the same bug twice because institutional
+                        knowledge isn't vectorized or searchable in real-time.</p>
                 </div>
-                <div class="p-4 bg-white/5 rounded-lg border border-white/5">
-                    <h3 class="text-blue-400 font-bold text-xs uppercase mb-2">Alert Fatigue</h3>
-                    <p class="text-xs text-slate-400">Human MTTR is bottlenecked by the sheer volume of low-context
-                        noise.</p>
+                <div class="p-6 bg-slate-50/50 rounded-xl border border-slate-200/50 space-y-3">
+                    <h3 class="text-blue-600 font-black text-[10px] uppercase tracking-widest">Alert-Action Gap</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">Human MTTR is bottlenecked by the technical debt
+                        of manual bridge calls and dashboard correlation.</p>
                 </div>
-                <div class="p-4 bg-white/5 rounded-lg border border-white/5">
-                    <h3 class="text-blue-400 font-bold text-xs uppercase mb-2">Manual MTTR</h3>
-                    <p class="text-xs text-slate-400">Standard troubleshooting relies on manual Jaeger/Grafana
-                        correlation.</p>
+                <div class="p-6 bg-slate-50/50 rounded-xl border border-slate-200/50 space-y-3">
+                    <h3 class="text-blue-600 font-black text-[10px] uppercase tracking-widest">Tool Fragmentation</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">Observability silos across AWS, GCP, and K8s
+                        prevent a unified autonomic reasoning strata.</p>
                 </div>
             </div>
         </section>
 
-        <section class="liquid-glass p-8 space-y-6">
-            <h2 class="text-2xl font-bold text-white tracking-tight flex items-center">
-                <i data-lucide="brain" class="text-indigo-400 w-6 h-6 mr-3"></i> THE_Cognitive_SOLUTION
+        <!-- ARCHITECTURE -->
+        <section class="liquid-glass p-10 space-y-8">
+            <h2 class="text-2xl font-black text-slate-800 tracking-tight flex items-center uppercase italic">
+                <i data-lucide="brain-circuit" class="text-blue-500 w-6 h-6 mr-3"></i> Cognitive Architecture
             </h2>
-            <p class="text-slate-300 leading-relaxed">
-                SRE-Space implements a high-fidelity <strong>8-Agent OODA Loop</strong> (Observe, Orient, Decide, Act).
-                Unlike static monitoring, our control plane acts as an autonomous engineer that reasons over
-                <strong>OpenTelemetry</strong> traces and matches them against long-term <strong>Pinecone</strong>
-                memory.
-            </p>
-            <div class="flex justify-center py-8">
+            <div class="prose prose-slate max-w-none">
+                <p class="text-sm text-slate-600 leading-relaxed font-medium">
+                    SRE-Space implements a high-fidelity <strong>8-Agent OODA Loop</strong> (Observe, Orient, Decide,
+                    Act).
+                    Unlike static monitoring, our control plane acts as an autonomous engineer that reasons over
+                    <strong>OpenTelemetry</strong> traces and matches them against long-term <strong>Pinecone
+                        Cloud</strong> memory.
+                </p>
+            </div>
+            <div class="flex justify-center py-6">
                 <div
-                    class="relative w-full max-w-lg aspect-video liquid-glass flex items-center justify-center border-indigo-500/30">
-                    <div class="text-center font-mono">
-                        <div class="text-[10px] text-indigo-400 mb-2">[ OODA_MIND_MAP ]</div>
-                        <div class="flex items-center space-x-4">
-                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded">SCOUT</span>
-                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                            <span
-                                class="px-3 py-1 bg-white/10 border border-blue-400/30 rounded text-blue-400">BRAIN</span>
-                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded">FIXER</span>
-                        </div>
+                    class="w-full p-8 bg-blue-50/50 border border-blue-100 rounded-2xl text-center space-y-4 shadow-inner">
+                    <div class="text-[10px] font-black text-blue-400 uppercase tracking-[0.4em]">Autonomic Neural Flow
+                    </div>
+                    <div class="flex flex-wrap items-center justify-center gap-4">
+                        <span
+                            class="px-4 py-2 bg-white rounded-lg border border-slate-200 text-[10px] font-bold shadow-sm">SCOUT</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 text-slate-300"></i>
+                        <span
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-lg text-[10px] font-bold">BRAIN</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 text-slate-300"></i>
+                        <span
+                            class="px-4 py-2 bg-white rounded-lg border border-slate-200 text-[10px] font-bold shadow-sm">FIXER</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 text-slate-300"></i>
+                        <span
+                            class="px-4 py-2 bg-white rounded-lg border border-slate-200 text-[10px] font-bold shadow-sm">CURATOR</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="liquid-glass p-8 space-y-8">
-            <h2 class="text-2xl font-bold text-white tracking-tight flex items-center">
-                <i data-lucide="rocket" class="text-green-400 w-6 h-6 mr-3"></i> TRANSITION_TO_AUTOPILOT
-            </h2>
-            <div class="space-y-4">
-                <div class="flex items-start space-x-4">
-                    <div class="w-8 h-8 rounded bg-white/5 flex items-center justify-center text-xs font-bold shrink-0">
-                        1</div>
-                    <div>
-                        <h4 class="text-sm font-bold text-white">Local Simulation (Sandbox)</h4>
-                        <p class="text-xs text-slate-500">Run `docker-compose up` to trigger the reality manager. Use
-                            the dashboard Chaos Lab to prove parity.</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-4 border-t border-white/5 pt-4">
-                    <div
-                        class="w-8 h-8 rounded bg-blue-500/20 flex items-center justify-center text-xs font-bold text-blue-400 shrink-0">
-                        2</div>
-                    <div>
-                        <h4 class="text-sm font-bold text-white">Cloud Autopilot (AWS/GCP)</h4>
-                        <p class="text-xs text-slate-500">Connect your Production Cloud API keys. The control plane will
-                            bridge from your local workstation to global observability strata.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <footer class="text-center pt-12">
-            <h3 class="text-white font-bold tracking-widest uppercase mb-2">Mohammed Salman</h3>
-            <p class="text-blue-400 text-[10px] font-bold uppercase tracking-[0.3em]">Engineering Lead · AIOps
+        <!-- FOOTER -->
+        <footer class="text-center pt-8 border-t border-slate-200/50 space-y-2">
+            <h3 class="text-slate-800 font-extrabold tracking-widest uppercase">Mohammed Salman</h3>
+            <p class="text-blue-600 text-[10px] font-black uppercase tracking-[0.4em]">Engineering Lead · AIOps
                 Specialist</p>
+            <div class="flex justify-center gap-6 pt-4">
+                <a href="https://github.com/mohammedsalmanj" target="_blank"
+                    class="text-slate-400 hover:text-slate-900 transition-colors"><i data-lucide="github"
+                        class="w-5 h-5"></i></a>
+                <a href="https://linkedin.com/in/mohammed-salman" target="_blank"
+                    class="text-slate-400 hover:text-blue-600 transition-colors"><i data-lucide="linkedin"
+                        class="w-5 h-5"></i></a>
+            </div>
         </footer>
     </div>
     <script>lucide.createIcons();</script>
