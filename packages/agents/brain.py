@@ -31,6 +31,7 @@ def brain_agent(state: dict) -> dict:
 
     msg = state["error_spans"][0]["exception.message"]
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] [ORIENT] 🧠 Brain Analysis Required. Analyzing OTel Traces...")
+    logs.append(f"REASONING: Analyzing OTLP span signatures for service '{state.get('service')}'.")
     
     # 0. Operational Impact Early Assessment
     state["blast_radius"] = 4 # Default initial assessment
@@ -52,11 +53,8 @@ def brain_agent(state: dict) -> dict:
         except Exception as e:
             logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] RAG query failed ({str(e)}), escalating to deep reasoning cluster.")
 
-    # 2. Reasoning Layer: LLM Diagnosis (CoT)
-    if not rag_hit:
-        api_key = os.getenv("OPENAI_API_KEY")
-        # Auto-detect if we should use the Brain's reasoning cluster or local knowledge
-        use_llm = bool(api_key and not api_key.startswith("your_")) 
+        if not rag_hit:
+            logs.append(f"REASONING: No historical match in vector memory. Escalating to high-reasoning LLM cluster.") 
         
         if state.get("simulation_mode"):
             logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] [SIMULATION] 🛡️ Shadow Reasoning Active. Synthesizing diagnostic proof...")
@@ -97,6 +95,7 @@ def brain_agent(state: dict) -> dict:
             state["blast_radius"] = 4
             
             logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] [ORIENT] Root Cause Analysis (RCA) Defined.")
+            logs.append(f"REASONING: Cross-referencing OTel error message with local heuristics. MTTR reduced by bypass.")
             logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] RCA: {state['root_cause']}")
             logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] Recommended Fix: {state['remediation']}")
 

@@ -4,212 +4,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRE Control Plane</title>
+    <title>SRE.Space | Control Plane</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="./style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script type="module" src="./main.js" defer></script>
 </head>
 
-<body class="bg-gray-50 text-slate-800 font-sans tracking-tight min-h-screen">
+<body class="text-slate-200 font-sans tracking-tight min-h-screen">
 
-    <!-- Subtle blue gradient header -->
-    <header class="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <!-- Initialization Overlay -->
+    <div id="init-overlay"
+        class="fixed inset-0 z-[100] bg-[#0D0D0D] flex items-center justify-center transition-opacity duration-700">
+        <div class="max-w-md w-full p-8 liquid-glass text-center space-y-8">
+            <div class="flex justify-center">
+                <div
+                    class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center animate-pulse-glow border border-blue-400/30">
+                    <i data-lucide="zap" class="text-blue-400 w-8 h-8"></i>
+                </div>
+            </div>
+
+            <div id="init-steps" class="space-y-6">
+                <div id="step-1" class="step-active flex flex-col items-center">
+                    <h3 class="text-xl font-bold text-white mb-2 tracking-tight">Step 1: Telemetry Injection</h3>
+                    <p class="text-slate-400 text-sm">Synchronizing with OTLP Port 4317...</p>
+                    <div class="mt-4 w-full bg-white/5 h-1 rounded-full overflow-hidden">
+                        <div id="step-1-progress" class="h-full bg-blue-500 w-0 transition-all duration-1000"></div>
+                    </div>
+                </div>
+
+                <div id="step-2" class="step-hidden flex flex-col items-center">
+                    <h3 class="text-xl font-bold text-white mb-2 tracking-tight">Step 2: Control Link Established</h3>
+                    <p class="text-slate-400 text-sm" id="step-2-url">Linking Registry to Brain Agent...</p>
+                    <div class="mt-4 flex justify-center space-x-2">
+                        <i data-lucide="server" class="w-5 h-5 text-blue-400"></i>
+                        <div class="w-12 h-[2px] bg-blue-500/30 mt-2.5 animate-pulse"></div>
+                        <i data-lucide="brain" class="w-5 h-5 text-indigo-400"></i>
+                    </div>
+                </div>
+
+                <div id="step-3" class="step-hidden flex flex-col items-center">
+                    <h3 class="text-xl font-bold text-green-400 mb-2 tracking-tight">Step 3: Space Confirmed</h3>
+                    <p class="text-slate-400 text-sm">Control Plane is now autonomously observing your production
+                        infrastructure.</p>
+                    <button id="launch-button"
+                        class="mt-6 px-8 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold transition-all transform hover:scale-105">
+                        INITIALIZE CONTROL
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between p-4 liquid-glass">
             <div class="flex items-center space-x-4">
-                <h1 class="text-2xl font-semibold text-white tracking-wide">SRE Control Plane</h1>
-                <span
-                    class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 uppercase tracking-wider border border-blue-200"
-                    id="header-env-badge">Production</span>
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="activity" class="text-blue-400 w-6 h-6"></i>
+                    <h1 class="text-xl font-bold text-white tracking-widest uppercase">SRE.SPACE</h1>
+                </div>
+                <div id="stack-logo-container" class="border-l border-white/10 pl-4 flex items-center space-x-3">
+                    <!-- Dynamic Stack Logo -->
+                    <i id="stack-icon" data-lucide="cloud" class="w-5 h-5 text-slate-400"></i>
+                    <span class="text-xs font-mono text-slate-500 uppercase tracking-tighter"
+                        id="header-env-badge">CLOUD_MODE</span>
+                </div>
             </div>
 
             <div class="flex items-center space-x-6">
-                <!-- Status Badge -->
-                <div class="flex items-center space-x-2 bg-white/10 px-3 py-1.5 rounded-md border border-white/20">
-                    <span id="global-status-indicator" class="w-2.5 h-2.5 rounded-full bg-green-400"></span>
+                <!-- Status -->
+                <div class="flex items-center space-x-3 bg-white/5 px-4 py-1.5 rounded-full border border-white/10">
+                    <div id="global-status-indicator"
+                        class="w-2 h-2 rounded-full bg-green-400 animate-pulse status-glow-green"></div>
                     <span id="global-status-text"
-                        class="text-sm font-medium text-white uppercase tracking-wider">Nominal</span>
+                        class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">NOMINAL_STATE</span>
                 </div>
+
+                <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
+                    <a href="/about" class="text-slate-400 hover:text-white transition-colors">ABOUT</a>
+                    <a href="https://github.com/mohammedsalmanj/sre.space-cp" target="_blank"
+                        class="text-slate-400 hover:text-white transition-colors"><i data-lucide="github"
+                            class="w-5 h-5"></i></a>
+                </nav>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-6 py-8">
+    <main class="max-w-7xl mx-auto px-6 py-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-        <!-- Error Banner -->
-        <div id="error-banner" class="hidden mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-md shadow-sm">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                        fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                            clip-rule="evenodd" />
-                    </svg>
+        <!-- Left Column: Observability Map -->
+        <div class="lg:col-span-1 space-y-6">
+
+            <!-- Infrastructure Context -->
+            <section class="liquid-glass p-6 animate-slide-up">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest">INFRA_STRATUM</h2>
+                    <i data-lucide="database" class="w-4 h-4 text-slate-500"></i>
                 </div>
-                <div class="ml-3">
-                    <h3 class="text-sm font-medium text-red-800" id="error-title">Connection Error</h3>
-                    <p class="text-sm text-red-700 mt-1" id="error-message">Unable to reach the Control Plane API.</p>
+                <div class="space-y-5">
+                    <div class="flex justify-between items-center group">
+                        <span class="text-[11px] text-slate-500 font-bold uppercase">Provider</span>
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="server" class="w-4 h-4 text-blue-400"></i>
+                            <span class="text-sm font-mono text-white" id="provider-badge">DETECTION...</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[11px] text-slate-500 font-bold uppercase">Memory DB</span>
+                        <span class="text-sm font-mono text-white" id="vector-db-badge">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[11px] text-slate-500 font-bold uppercase">Latency</span>
+                        <span class="text-sm font-mono text-[#00D1FF]" id="latency-val">-- ms</span>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            <!-- Active Agents -->
+            <section class="liquid-glass p-6 animate-slide-up" style="animation-delay: 0.1s">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">AGENT_SQUAD</h2>
+                <div class="space-y-4">
+                    <div
+                        class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 transition-all hover:bg-white/10">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-2 h-2 rounded-full bg-blue-500" id="agent-scout-status"></div>
+                            <span class="text-xs font-bold text-slate-200 uppercase">Scout</span>
+                        </div>
+                        <i data-lucide="eye" class="w-4 h-4 text-slate-500"></i>
+                    </div>
+                    <div
+                        class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 transition-all hover:bg-white/10">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-2 h-2 rounded-full bg-indigo-500" id="agent-brain-status"></div>
+                            <span class="text-xs font-bold text-slate-200 uppercase">Brain</span>
+                        </div>
+                        <i data-lucide="zap" class="w-4 h-4 text-slate-500"></i>
+                    </div>
+                    <div
+                        class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 transition-all hover:bg-white/10">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-2 h-2 rounded-full bg-green-500" id="agent-fixer-status"></div>
+                            <span class="text-xs font-bold text-slate-200 uppercase">Fixer</span>
+                        </div>
+                        <i data-lucide="tool" class="w-4 h-4 text-slate-500"></i>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chaos Lab -->
+            <section class="liquid-glass p-6 animate-slide-up" style="animation-delay: 0.2s">
+                <h2 class="text-xs font-bold text-red-400 uppercase tracking-widest mb-6 flex items-center">
+                    <i data-lucide="flame" class="w-4 h-4 mr-2"></i> CHAOS_LAB
+                </h2>
+                <div class="space-y-3">
+                    <button onclick="window.triggerChaos('AWS_EC2_DISK_FULL')"
+                        class="w-full text-left px-4 py-2 hover:bg-red-500/10 border border-white/5 rounded text-[11px] font-bold uppercase tracking-tighter text-slate-300 transition-all flex justify-between items-center group">
+                        <span>EBS_EXHAUSTION</span>
+                        <i data-lucide="plus" class="w-3 h-3 opacity-0 group-hover:opacity-100"></i>
+                    </button>
+                    <button onclick="window.triggerChaos('K8S_POD_CRASH')"
+                        class="w-full text-left px-4 py-2 hover:bg-orange-500/10 border border-white/5 rounded text-[11px] font-bold uppercase tracking-tighter text-slate-300 transition-all flex justify-between items-center group">
+                        <span>POD_CRASH_LOOP</span>
+                        <i data-lucide="plus" class="w-3 h-3 opacity-0 group-hover:opacity-100"></i>
+                    </button>
+                    <button id="local-init-button"
+                        class="hidden w-full mt-4 py-2 px-4 bg-green-600/20 border border-green-500/30 text-green-400 rounded text-[11px] font-bold uppercase tracking-widest hover:bg-green-600/40 transition-all">
+                        INIT_OPERATIONAL_PHASE
+                    </button>
+                </div>
+            </section>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Center/Right: Sensory Control Center -->
+        <div class="lg:col-span-3 space-y-6 flex flex-col">
 
-            <!-- Left Column: Metrics & Controls -->
-            <div class="lg:col-span-1 space-y-6">
-
-                <!-- Infrastructure Context -->
-                <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-100 pb-2">Infrastructure
-                        Context</h2>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500 font-medium">Cloud Provider</span>
-                            <span
-                                class="text-sm font-mono bg-gray-100 px-2 py-1 rounded text-gray-800 border border-gray-200"
-                                id="provider-badge">AWS</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500 font-medium">Vector DB</span>
-                            <span
-                                class="text-sm font-mono bg-gray-100 px-2 py-1 rounded text-gray-800 border border-gray-200"
-                                id="vector-db-badge">Pinecone</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500 font-medium">Latency (Edge)</span>
-                            <span
-                                class="text-sm font-mono text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100"
-                                id="latency-val">42ms</span>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Active Agents -->
-                <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-100 pb-2">Active Agents
-                    </h2>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-100">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-2 h-2 rounded-full bg-blue-500" id="agent-scout-status"></span>
-                                <span class="text-sm font-medium text-gray-800">Scout Agent</span>
-                            </div>
-                            <span
-                                class="text-xs text-blue-600 font-mono bg-blue-50 px-2 py-0.5 rounded border border-blue-100 uppercase">Observe</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-100">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-2 h-2 rounded-full bg-indigo-500" id="agent-brain-status"></span>
-                                <span class="text-sm font-medium text-gray-800">Brain Agent</span>
-                            </div>
-                            <span
-                                class="text-xs text-indigo-600 font-mono bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 uppercase">Orient/Decide</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-100">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-2 h-2 rounded-full bg-orange-500" id="agent-fixer-status"></span>
-                                <span class="text-sm font-medium text-gray-800">Fixer Agent</span>
-                            </div>
-                            <span
-                                class="text-xs text-orange-600 font-mono bg-orange-50 px-2 py-0.5 rounded border border-orange-100 uppercase">Act</span>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Chaos Lab -->
-                <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h2
-                        class="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-100 pb-2 flex items-center">
-                        <svg class="w-4 h-4 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
-                            </path>
-                        </svg>
-                        Chaos Lab
-                    </h2>
-                    <p class="text-xs text-gray-500 mb-4">Inject simulated failure vectors to test SRE Loop resilience.
-                    </p>
-                    <div class="space-y-3">
-                        <button onclick="window.triggerChaos('AWS_EC2_DISK_FULL')"
-                            class="w-full text-left px-4 py-2 bg-white border border-red-200 text-red-700 rounded text-sm font-medium hover:bg-red-50 transition-colors flex justify-between items-center group">
-                            <span>EBS Volume Exhaust</span>
-                            <span class="opacity-0 group-hover:opacity-100 text-xs font-mono">INJECT</span>
-                        </button>
-                        <button onclick="window.triggerChaos('K8S_POD_CRASH')"
-                            class="w-full text-left px-4 py-2 bg-white border border-orange-200 text-orange-700 rounded text-sm font-medium hover:bg-orange-50 transition-colors flex justify-between items-center group">
-                            <span>Pod CrashLoopBackOff</span>
-                            <span class="opacity-0 group-hover:opacity-100 text-xs font-mono">INJECT</span>
-                        </button>
-                        <button onclick="window.triggerChaos('NETWORK_PARTITION')"
-                            class="w-full text-left px-4 py-2 bg-white border border-yellow-200 text-yellow-700 rounded text-sm font-medium hover:bg-yellow-50 transition-colors flex justify-between items-center group">
-                            <span>Network Partition</span>
-                            <span class="opacity-0 group-hover:opacity-100 text-xs font-mono">INJECT</span>
-                        </button>
-                    </div>
-                </section>
-
-                <!-- Guardrails Panel -->
-                <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-100 pb-2">Safety Guardrails
-                    </h2>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-600 font-medium">Auto-Recovery</span>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" checked class="sr-only peer" disabled>
-                                <div
-                                    class="w-9 h-5 bg-blue-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all">
-                                </div>
-                            </label>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-600 font-medium">Circuit Breaker</span>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" checked class="sr-only peer" disabled>
-                                <div
-                                    class="w-9 h-5 bg-blue-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all">
-                                </div>
-                            </label>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-600 font-medium">Production Mutations</span>
-                            <span class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded font-mono">BLOCKED</span>
-                        </div>
-                    </div>
-                </section>
-
-            </div>
-
-            <!-- Right Column: Feeds & Logs -->
-            <div class="lg:col-span-2 space-y-6 flex flex-col">
-
-                <!-- Deployment & OODA Logs -->
-                <section
-                    class="bg-white rounded-lg shadow-sm border border-gray-200 flex-1 flex flex-col min-h-[500px]">
-                    <div class="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50 rounded-t-lg">
-                        <h2 class="text-lg font-semibold text-gray-900 flex items-center">
-                            Deployment & Decision Logs
+            <section class="liquid-glass flex-1 flex flex-col min-h-[600px] animate-slide-up"
+                style="animation-delay: 0.3s">
+                <div class="flex justify-between items-center p-6 border-b border-white/5">
+                    <div class="flex flex-col">
+                        <h2 class="text-sm font-bold text-white uppercase tracking-[0.2em] mb-1">Sensory Command Center
                         </h2>
-                        <div class="flex space-x-2">
-                            <span id="sse-indicator"
-                                class="text-xs font-mono font-medium px-2 py-1 rounded bg-gray-200 text-gray-600 border border-gray-300">SSE
-                                DISCONNECTED</span>
-                            <button onclick="window.clearLogs()"
-                                class="text-xs px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors">Clear</button>
-                        </div>
+                        <p class="text-[10px] text-slate-500 font-mono tracking-tighter uppercase">Real-time Autonomous
+                            Decision Stream</p>
                     </div>
-
-                    <div id="logs-container"
-                        class="p-4 bg-[#f8f9fa] flex-1 overflow-y-auto font-mono text-sm space-y-1">
-                        <div class="text-gray-400 italic mb-2">System initialized. Waiting for telemetry data...</div>
+                    <div class="flex items-center space-x-3">
+                        <div id="sse-indicator"
+                            class="text-[9px] font-mono font-bold px-3 py-1 rounded-full bg-white/5 text-slate-500 border border-white/10 uppercase tracking-widest">
+                            OFFLINE</div>
+                        <button onclick="window.clearLogs()" class="text-white hover:text-red-400 transition-colors">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
                     </div>
-                </section>
+                </div>
 
-            </div>
+                <div id="logs-container" class="p-6 flex-1 overflow-y-auto font-mono text-xs space-y-2 bg-black/20">
+                    <div class="text-slate-600 italic">SYSTEM_IDLE: Synchronizing OODA cognitive shards...</div>
+                </div>
+            </section>
 
+            <!-- Bottom Credits -->
+            <footer class="liquid-glass p-6 text-center animate-slide-up" style="animation-delay: 0.4s">
+                <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div class="text-left mb-4 md:mb-0">
+                        <h3 class="text-white font-bold tracking-widest text-lg uppercase">Mohammed Salman</h3>
+                        <p class="text-blue-400 text-[10px] font-bold uppercase tracking-[0.3em]">SRE · AIOps Engineer
+                        </p>
+                        <p class="text-slate-500 text-[9px] mt-1 font-mono uppercase tracking-tighter">Reasoning for
+                            High-Scale Reliability.</p>
+                    </div>
+                    <div class="flex space-x-6">
+                        <a href="https://github.com/mohammedsalmanj" target="_blank"
+                            class="br-github text-slate-500 transition-all transform hover:scale-125">
+                            <i data-lucide="github" class="w-6 h-6"></i>
+                        </a>
+                        <a href="https://linkedin.com/in/mohammedsalmanj" target="_blank"
+                            class="br-linkedin text-slate-500 transition-all transform hover:scale-125">
+                            <i data-lucide="linkedin" class="w-6 h-6"></i>
+                        </a>
+                    </div>
+                </div>
+            </footer>
         </div>
     </main>
+
+    <script>
+        // Init Lucide Icons
+        window.onload = () => lucide.createIcons();
+    </script>
 </body>
 
 </html>

@@ -113,6 +113,28 @@ async def save_config(request: Request) -> dict:
 
     return {"status": "success", "message": f"Stack {stack_type} configured."}
 
+@app.get("/about")
+async def about_page(request: Request):
+    """
+    Serves the premium branding and architectural guide.
+    Solves MTTR by explaining the autonomous OODA loop.
+    """
+    return templates.TemplateResponse("about.html", {"request": request})
+
+@app.get("/api/v1/meta")
+async def get_meta():
+    """Returns platform metadata for the 'Liquid Glass' UI system."""
+    return {
+        "lead": "Mohammed Salman",
+        "role": "SRE · AIOps Engineer",
+        "philosophy": "Reasoning for High-Scale Reliability.",
+        "stack_icons": {
+            "ec2": "aws",
+            "k8s": "kubernetes",
+            "otel": "opentelemetry"
+        }
+    }
+
 from packages.infrastructure.simulation.chaos_engine import chaos_engine
 
 @app.post("/demo/chaos/trigger")
