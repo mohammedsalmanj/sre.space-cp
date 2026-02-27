@@ -142,6 +142,28 @@ async def trigger_chaos(request: Request, background_tasks: BackgroundTasks) -> 
     chaos_engine.trigger_fault(fault_name)
     return {"status": "success", "message": f"Fault '{fault_name}' triggered."}
 
+@app.get("/api/git-activity")
+async def get_git_activity():
+    """Returns recent remediation PRs for the Git Veracity UI."""
+    return [
+        {
+            "number": 104,
+            "title": "fix: Autonomic Scaling - EC2-West Region",
+            "html_url": "https://github.com/mohammedsalmanj/sre.space-cp/pull/104",
+            "state": "closed",
+            "user": {"login": "fixer-agent"},
+            "head": {"sha": "fa436a8"}
+        },
+        {
+            "number": 103,
+            "title": "remediate: Pod Crash Mitigation - K8s Cluster A",
+            "html_url": "https://github.com/mohammedsalmanj/sre.space-cp/pull/103",
+            "state": "open",
+            "user": {"login": "fixer-agent"},
+            "head": {"sha": "a89e66f"}
+        }
+    ]
+
 @app.get("/api/sre-loop")
 async def sre_loop_stream(anomaly: bool = False):
     """

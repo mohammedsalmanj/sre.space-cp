@@ -109,20 +109,43 @@ body {
 }
 
 /* Animations */
-@keyframes fadeInScale {
+@keyframes entrance {
     from {
         opacity: 0;
-        transform: scale(0.98);
+        transform: translateY(10px);
     }
 
     to {
         opacity: 1;
-        transform: scale(1);
+        transform: translateY(0);
     }
 }
 
 .animate-entrance {
-    animation: fadeInScale 0.5s ease-out forwards;
+    animation: entrance 0.4s ease-out;
+}
+
+/* Custom Component Radii & Shadows */
+.liquid-glass {
+    border-radius: 20px !important;
+}
+
+.btn-premium {
+    box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.2);
+}
+
+.btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.3);
+}
+
+.scroll-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scroll-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 /* Layout Utilities */
