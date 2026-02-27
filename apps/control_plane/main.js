@@ -23,13 +23,9 @@ window.showTab = (tab) => {
         const btn = document.getElementById(`tab-${p}`);
         if (!el || !btn) return;
         el.classList.toggle('hidden', p !== tab);
-        if (p === tab) {
-            btn.classList.add('border-blue-600', 'text-slate-900');
-            btn.classList.remove('text-slate-400');
-        } else {
-            btn.classList.remove('border-blue-600', 'text-slate-900');
-            btn.classList.add('text-slate-400');
-        }
+        btn.classList.toggle('active', p === tab);
+        btn.classList.toggle('text-slate-900', p === tab);
+        btn.classList.toggle('text-slate-400', p !== tab);
     });
 };
 
