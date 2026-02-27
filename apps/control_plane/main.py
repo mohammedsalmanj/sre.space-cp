@@ -8,7 +8,7 @@ Dependencies: fastapi, uvicorn, langchain, packages.shared.*, packages.agents.*
 Inputs: Chaos injection requests (POST /demo/inject-failure)
 Outputs: SSE event streams, system health logs, and GitHub activity snapshots
 """
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, BackgroundTasks
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
@@ -42,7 +42,7 @@ app = FastAPI(title=f"SRE-Space | {ENV.upper()} Control Loop v5.0")
 # --- Security & Connectivity (CORS Policy) ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*", "https://*.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -116,7 +116,7 @@ async def save_config(request: Request) -> dict:
 from packages.infrastructure.simulation.chaos_engine import chaos_engine
 
 @app.post("/demo/chaos/trigger")
-async def trigger_chaos(request: Request) -> dict:
+async def trigger_chaos(request: Request, background_tasks: BackgroundTasks) -> dict:
     """
     Triggers a specific fault profile via the Chaos Engine for OODA validation.
     """
@@ -127,8 +127,8 @@ async def trigger_chaos(request: Request) -> dict:
     
     chaos_engine.trigger_fault(fault_name)
     
-    # 🏁 Triggering the Autonomic OODA Loop immediately via background task
-    asyncio.create_task(run_sre_loop(is_anomaly=True, simulation_mode=True))
+    # 🏁 Triggering the Autonomic OODA Loop safely in background to avoid Vercel timeouts
+    background_tasks.add_task(run_sre_loop, is_anomaly=True, simulation_mode=True)
     
     return {"status": "success", "message": f"Chaos triggered: {fault_name}"}
 
@@ -139,7 +139,7 @@ async def clear_chaos() -> dict:
     return {"status": "success", "message": "Chaos cleared."}
 
 @app.post("/demo/inject-failure")
-async def inject_failure(request: Request) -> dict:
+async def inject_failure(request: Request, background_tasks: BackgroundTasks) -> dict:
     """
     Entry point for synthetic chaos injection used during validation or demo cycles.
     
@@ -157,13 +157,13 @@ async def inject_failure(request: Request) -> dict:
     logger.info(f"🔥 [CHAOS] Synthetic {chaos_type.replace('_', ' ')} injected into policy-service.")
     sim_state.inject_failure(chaos_type)
     
-    # 🏁 Triggering the Autonomic OODA Loop immediately via background task
-    asyncio.create_task(run_sre_loop(is_anomaly=True, simulation_mode=False))
+    # 🏁 Triggering the Autonomic OODA Loop safely in background
+    background_tasks.add_task(run_sre_loop, is_anomaly=True, simulation_mode=False)
     
     return {"status": "success", "message": f"Failure injected: {chaos_type}", "type": chaos_type}
 
 @app.post("/demo/sandbox/start")
-async def start_sandbox() -> dict:
+async def start_sandbox(background_tasks: BackgroundTasks) -> dict:
     """
     Activates the sandbox mode by triggering a mock database connection leak.
     Used for local testing without real cloud infrastructure.
@@ -174,12 +174,25 @@ async def start_sandbox() -> dict:
             f.write("active")
         logger.info("🧪 [SANDBOX] Mock Database Leak Injected.")
         
-        # Trigger the OODA loop
-        asyncio.create_task(run_sre_loop(is_anomaly=True, simulation_mode=True))
+        # Trigger the OODA loop safely in background
+        background_tasks.add_task(run_sre_loop, is_anomaly=True, simulation_mode=True)
         
         return {"status": "success", "message": "Sandbox active: DB Leak Injected"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+@app.get("/api/v1/status/{incident_id}")
+async def get_incident_status(incident_id: str):
+    """
+    Poll for updates after a timeout for a specific incident.
+    Prevents Vercel 60s timeout loops.
+    """
+    current_state = sim_state.get_state()
+    return {
+        "incident_id": incident_id,
+        "status": "Resolved" if not current_state.get("is_anomaly") else "In Progress",
+        "failure_type": current_state.get("failure_type", "None")
+    }
 
 @app.get("/quote")
 async def get_quote(user_id: str = "unknown") -> dict:

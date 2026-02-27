@@ -82,11 +82,18 @@ Enables safe testing of the OODA loop without risking production uptime.
 - **Includes**: Kafka, ChromaDB, Jaeger, OTel, Mock Trace Generator.
 - **Capabilities**: Chaos Injection, REAL GitHub PR creation, optional AWS/GCP connectivity.
 
-### ☁️ Cloud Mode (Production Setup)
+### ☁️ Cloud Mode (Vercel + Render Production Setup)
 Full-scale residency for active infra management.
-- **Backend**: Deploy to Render / EC2 / GKE.
-- **Frontend**: Deploy to Vercel / S3 Static.
-- **Configuration** (`.env`):
+- **Backend**: Deploy to Render (Python Web Service).
+- **Frontend**: Deploy to Vercel.
+- **Why No Cloudflare?**: Direct connections between Render and Vercel ensure significantly lower latency for OpenTelemetry (OTel) streams and prevent real-time Server-Sent Event (SSE) drops. Bypassing Cloudflare proxying also avoids restrictive SSL/TLS and WebSocket timeout errors (e.g., ERR_SSL_VERSION_OR_CIPHER_MISMATCH, 403s, 521s). Ensure Cloudflare proxy status is "DNS Only" (Gray Cloud) for all records.
+
+**Vercel + Render Setup Guide:**
+1. **Render (Backend)**: Create Web Service ➡️ Env: Python ➡️ Build Cmd: `pip install -r requirements.txt` ➡️ Start Cmd: `uvicorn apps.control_plane.main:app --host 0.0.0.0 --port 10000` ➡️ Port: `10000`. Add your `OPENAI_API_KEY`, `GITHUB_TOKEN`, and `PINECONE_API_KEY` to the Environment.
+2. **Vercel (Frontend)**: Import repo ➡️ Framework: Vite ➡️ Build Cmd: `npm run build` ➡️ Output Dir: `dist`. Set `VITE_API_BASE` to your `.onrender.com` URL.
+3. **Connectivity**: The Render backend explicitly permits `*.vercel.app` via CORS.
+
+- **Configuration** (`.env` on Render):
   ```bash
   ENV=cloud
   STAGE=production
@@ -417,19 +424,14 @@ SRE-Space/
 ## 🧪 Chaos Lab: The Simulation Engine
 SRE-Space includes a built-in **Simulation Engine** (`packages/infrastructure/simulation/chaos_engine.py`) designed to validate the 8-agent OODA loop without causing actual downtime on your managed resources.
 
-### 🛡️ Simulation vs. Injection
-*   **Standard Injection** (`/demo/inject-failure`): Modifies the local mock service to produce real OTel error spans.
-*   **Chaos Lab Simulation** (`/demo/chaos/trigger`): Shadow-injects a structured **Fault Profile** directly into the Scout Agent's stream. This allows you to test specific stack architectures (EC2 vs. K8s) regardless of where the Control Plane is physically running.
+### 🎮 The "Simulation Button" Guide
+Verify the entire multi-platform architecture (Vercel UI ➡️ Render Logic ➡️ Pinecone Memory ➡️ GitHub Actions) with one click from the dashboard:
 
-### 🎮 How to Run a Simulation
-1.  **Access the HUD**: Open the SRE-Space Dashboard.
-2.  **Select Fault Profile**: In the "Chaos Lab" section, choose a stack-aware fault:
-    *   **🚀 AWS_EC2_DISK_FULL**: Synthetic EBS volume exhaustion.
-    *   **☸️ K8S_POD_CRASH**: CrashLoopBackOff status injection.
-    *   **☁️ GCE_CPU_BURN**: Compute lockup simulation.
-3.  **Trace the Loop**: Watch the "Sensory Intake" HUD show the Scout agent detecting the **Shadow Injection**.
-4.  **Observe RAG**: See the Brain query **Pinecone/Chroma** for historical matches.
-5.  **Dry-Run Fix**: With `SIMULATION_MODE=true`, the Fixer will log exactly what it *would* have executed while still opening a real **Simulation Pull Request** in GitHub to test the GitOps flow.
+1. **Access the HUD**: Open the deployed SRE-Space Dashboard on Vercel.
+2. **Select Fault Profile**: In the "Chaos Lab" section, click a fault button (e.g., **🚀 AWS_EC2_DISK_FULL** or **☸️ K8S_POD_CRASH**).
+3. **Trace the Loop**: Watch the "Sensory Intake" console. The Scout agent on Render detects the **Shadow Injection** from Vercel natively via background tasks (immune to HTTP timeouts).
+4. **Verify Cloud Memory**: Watch the Brain agent query Pinecone. If it identifies a previous fix strategy, your Vercel ➡️ Render ➡️ Pinecone pipeline is fully validated!
+5. **Dry-Run Fix**: The Fixer will log exactly what it *would* have executed while still securely opening a real **Simulation Pull Request** in your GitHub repository—all without hitting a single Cloudflare-related 403 or 521 error network drop.
 
 ---
 

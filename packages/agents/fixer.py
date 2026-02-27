@@ -69,8 +69,25 @@ def fixer_agent(state: dict) -> dict:
             "iac_file": None
         }
     else:
-        execution_result = adapter.execute(action_plan)
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] [ACT] Adapter Execution: {execution_result.get('status')}")
+        max_retries = 3
+        execution_result = None
+        for attempt in range(max_retries):
+            try:
+                execution_result = adapter.execute(action_plan)
+                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] [ACT] Adapter Execution: {execution_result.get('status')}")
+                break
+            except Exception as e:
+                error_str = str(e)
+                # Fail-Safe: Exponential backoff for connection errors (502/504)
+                if "502" in error_str or "504" in error_str or "connection" in error_str.lower():
+                    wait_time = (2 ** attempt) * 2
+                    logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [FIXER] [RETRY] Connection error ({error_str}). Retrying in {wait_time}s ({attempt + 1}/{max_retries})...")
+                    time.sleep(wait_time)
+                else:
+                    raise e
+        
+        if not execution_result:
+            raise Exception("Maximum retries reached. Action execution failed due to persistent connection issues.")
     
     # 3. GitOps Implementation Layer
     gh = GitHubService()
