@@ -14,45 +14,68 @@
 </head>
 
 <body class="p-4 md:p-8">
-    <div class="max-w-[1440px] mx-auto min-h-screen flex flex-col gap-6 animate-entrance">
+    <div class="max-w-[1500px] mx-auto min-h-screen flex flex-col gap-6 animate-entrance">
 
-        <!-- TOP NAV BAR -->
+        <!-- PREMIUM HEADER (Inspired by Commit 40bfc41) -->
         <header
-            class="liquid-glass p-5 flex flex-wrap items-center justify-between gap-4 border-b-2 border-white/50 shadow-lg">
-            <div class="flex items-center gap-4">
-                <div
-                    class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                    <i data-lucide="shield-check" class="text-white w-6 h-6"></i>
+            class="liquid-glass p-8 flex flex-wrap items-start justify-between gap-6 border-b-2 border-white/50 shadow-lg">
+            <div class="space-y-4">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <i data-lucide="shield-check" class="text-white w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-black tracking-tighter text-slate-900 uppercase italic leading-none">
+                            AGENTIC SRE.SPACE</h1>
+                        <p class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.4em] mt-2">Autonomous
+                            Control Plane v6.0</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-xl font-black tracking-tighter text-slate-800 uppercase italic leading-none">
-                        SRE.SPACE</h1>
-                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-1">Autonomous Control
-                        Plane</p>
+                <div class="max-w-xl">
+                    <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed mb-2">
+                        Cognitive Reliability Engine: Provision · Observe · Remediate · Validate</p>
+                    <ul class="flex flex-wrap gap-x-6 gap-y-2 text-[10px] font-black text-slate-400 uppercase italic">
+                        <li class="flex items-center gap-1.5"><i data-lucide="check-circle-2"
+                                class="w-3 h-3 text-blue-500"></i> OTel Ingestion</li>
+                        <li class="flex items-center gap-1.5"><i data-lucide="check-circle-2"
+                                class="w-3 h-3 text-blue-500"></i> LLM-Driven RCA</li>
+                        <li class="flex items-center gap-1.5"><i data-lucide="check-circle-2"
+                                class="w-3 h-3 text-blue-500"></i> GitOps Patching</li>
+                        <li class="flex items-center gap-1.5"><i data-lucide="check-circle-2"
+                                class="w-3 h-3 text-blue-500"></i> SLO Validation</li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="flex items-center gap-6">
-                <!-- MODE TOGGLE -->
-                <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200"
-                    id="mode-toggle-container">
-                    <button onclick="setMode('real')" id="btn-mode-real"
-                        class="px-3 py-1 text-[10px] font-black rounded-lg transition-all text-slate-400">REAL</button>
-                    <button onclick="setMode('demo')" id="btn-mode-demo"
-                        class="px-3 py-1 text-[10px] font-black rounded-lg transition-all bg-blue-600 text-white shadow-sm">DEMO</button>
+            <div class="flex flex-col items-end gap-6">
+                <!-- SYSTEM STATUS & BADGES -->
+                <div class="flex items-center gap-4">
+                    <div id="env-badge-container"
+                        class="status-badge px-4 py-2 bg-slate-100 text-slate-700 border border-slate-200">
+                        <span class="text-[9px] font-black uppercase tracking-widest flex items-center gap-2">
+                            <i data-lucide="cpu" class="w-3 h-3"></i> <span id="env-badge-text">LOCAL SANDBOX</span>
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-3 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-[10px] font-black text-emerald-700 uppercase tracking-widest">System
+                            Nominal</span>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-3 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-[10px] font-black text-emerald-700 uppercase tracking-widest">System
-                        Nominal</span>
-                </div>
-
-                <nav class="flex items-center gap-4 border-l pl-6 border-slate-200">
+                <nav class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200 mr-2"
+                        id="mode-toggle-container">
+                        <button onclick="setMode('real')" id="btn-mode-real"
+                            class="px-3 py-1 text-[10px] font-black rounded-lg transition-all text-slate-400">REAL</button>
+                        <button onclick="setMode('demo')" id="btn-mode-demo"
+                            class="px-3 py-1 text-[10px] font-black rounded-lg transition-all bg-blue-600 text-white shadow-sm">DEMO</button>
+                    </div>
                     <a href="/about" id="about-link" target="_blank"
-                        class="text-[10px] font-black text-slate-500 hover:text-blue-600 transition-colors uppercase tracking-widest">Guide</a>
+                        class="text-[10px] font-black text-slate-500 hover:text-blue-600 transition-colors uppercase tracking-[0.3em] font-mono">Guide</a>
                     <button onclick="triggerChaos()"
-                        class="btn-premium px-5 py-2.5 rounded-xl text-[10px] uppercase tracking-widest shadow-blue-200/50">
+                        class="btn-premium px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-blue-200/50">
                         <i data-lucide="zap" class="w-3 h-3 inline mr-1"></i> Inject Chaos
                     </button>
                 </nav>
@@ -60,214 +83,398 @@
         </header>
 
         <!-- TAB NAVIGATION -->
-        <div class="flex gap-10 border-b border-slate-200 px-2">
+        <div class="flex gap-12 border-b border-slate-200 px-4">
             <button onclick="showTab('dashboard')" id="tab-dashboard"
-                class="pb-4 text-[11px] font-black tracking-[0.2em] border-b-2 border-blue-600 text-slate-800 uppercase">Dashboard</button>
+                class="pb-4 text-[11px] font-black tracking-[0.3em] border-b-2 border-blue-600 text-slate-900 uppercase">Dashboard</button>
+            <button onclick="showTab('provisioning')" id="tab-provisioning"
+                class="pb-4 text-[11px] font-black tracking-[0.3em] border-b-2 border-transparent text-slate-400 hover:text-slate-900 uppercase transition-all">Provisioning</button>
             <button onclick="showTab('marketplace')" id="tab-marketplace"
-                class="pb-4 text-[11px] font-black tracking-[0.2em] border-b-2 border-transparent text-slate-400 hover:text-slate-600 uppercase transition-all">Marketplace</button>
-            <button onclick="showTab('deploy')" id="tab-deploy"
-                class="pb-4 text-[11px] font-black tracking-[0.2em] border-b-2 border-transparent text-slate-400 hover:text-slate-600 uppercase transition-all">Deploy
-                Target</button>
+                class="pb-4 text-[11px] font-black tracking-[0.3em] border-b-2 border-transparent text-slate-400 hover:text-slate-900 uppercase transition-all">Marketplace</button>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
-            <!-- SIDEBAR: BRANDING & AGENTS -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
+            <!-- SIDEBAR: BRANDING & STATUS -->
             <aside class="lg:col-span-3 space-y-6">
-                <div class="liquid-glass p-6 space-y-4">
-                    <div class="flex items-center gap-3">
+                <div class="liquid-glass p-8 space-y-4">
+                    <div class="flex items-center gap-4">
                         <div
-                            class="w-12 h-12 bg-slate-100 rounded-full border-2 border-white shadow-sm flex items-center justify-center overflow-hidden">
-                            <i data-lucide="user" class="text-slate-400 w-6 h-6"></i>
+                            class="w-14 h-14 bg-slate-100 rounded-full border-[3px] border-white shadow-md flex items-center justify-center overflow-hidden">
+                            <i data-lucide="user" class="text-slate-400 w-7 h-7"></i>
                         </div>
                         <div>
-                            <h2 class="text-sm font-extrabold text-slate-800 uppercase">Mohammed Salman</h2>
-                            <p class="text-[10px] font-bold text-blue-600 uppercase tracking-wide">SRE · AIOps Engineer
-                            </p>
-                        </div>
-                    </div>
-                    <div class="space-y-2 pt-2 border-t border-slate-200/50">
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-relaxed">
-                            REASONING FOR HIGH-SCALE RELIABILITY.</p>
-                        <div class="flex gap-4 pt-1">
-                            <a href="https://github.com/mohammedsalmanj" target="_blank"
-                                class="text-slate-400 hover:text-slate-900 transition-colors"><i data-lucide="github"
-                                    class="w-4 h-4"></i></a>
-                            <a href="https://linkedin.com/in/mohammed-salman" target="_blank"
-                                class="text-slate-400 hover:text-blue-600 transition-colors"><i data-lucide="linkedin"
-                                    class="w-4 h-4"></i></a>
+                            <h2 class="text-sm font-black text-slate-900 uppercase tracking-tight">Mohammed Salman</h2>
+                            <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest mt-0.5">SRE · AIOps
+                                Engineer</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="liquid-glass p-6">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 border-b pb-2">Agent
-                        Neural Health</h3>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold text-slate-500 uppercase">Scout</span>
+                <!-- LIVE SYSTEM BOARD (Restored from 40bfc41) -->
+                <div class="liquid-glass p-8 space-y-6">
+                    <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 border-b pb-3">
+                        Agent Neural Health</h3>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div
+                            class="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                            <div class="space-y-1">
+                                <span
+                                    class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Scout</span>
+                                <span class="text-[11px] font-bold text-slate-800">TELEMETRY INTAKE</span>
+                            </div>
                             <span id="health-scout"
-                                class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                                class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold text-slate-500 uppercase">Brain</span>
+                        <div
+                            class="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                            <div class="space-y-1">
+                                <span
+                                    class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Brain</span>
+                                <span class="text-[11px] font-bold text-slate-800">REASONING STRATA</span>
+                            </div>
                             <span id="health-brain"
-                                class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                                class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold text-slate-500 uppercase">Fixer</span>
-                            <span id="health-fixer" class="w-2 h-2 rounded-full bg-slate-300"></span>
+                        <div
+                            class="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                            <div class="space-y-1">
+                                <span
+                                    class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Fixer</span>
+                                <span class="text-[11px] font-bold text-slate-800">GIT/INFRA MUTATION</span>
+                            </div>
+                            <span id="health-fixer" class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- GIT VERACITY -->
-                <div class="liquid-glass p-6 flex-1 flex flex-col">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 border-b pb-2">Git
-                        Veracity</h3>
-                    <div id="incident-list" class="space-y-3 overflow-y-auto max-h-[300px] scroll-hide">
-                        <div class="text-[10px] text-slate-400 italic">Syncing GitHub state...</div>
+                <!-- PRODUCTION GUARDRAILS (Restored from 40bfc41) -->
+                <div class="liquid-glass p-8">
+                    <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-6 border-b pb-3">
+                        Operational Guardrails</h3>
+                    <div class="space-y-5">
+                        <div class="flex items-center justify-between text-[11px] font-bold text-slate-600">
+                            <span>🛡️ SNAPSHOT FIRST</span>
+                            <span
+                                class="text-[9px] font-black bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded border border-emerald-100">ENABLED</span>
+                        </div>
+                        <div class="flex items-center justify-between text-[11px] font-bold text-slate-600">
+                            <span>🔁 AUTO ROLLBACK</span>
+                            <span
+                                class="text-[9px] font-black bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded border border-emerald-100">ENABLED</span>
+                        </div>
+                        <div class="flex items-center justify-between text-[11px] font-bold text-slate-600">
+                            <span>📦 GITOPS PR ONLY</span>
+                            <span
+                                class="text-[9px] font-black bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded border border-emerald-100">ENABLED</span>
+                        </div>
+                        <div
+                            class="flex items-center justify-between text-[11px] font-bold text-slate-600 pt-2 border-t border-slate-100">
+                            <span>⚠ ESCALATION GATE</span>
+                            <span class="text-blue-600 font-black tracking-tighter">> 0.85 CONF</span>
+                        </div>
                     </div>
                 </div>
             </aside>
 
             <!-- MAIN CONTENT AREA -->
-            <main class="lg:col-span-9 space-y-6 overflow-y-auto pr-2 pb-10 scroll-hide">
+            <main class="lg:col-span-9 space-y-8 overflow-y-auto pr-2 pb-16 scroll-hide">
 
                 <!-- DASHBOARD CONTENT -->
-                <div id="content-dashboard" class="space-y-6 animate-entrance">
+                <div id="content-dashboard" class="space-y-8 animate-entrance">
                     <!-- METRICS BAR -->
-                    <div class="grid grid-cols-3 gap-6">
-                        <div class="liquid-glass p-6 text-center">
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Avg
-                                MTTR</span>
-                            <div id="metric-mttr" class="text-3xl font-black text-slate-800 mt-1">4.2m</div>
+                    <div class="grid grid-cols-3 gap-8">
+                        <div class="liquid-glass p-8 text-center transition-all hover:border-blue-200">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">MTTR
+                                DRIFT</span>
+                            <div id="metric-mttr"
+                                class="text-4xl font-black text-slate-900 mt-2 font-mono tracking-tighter">4.2m</div>
                         </div>
-                        <div class="liquid-glass p-6 text-center">
-                            <span
-                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resilience</span>
-                            <div id="metric-resilience" class="text-3xl font-black text-emerald-600 mt-1">99.8%</div>
+                        <div class="liquid-glass p-8 text-center transition-all hover:border-emerald-200">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">RECOVERY
+                                RATE</span>
+                            <div id="metric-resilience"
+                                class="text-4xl font-black text-emerald-600 mt-2 font-mono tracking-tighter">99.8%</div>
                         </div>
-                        <div class="liquid-glass p-6 text-center">
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">PR
-                                Actions</span>
-                            <div id="active-prs" class="text-3xl font-black text-blue-600 mt-1">124</div>
+                        <div class="liquid-glass p-8 text-center transition-all hover:border-blue-200">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">PR
+                                VELOCITY</span>
+                            <div id="active-prs"
+                                class="text-4xl font-black text-blue-600 mt-2 font-mono tracking-tighter">124</div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <!-- SENSORY INTAKE (HUD) -->
-                        <div class="liquid-glass flex flex-col min-h-[400px]">
+                        <div class="liquid-glass flex flex-col min-h-[450px] shadow-xl">
                             <div
-                                class="px-6 py-3 border-b border-slate-100 bg-white/30 flex justify-between items-center">
+                                class="px-8 py-4 border-b border-slate-100 bg-white/40 flex justify-between items-center">
                                 <h3
-                                    class="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span> Sensory
-                                    Intake
+                                    class="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em] flex items-center gap-3">
+                                    <span
+                                        class="w-2 h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.5)]"></span>
+                                    OODA Telemetry
                                 </h3>
                                 <button onclick="window.clearLogs()"
-                                    class="text-[9px] font-bold text-slate-400 hover:text-blue-600 transition-all uppercase">Clear</button>
+                                    class="text-[10px] font-black text-slate-400 hover:text-blue-600 uppercase transition-all tracking-widest">Clear
+                                    Strata</button>
                             </div>
                             <div id="logs-feed"
-                                class="p-6 overflow-y-auto flex-1 font-mono text-[11px] space-y-2 bg-slate-50/30">
-                                <div class="text-slate-400 italic">Awaiting telemetry heartbeat...</div>
+                                class="p-8 overflow-y-auto flex-1 font-mono text-[11px] space-y-3 bg-slate-50/20 scroll-hide">
+                                <div class="text-slate-400 italic"># Handshaking with telemetry providers...</div>
                             </div>
                         </div>
 
-                        <!-- CHAOS LAB -->
-                        <div class="liquid-glass p-6 space-y-6">
-                            <div class="flex items-center justify-between border-b pb-4">
-                                <h3 class="text-[10px] font-black text-slate-800 uppercase tracking-widest">Chaos
-                                    Laboratory</h3>
-                                <span id="env-badge"
-                                    class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 uppercase">Local
-                                    Sim</span>
+                        <div class="space-y-8 flex flex-col">
+                            <!-- CHAOS LAB -->
+                            <div class="liquid-glass p-8 space-y-6 flex-1">
+                                <div class="flex items-center justify-between border-b pb-4">
+                                    <h3 class="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em]">
+                                        Complexity Injection Laboratory</h3>
+                                    <span
+                                        class="text-[10px] font-black text-red-500 uppercase tracking-widest flex items-center gap-1.5"><i
+                                            data-lucide="alert-triangle" class="w-3 h-3"></i> Agentic Testing</span>
+                                </div>
+                                <div class="grid grid-cols-1 gap-4">
+                                    <button onclick="triggerChaos('AWS_EC2_DISK_FULL')"
+                                        class="w-full p-5 rounded-3xl border border-slate-100 bg-slate-50/50 hover:bg-red-50 hover:border-red-200 transition-all text-left flex justify-between items-center group shadow-sm">
+                                        <div>
+                                            <span
+                                                class="text-[12px] font-black text-slate-800 uppercase block group-hover:text-red-700 tracking-tight">🚀
+                                                AWS EC2: EBS VOLUME EXHAUST</span>
+                                            <span
+                                                class="text-[9px] text-slate-400 uppercase font-bold mt-0.5 block">Infrastructure
+                                                Failure Profile</span>
+                                        </div>
+                                        <i data-lucide="terminal"
+                                            class="w-5 h-5 text-slate-300 group-hover:text-red-500 group-hover:scale-110 transition-all"></i>
+                                    </button>
+                                    <button onclick="triggerChaos('K8S_POD_CRASH')"
+                                        class="w-full p-5 rounded-3xl border border-slate-100 bg-slate-50/50 hover:bg-orange-50 hover:border-orange-200 transition-all text-left flex justify-between items-center group shadow-sm">
+                                        <div>
+                                            <span
+                                                class="text-[12px] font-black text-slate-800 uppercase block group-hover:text-orange-700 tracking-tight">☸️
+                                                K8S: CRASHLOOPBACKOFF</span>
+                                            <span
+                                                class="text-[9px] text-slate-400 uppercase font-bold mt-0.5 block">Orchestration
+                                                Anomaly State</span>
+                                        </div>
+                                        <i data-lucide="layers"
+                                            class="w-5 h-5 text-slate-300 group-hover:text-orange-500 group-hover:scale-110 transition-all"></i>
+                                    </button>
+                                    <button onclick="triggerChaos('GCE_CPU_BURN')"
+                                        class="w-full p-5 rounded-3xl border border-slate-100 bg-slate-50/50 hover:bg-purple-50 hover:border-purple-200 transition-all text-left flex justify-between items-center group shadow-sm">
+                                        <div>
+                                            <span
+                                                class="text-[12px] font-black text-slate-800 uppercase block group-hover:text-purple-700 tracking-tight">☁️
+                                                GCP GCE: CPU SOFT LOCKUP</span>
+                                            <span
+                                                class="text-[9px] text-slate-400 uppercase font-bold mt-0.5 block">Runtime
+                                                Performance Stress</span>
+                                        </div>
+                                        <i data-lucide="activity"
+                                            class="w-5 h-5 text-slate-300 group-hover:text-purple-500 group-hover:scale-110 transition-all"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="space-y-3">
-                                <button onclick="triggerChaos('AWS_EC2_DISK_FULL')"
-                                    class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-red-50 hover:border-red-200 transition-all text-left flex justify-between items-center group">
+
+                            <!-- GIT VERACITY PREVIEW -->
+                            <div class="liquid-glass p-8 flex flex-col h-[300px]">
+                                <h3
+                                    class="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 border-b pb-3">
+                                    Active Remediation PRs</h3>
+                                <div id="incident-list" class="space-y-3 overflow-y-auto flex-1 scroll-hide">
+                                    <div class="text-[10px] text-slate-400 italic font-mono uppercase"># Synchronizing
+                                        veracity pool...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROVISIONING CONTENT (Restored Max-Content from 40bfc41) -->
+                <div id="content-provisioning" class="hidden space-y-8 animate-entrance">
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tighter uppercase italic">Infrastructure
+                        Provisioning</h2>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        <!-- Provider Selection -->
+                        <div class="lg:col-span-12">
+                            <div class="liquid-glass p-10 space-y-8">
+                                <div class="flex items-center justify-between mb-4">
                                     <div>
-                                        <span
-                                            class="text-[11px] font-black text-slate-700 uppercase block group-hover:text-red-700">🚀
-                                            EBS Volume Exhaust</span>
-                                        <span class="text-[9px] text-slate-400 uppercase">EC2 Infrastructure
-                                            Fault</span>
+                                        <h3 class="text-2xl font-black text-slate-900 uppercase">Target Cloud
+                                            Environment</h3>
+                                        <p class="text-sm text-slate-500 font-medium">Select a provider to reveal
+                                            architecture profiles.</p>
                                     </div>
-                                    <i data-lucide="play" class="w-4 h-4 text-slate-300 group-hover:text-red-500"></i>
-                                </button>
-                                <button onclick="triggerChaos('K8S_POD_CRASH')"
-                                    class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-red-50 hover:border-red-200 transition-all text-left flex justify-between items-center group">
-                                    <div>
-                                        <span
-                                            class="text-[11px] font-black text-slate-700 uppercase block group-hover:text-red-700">☸️
-                                            CrashLoopBackOff</span>
-                                        <span class="text-[9px] text-slate-400 uppercase">K8s Orchestration
-                                            Anomaly</span>
+                                    <i data-lucide="globe" class="w-8 h-8 text-blue-500 opacity-20"></i>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                    <button onclick="updateProvisioner('aws')" id="prov-aws"
+                                        class="p-6 rounded-3xl border-2 border-blue-600 bg-blue-50 text-left transition-all group shadow-blue-100/50 shadow-lg">
+                                        <div class="text-3xl mb-3">🚀</div>
+                                        <div class="font-black text-slate-900 uppercase tracking-widest text-sm">
+                                            Provision AWS</div>
+                                        <p class="text-[9px] font-black text-blue-600 uppercase mt-1">EC2 · EKS · EB</p>
+                                    </button>
+                                    <button onclick="updateProvisioner('gcp')" id="prov-gcp"
+                                        class="p-6 rounded-3xl border border-slate-200 bg-white/50 text-left hover:border-blue-300 transition-all group">
+                                        <div class="text-3xl mb-3">☁️</div>
+                                        <div class="font-black text-slate-900 uppercase tracking-widest text-sm">
+                                            Provision GCP</div>
+                                        <p class="text-[9px] font-black text-slate-400 uppercase mt-1">GCE · GKE · RUN
+                                        </p>
+                                    </button>
+                                    <button onclick="updateProvisioner('kubernetes')" id="prov-k8s"
+                                        class="p-6 rounded-3xl border border-slate-200 bg-white/50 text-left hover:border-blue-300 transition-all group">
+                                        <div class="text-3xl mb-3">☸️</div>
+                                        <div class="font-black text-slate-900 uppercase tracking-widest text-sm">
+                                            Provision K8S</div>
+                                        <p class="text-[9px] font-black text-slate-400 uppercase mt-1">On-Prem · Multi
+                                            </li>
+                                    </button>
+                                    <button onclick="updateProvisioner('local')" id="prov-local"
+                                        class="p-6 rounded-3xl border border-slate-200 bg-white/50 text-left hover:border-blue-300 transition-all group">
+                                        <div class="text-3xl mb-3">🧪</div>
+                                        <div class="font-black text-slate-900 uppercase tracking-widest text-sm">Sandbox
+                                            Mode</div>
+                                        <p class="text-[9px] font-black text-slate-400 uppercase mt-1">Docker Simulation
+                                        </p>
+                                    </button>
+                                </div>
+
+                                <!-- Sub-Stack Profiles (Interactive) -->
+                                <div id="panel-aws"
+                                    class="p-10 bg-slate-50/50 rounded-[40px] border border-slate-100 space-y-8 animate-entrance">
+                                    <div class="flex items-center gap-4 border-b pb-6 border-slate-200">
+                                        <div
+                                            class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-slate-200 shadow-sm">
+                                            <i data-lucide="server" class="text-blue-600"></i></div>
+                                        <div>
+                                            <h4 class="text-lg font-black text-slate-900 uppercase tracking-tight">AWS
+                                                Infrastructure Stack</h4>
+                                            <p class="text-xs text-slate-500 uppercase font-black tracking-widest">
+                                                Select sub-stack architecture</p>
+                                        </div>
                                     </div>
-                                    <i data-lucide="play" class="w-4 h-4 text-slate-300 group-hover:text-red-500"></i>
-                                </button>
-                                <button onclick="triggerChaos('GCE_CPU_BURN')"
-                                    class="w-full p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-red-50 hover:border-red-200 transition-all text-left flex justify-between items-center group">
-                                    <div>
-                                        <span
-                                            class="text-[11px] font-black text-slate-700 uppercase block group-hover:text-red-700">☁️
-                                            Compute Soft Lockup</span>
-                                        <span class="text-[9px] text-slate-400 uppercase">GCE Runtime Stress</span>
+                                    <div class="flex flex-wrap gap-10">
+                                        <label class="flex items-center gap-3 cursor-pointer group">
+                                            <input type="radio" name="aws-stack" checked
+                                                class="w-5 h-5 accent-blue-600">
+                                            <span
+                                                class="text-sm font-black text-slate-700 uppercase group-hover:text-blue-600 transition-all">EC2
+                                                STANDALONE</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 cursor-pointer group">
+                                            <input type="radio" name="aws-stack" class="w-5 h-5 accent-blue-600">
+                                            <span
+                                                class="text-sm font-black text-slate-700 uppercase group-hover:text-blue-600 transition-all">EKS
+                                                CLUSTERED</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 cursor-pointer group">
+                                            <input type="radio" name="aws-stack" class="w-5 h-5 accent-blue-600">
+                                            <span
+                                                class="text-sm font-black text-slate-700 uppercase group-hover:text-blue-600 transition-all">EBS
+                                                STORAGE STRATA</span>
+                                        </label>
                                     </div>
-                                    <i data-lucide="play" class="w-4 h-4 text-slate-300 group-hover:text-red-500"></i>
-                                </button>
+                                    <div class="p-6 bg-white rounded-3xl border border-slate-200/50 shadow-inner">
+                                        <p
+                                            class="text-xs text-slate-500 leading-relaxed font-bold uppercase tracking-widest flex items-center gap-3">
+                                            <i data-lucide="info" class="w-4 h-4 text-blue-500"></i> Provisioning EC2
+                                            t3.medium with Ubuntu 22.04 LTS and OpenTelemetry collector pre-installed.
+                                        </p>
+                                    </div>
+                                    <button onclick="provisionStack('aws')"
+                                        class="btn-premium px-10 py-5 rounded-3xl text-xs font-black uppercase tracking-[0.3em] flex items-center gap-3 shadow-blue-200/50">
+                                        Initialize AWS Provisioning <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+
+                                <div id="panel-gcp"
+                                    class="hidden p-10 bg-slate-50/50 rounded-[40px] border border-slate-100 space-y-8 animate-entrance">
+                                    <div class="flex items-center gap-4 border-b pb-6 border-slate-200">
+                                        <div
+                                            class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-slate-200 shadow-sm">
+                                            <i data-lucide="cloud" class="text-blue-600"></i></div>
+                                        <div>
+                                            <h4 class="text-lg font-black text-slate-900 uppercase tracking-tight">GCP
+                                                Runtime Stack</h4>
+                                            <p class="text-xs text-slate-500 uppercase font-black tracking-widest">
+                                                Select computation model</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-wrap gap-10">
+                                        <label class="flex items-center gap-3 cursor-pointer group">
+                                            <input type="radio" name="gcp-stack" checked
+                                                class="w-5 h-5 accent-blue-600">
+                                            <span
+                                                class="text-sm font-black text-slate-700 uppercase group-hover:text-blue-600 transition-all">GCE
+                                                INSTANCE</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 cursor-pointer group">
+                                            <input type="radio" name="gcp-stack" class="w-5 h-5 accent-blue-600">
+                                            <span
+                                                class="text-sm font-black text-slate-700 uppercase group-hover:text-blue-600 transition-all">GKE
+                                                MANAGED K8S</span>
+                                        </label>
+                                    </div>
+                                    <button onclick="provisionStack('gcp')"
+                                        class="btn-premium px-10 py-5 rounded-3xl text-xs font-black uppercase tracking-[0.3em] flex items-center gap-3 shadow-blue-200/50">
+                                        Initialize GCP Provisioning <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+
+                                <div id="panel-local"
+                                    class="hidden p-10 bg-slate-50/50 rounded-[40px] border border-slate-100 space-y-4">
+                                    <h4 class="text-sm font-black text-slate-900 uppercase tracking-[0.2em]">Sandbox
+                                        Normalization</h4>
+                                    <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">Utilizing
+                                        local Docker daemon for OODA loop simulation. No cloud credentials required.</p>
+                                    <button onclick="provisionStack('local')"
+                                        class="btn-premium px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest mt-4">
+                                        Activate Sandbox Host
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- MARKETPLACE CONTENT -->
-                <div id="content-marketplace" class="hidden space-y-8 animate-entrance">
-                    <h2 class="text-3xl font-black text-slate-800 tracking-tighter uppercase italic">Active Policy Tiers
+                <div id="content-marketplace" class="hidden space-y-10 animate-entrance">
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tighter uppercase italic">Active Policy Tiers
                     </h2>
-                    <div class="grid grid-cols-2 gap-8">
-                        <div class="liquid-glass p-10 hover:border-blue-400 transition-all group">
+                    <div class="grid grid-cols-2 gap-10">
+                        <div
+                            class="liquid-glass p-12 hover:border-blue-400 transition-all group relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-all"><i
+                                    data-lucide="heart" class="w-32 h-32"></i></div>
                             <div
-                                class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-4xl mb-6 border border-blue-100 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                class="w-20 h-20 bg-blue-50 rounded-[30px] flex items-center justify-center text-5xl mb-8 border border-blue-100 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
                                 ❤️</div>
-                            <h3 class="text-2xl font-black mb-3 text-slate-800 uppercase">Life Elite</h3>
-                            <p class="text-slate-500 text-xs leading-relaxed mb-10">High-fidelity coverage with embedded
-                                autonomous claim verification agents and real-time biometric telemetry indexing.</p>
-                            <button class="btn-premium w-full py-4 uppercase font-black tracking-widest">Get
-                                Quote</button>
-                        </div>
-                        <div class="liquid-glass p-10 hover:border-purple-400 transition-all group">
-                            <div
-                                class="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center text-4xl mb-6 border border-purple-100 group-hover:bg-purple-600 group-hover:text-white transition-all">
-                                🛡️</div>
-                            <h3 class="text-2xl font-black mb-3 text-slate-800 uppercase">Cyber Shield</h3>
-                            <p class="text-slate-500 text-xs leading-relaxed mb-10">Comprehensive protection against
-                                logic flows and state corruption anomalies. Includes 24/7 autonomous RCA monitoring.</p>
+                            <h3 class="text-2xl font-black mb-4 text-slate-900 uppercase italic">Life Elite</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed mb-12 font-medium">High-fidelity coverage
+                                with embedded autonomous claim verification agents and real-time biometric telemetry
+                                indexing. Designed for zero-lag remediation of mortality risk profiles.</p>
                             <button
-                                class="btn-premium w-full py-4 uppercase font-black tracking-widest bg-slate-800 border-none">Deploy
-                                Cover</button>
+                                class="btn-premium w-full py-5 rounded-3xl uppercase font-black tracking-[0.3em] shadow-blue-100/50">Get
+                                Integrated Quote</button>
                         </div>
-                    </div>
-                </div>
-
-                <!-- DEPLOY CONTENT -->
-                <div id="content-deploy" class="hidden space-y-8 animate-entrance">
-                    <div class="liquid-glass p-10">
-                        <h2 class="text-4xl font-black mb-8 tracking-tighter text-blue-600 uppercase italic">Deployment
-                            Strata</h2>
-                        <div class="space-y-8">
-                            <section>
-                                <h3 class="text-lg font-black text-slate-800 mb-4 flex items-center gap-3">
-                                    <span
-                                        class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-black text-white">A</span>
-                                    Target Infrastructure
-                                </h3>
-                                <div
-                                    class="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-slate-600 leading-relaxed text-xs">
-                                    Deploying in **Hybrid Cloud** environment. Ensure OpenTelemetry collector is
-                                    listening on port 4317. Verify IAM role `sre-space-control` has snapshot
-                                    permissions.
-                                </div>
-                            </section>
+                        <div
+                            class="liquid-glass p-12 hover:border-purple-400 transition-all group relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-all"><i
+                                    data-lucide="shield" class="w-32 h-32"></i></div>
+                            <div
+                                class="w-20 h-20 bg-purple-50 rounded-[30px] flex items-center justify-center text-5xl mb-8 border border-purple-100 group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm">
+                                🛡️</div>
+                            <h3 class="text-2xl font-black mb-4 text-slate-900 uppercase italic">Cyber Shield</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed mb-12 font-medium">Comprehensive protection
+                                against logic flows and state corruption anomalies. Includes 24/7 autonomous RCA
+                                monitoring and automatic Hot-Fix deployment via GitOps.</p>
+                            <button
+                                class="btn-premium w-full py-5 rounded-3xl uppercase font-black tracking-[0.3em] bg-slate-900 border-none shadow-slate-200/50">Deploy
+                                Neural Cover</button>
                         </div>
                     </div>
                 </div>
@@ -276,28 +483,30 @@
         </div>
     </div>
 
-    <!-- ORBITAL INITIALIZATION (RESTORED MODAL) -->
+    <!-- ORBITAL SETUP (Now Hidden on launch by JS) -->
     <div id="onboarding-modal"
-        class="fixed inset-0 z-[2000] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-xl">
-        <div class="liquid-glass max-w-2xl w-full p-12 relative overflow-hidden animate-entrance border-blue-200/50">
-            <h2 class="text-4xl font-black mb-10 tracking-tighter text-slate-800 uppercase italic">Orbital Setup</h2>
-            <div class="grid grid-cols-2 gap-6">
+        class="fixed inset-0 z-[2000] hidden flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-3xl">
+        <div class="liquid-glass max-w-2xl w-full p-12 relative overflow-hidden border-blue-200/50 animate-entrance">
+            <h2 class="text-4xl font-black mb-10 tracking-tighter text-slate-900 uppercase italic">Orbital Setup</h2>
+            <div class="grid grid-cols-2 gap-8">
                 <button onclick="selectStack('aws')"
-                    class="p-8 rounded-3xl border border-slate-200 bg-white/50 hover:border-blue-500 hover:shadow-xl transition-all text-left group">
-                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🚀</div>
-                    <div class="font-black text-slate-800 uppercase tracking-widest">Provision AWS</div>
-                    <p class="text-[10px] text-slate-400 mt-2 uppercase">Elastic Cloud Strata</p>
+                    class="p-8 rounded-[40px] border border-slate-200 bg-white/80 hover:border-blue-500 hover:shadow-2xl transition-all text-left group">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition-transform">🚀</div>
+                    <div class="font-black text-slate-900 uppercase tracking-[0.2em] text-sm">Provision AWS</div>
+                    <p class="text-[10px] text-slate-400 mt-2 font-black uppercase tracking-widest">Elastic Cloud Strata
+                    </p>
                 </button>
                 <button onclick="selectStack('local')"
-                    class="p-8 rounded-3xl border border-slate-200 bg-white/50 hover:border-blue-500 hover:shadow-xl transition-all text-left group">
-                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🧪</div>
-                    <div class="font-black text-slate-800 uppercase tracking-widest">Local Sandbox</div>
-                    <p class="text-[10px] text-slate-400 mt-2 uppercase">Docker Containment</p>
+                    class="p-8 rounded-[40px] border border-slate-200 bg-white/80 hover:border-blue-500 hover:shadow-2xl transition-all text-left group">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition-transform">🧪</div>
+                    <div class="font-black text-slate-900 uppercase tracking-[0.2em] text-sm">Local Sandbox</div>
+                    <p class="text-[10px] text-slate-400 mt-2 font-black uppercase tracking-widest">Docker Containment
+                    </p>
                 </button>
             </div>
-            <button onclick="skipOnboarding()"
-                class="w-full mt-10 text-[10px] uppercase font-black text-slate-400 hover:text-blue-600 tracking-[0.4em] transition-all">Proceed
-                to Dashboard →</button>
+            <button onclick="switchToProvisioning()"
+                class="w-full mt-10 text-[10px] uppercase font-black text-slate-400 hover:text-blue-600 tracking-[0.5em] transition-all">Enter
+                Operational Workspace →</button>
         </div>
     </div>
 

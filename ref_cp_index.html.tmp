@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPACE.CONTROL | Reliability Playground</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --electric-blue: #2563EB;
+            --status-green: #10B981;
+            --warning-amber: #F59E0B;
+            --critical-red: #EF4444;
+            --bg-gradient-start: #ffffff;
+            --bg-gradient-end: #eff6ff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: #0f172a;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(37, 99, 235, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(37, 99, 235, 0.3);
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1), 0 4px 6px -2px rgba(37, 99, 235, 0.05);
+        }
+
+        .hud-terminal {
+            font-family: 'JetBrains Mono', monospace;
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 16px;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-primary {
+            background-color: var(--electric-blue);
+            color: white;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39);
+        }
+
+        .btn-chaos {
+            background-color: #fef2f2;
+            color: var(--critical-red);
+            border: 1px solid #fecaca;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-chaos:hover {
+            background-color: var(--critical-red);
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39);
+        }
+
+        .status-badge {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+
+        .pulse-dot {
+            height: 8px;
+            width: 8px;
+            background-color: var(--status-green);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="p-6 md:p-10">
+    <div class="cyber-grid"></div>
+
+    <div class="max-w-7xl mx-auto space-y-8">
+        <!-- Top Header Layout -->
+        <header
+            class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6 border-b border-slate-200 pb-6">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-slate-900">
+                    Agentic SRE <span class="text-blue-600">Control Plane</span>
+                </h1>
+                <p class="text-slate-500 font-medium mt-1">Provision. Observe. Remediate. Validate. Roll Back.</p>
+                <div class="mt-3 text-sm text-slate-600 max-w-2xl">
+                    This control plane autonomously:
+                    <ul class="list-disc ml-5 mt-1 space-y-1">
+                        <li>Detects anomalies via OpenTelemetry</li>
+                        <li>Performs LLM-driven RCA</li>
+                        <li>Generates GitOps patches</li>
+                        <li>Validates SLO recovery</li>
+                        <li>Rolls back if remediation fails</li>
+                    </ul>
+                </div>
+                <div class="mt-4 flex gap-3">
+                    <span id="badge-cloud"
+                        class="hidden status-badge bg-blue-100 text-blue-700 border border-blue-200">☁️ CLOUD DEPLOYMENT
+                        MODE</span>
+                    <span id="badge-local" class="status-badge bg-slate-100 text-slate-700 border border-slate-200">🧪
+                        LOCAL CONTROL PLANE (Docker)</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button onclick="startTour()"
+                    class="px-4 py-2 text-sm font-semibold text-blue-600 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors flex items-center gap-2">
+                    ✨ START GUIDED TOUR
+                </button>
+                <button onclick="startSandbox()"
+                    class="px-4 py-2 text-sm font-semibold text-purple-600 bg-purple-50 border border-purple-200 rounded-xl hover:bg-purple-100 transition-colors flex items-center gap-2">
+                    🧪 START SANDBOX
+                </button>
+                <button onclick="deployControlPlane()"
+                    class="btn-primary px-5 py-2.5 text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20">
+                    🚀 DEPLOY CONTROL PLANE
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <!-- Environment / Provider Column -->
+            <div class="lg:col-span-4 space-y-6">
+
+                <!-- Environment Config -->
+                <div class="glass-card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-slate-800">Cloud Provider</h2>
+                        <span id="provider-status" class="pulse-dot"></span>
+                    </div>
+
+                    <select id="provider-select" onchange="updateProvider(this.value)"
+                        class="w-full bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-lg block p-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer shadow-sm">
+                        <option value="local">Local (Simulation)</option>
+                        <option value="aws">AWS (Amazon Web Services)</option>
+                        <option value="gcp">GCP (Google Cloud)</option>
+                        <option value="kubernetes">Kubernetes native</option>
+                    </select>
+
+                    <!-- Setup Guide Panel -->
+                    <div id="setup-panel-local" class="mt-6 p-4 bg-slate-50 border border-slate-100 rounded-xl text-sm">
+                        <h3 class="font-semibold text-slate-800 mb-3">Local Setup Guide</h3>
+                        <ol class="list-decimal ml-4 space-y-2 text-slate-600">
+                            <li><code>git clone ...</code></li>
+                            <li><code>cp .env.example .env</code></li>
+                            <li>Add <code>OPENAI_API_KEY</code></li>
+                            <li><code>docker-compose up -d</code></li>
+                        </ol>
+                        <ul class="mt-4 space-y-1 text-xs font-medium">
+                            <li class="flex items-center text-green-600"><svg class="w-4 h-4 mr-1" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg> Agent Services Ready</li>
+                            <li class="flex items-center text-green-600"><svg class="w-4 h-4 mr-1" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg> OTel Collector Connected</li>
+                        </ul>
+                    </div>
+
+                    <div id="setup-panel-aws"
+                        class="hidden mt-6 p-4 bg-slate-50 border border-slate-100 rounded-xl text-sm">
+                        <h3 class="font-semibold text-slate-800 mb-3 block">AWS Target Stack</h3>
+                        <div class="flex gap-2 mb-4">
+                            <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="aws-stack"
+                                    checked class="accent-blue-600"> EC2</label>
+                            <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="aws-stack"
+                                    class="accent-blue-600"> EKS</label>
+                            <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="aws-stack"
+                                    class="accent-blue-600"> Beanstalk</label>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-3">Requires AWS_ACCESS_KEY_ID attached with
+                            SRE-Space-ControlPlane IAM Role.</p>
+                        <button onclick="deployControlPlanePlatform('aws')" id="prov-btn-aws"
+                            class="w-full btn-primary py-2 text-xs flex justify-center gap-2 items-center">Provision EC2
+                            + Install Control Plane</button>
+                    </div>
+
+                    <div id="setup-panel-gcp"
+                        class="hidden mt-6 p-4 bg-slate-50 border border-slate-100 rounded-xl text-sm">
+                        <h3 class="font-semibold text-slate-800 mb-3">GCP Target Stack</h3>
+                        <div class="flex gap-2 mb-4">
+                            <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="gcp-stack"
+                                    checked class="accent-blue-600"> GCE</label>
+                            <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="gcp-stack"
+                                    class="accent-blue-600"> GKE</label>
+                        </div>
+                        <button onclick="deployControlPlanePlatform('gcp')" id="prov-btn-gcp"
+                            class="w-full btn-primary py-2 text-xs flex justify-center gap-2 items-center">Provision VM
+                            + Install Control Plane</button>
+                    </div>
+                </div>
+
+                <!-- Production Guardrails -->
+                <div class="glass-card p-6">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4">Production Guardrails</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <span class="text-sm font-semibold text-slate-600">🛡 Snapshot First</span>
+                            <span class="status-badge bg-green-100 text-green-700">ENABLED</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <span class="text-sm font-semibold text-slate-600">🔁 Auto Rollback</span>
+                            <span class="status-badge bg-green-100 text-green-700">ENABLED</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <span class="text-sm font-semibold text-slate-600">📦 GitOps PR Only</span>
+                            <span class="status-badge bg-green-100 text-green-700">ENABLED</span>
+                        </div>
+                        <div class="flex justify-between items-center pb-1">
+                            <span class="text-sm font-semibold text-slate-600">⚠ Escalation Gate</span>
+                            <span class="text-xs font-bold text-amber-600">> 0.85 Conf</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Terminal and Actions Column -->
+            <div class="lg:col-span-8 flex flex-col gap-6">
+
+                <!-- Live System Status Board -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div class="glass-card p-4 text-center">
+                        <div class="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Scout</div>
+                        <div class="text-sm font-bold text-green-600 flex items-center justify-center gap-1">
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div> Active
+                        </div>
+                        <div class="text-xs text-slate-400 mt-1">Lat: 450ms</div>
+                    </div>
+                    <div class="glass-card p-4 text-center">
+                        <div class="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider\">Brain</div>
+                        <div class="text-sm font-bold text-green-600 flex items-center justify-center gap-1">
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div> Active
+                        </div>
+                        <div class="text-xs text-slate-400 mt-1">Lat: 1.2s</div>
+                    </div>
+                    <div class="glass-card p-4 text-center">
+                        <div class="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Fixer</div>
+                        <div class="text-sm font-bold text-green-600 flex items-center justify-center gap-1">
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div> Ready
+                        </div>
+                        <div class="text-xs text-slate-400 mt-1">Lat: —</div>
+                    </div>
+                    <div class="glass-card p-4 text-center">
+                        <div class="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Curator</div>
+                        <div class="text-sm font-bold text-green-600 flex items-center justify-center gap-1">
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div> Indexed
+                        </div>
+                        <div class="text-xs text-slate-400 mt-1">120k vectors</div>
+                    </div>
+                    <div class="glass-card p-4 text-center">
+                        <div class="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Adapter</div>
+                        <div id="status-adapter-val"
+                            class="text-sm font-bold text-blue-600 flex items-center justify-center gap-1">LOCAL</div>
+                        <div class="text-xs text-slate-400 mt-1">Connected</div>
+                    </div>
+                </div>
+
+                <!-- OODA Terminal Feed -->
+                <div class="hud-terminal flex-1 flex flex-col overflow-hidden min-h-[350px] shadow-2xl relative">
+                    <div
+                        class="bg-slate-800/80 px-5 py-3 flex justify-between items-center text-xs font-bold text-slate-300 border-b border-slate-700/50">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></span>
+                            STREAMING OODA TELEMETRY
+                        </div>
+                        <div id="sys-status-label" class="text-green-400 uppercase tracking-widest">Nominal</div>
+                    </div>
+                    <div id="logs" class="p-6 overflow-y-auto flex-1 text-sm space-y-3 scrollbar-hide">
+                        <div class="text-slate-500 italic">Awaiting sensor data...</div>
+                    </div>
+                </div>
+
+                <!-- Chaos Controls -->
+                <div class="glass-card p-6">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <span>🔥</span> Chaos Controls (Agentic Reaction Demo)
+                    </h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="chaos-lab-buttons">
+                        <button onclick="triggerSimulation('AWS_EC2_DISK_FULL')"
+                            class="btn-chaos p-3 text-left w-full flex flex-col gap-1">
+                            <span class="text-sm">Disk Full (EC2)</span>
+                            <span class="text-[10px] font-normal opacity-80 uppercase tracking-wider">Inject
+                                Anomaly</span>
+                        </button>
+                        <button onclick="triggerSimulation('K8S_POD_CRASH')"
+                            class="btn-chaos p-3 text-left w-full flex flex-col gap-1">
+                            <span class="text-sm">Crash Pod (EKS)</span>
+                            <span class="text-[10px] font-normal opacity-80 uppercase tracking-wider">Inject
+                                Anomaly</span>
+                        </button>
+                        <button onclick="triggerSimulation('GCE_CPU_BURN')"
+                            class="btn-chaos p-3 text-left w-full flex flex-col gap-1">
+                            <span class="text-sm">CPU Burn (GCE)</span>
+                            <span class="text-[10px] font-normal opacity-80 uppercase tracking-wider">Inject
+                                Anomaly</span>
+                        </button>
+                        <button onclick="triggerSimulation('APP_MEM_LEAK')"
+                            class="btn-chaos p-3 text-left w-full flex flex-col gap-1">
+                            <span class="text-sm">Memory Leak</span>
+                            <span class="text-[10px] font-normal opacity-80 uppercase tracking-wider">App
+                                Emulation</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="text-center mt-12 pb-8 flex flex-col items-center justify-center gap-3">
+            <p class="text-sm font-semibold text-slate-800">Agentic SRE Control Plane</p>
+            <p class="text-xs text-slate-500">Crafted with reasoning for high reliability by Salman</p>
+            <div class="flex gap-4 mt-2">
+                <a href="https://github.com/mohammedsalmanj" target="_blank"
+                    class="text-slate-400 hover:text-slate-900 transition-colors">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill-rule="evenodd"
+                            d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </a>
+                <a href="https://salman-sre.space" target="_blank"
+                    class="text-slate-400 hover:text-blue-600 transition-colors">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill-rule="evenodd"
+                            d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tour Overlay -->
+    <div id="tour-overlay"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative">
+            <button onclick="closeTour()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><svg
+                    width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg></button>
+            <div id="tour-icon" class="text-4xl mb-4">🔭</div>
+            <h3 id="tour-title" class="text-2xl font-bold text-slate-800 mb-2">Phase 1: Scout</h3>
+            <p id="tour-desc" class="text-slate-600 leading-relaxed mb-6">"This is the Senses Layer — OpenTelemetry
+                Intake." Scout continuously monitors for anomalous signals, preventing alert fatigue.</p>
+            <div class="flex justify-between items-center">
+                <div class="flex gap-1" id="tour-dots-container">
+                    <div id="dot-0" class="w-2 h-2 rounded-full bg-blue-600"></div>
+                    <div id="dot-1" class="w-2 h-2 rounded-full bg-slate-200"></div>
+                    <div id="dot-2" class="w-2 h-2 rounded-full bg-slate-200"></div>
+                    <div id="dot-3" class="w-2 h-2 rounded-full bg-slate-200"></div>
+                    <div id="dot-4" class="w-2 h-2 rounded-full bg-slate-200"></div>
+                    <div id="dot-5" class="w-2 h-2 rounded-full bg-slate-200"></div>
+                    <div id="dot-6" class="w-2 h-2 rounded-full bg-slate-200"></div>
+                    <div id="dot-7" class="w-2 h-2 rounded-full bg-slate-200"></div>
+                </div>
+                <button onclick="nextTour()" class="btn-primary px-5 py-2 text-sm">Next Step</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deploy Overlay -->
+    <div id="deploy-overlay"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative">
+            <button onclick="closeDeploy()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><svg
+                    width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg></button>
+            <h3 class="text-2xl font-bold text-slate-800 mb-2">Cloud Setup Wizard</h3>
+            <p class="text-slate-600 mb-6 text-sm">Deterministic infrastructure provisioning for the SRE Control Plane.
+            </p>
+
+            <!-- Progress Tracker -->
+            <div class="flex items-center gap-2 mb-6 text-xs font-semibold text-slate-400" id="wizard-progress">
+                <span class="text-blue-600 pointer">STEP 1</span> <span class="mx-1">→</span>
+                <span id="prog-2">STEP 2</span> <span class="mx-1">→</span>
+                <span id="prog-3">STEP 3</span> <span class="mx-1">→</span>
+                <span id="prog-4">COMPLETE</span>
+            </div>
+
+            <!-- STEP 1: Select Cloud -->
+            <div id="wizard-step-1" class="space-y-3">
+                <div onclick="selectDeploy('aws')" id="dep-aws"
+                    class="p-4 border border-blue-500 bg-blue-50 rounded-xl cursor-pointer transition-all flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <img src="https://img.icons8.com/color/48/amazon-web-services.png" class="w-8 h-8" />
+                        <div>
+                            <h4 class="font-bold text-blue-900">Amazon Web Services</h4>
+                            <p class="text-xs text-blue-600">Install via IAM & EC2</p>
+                        </div>
+                    </div>
+                </div>
+                <div onclick="selectDeploy('gcp')" id="dep-gcp"
+                    class="p-4 border border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <img src="https://img.icons8.com/color/48/google-cloud.png" class="w-8 h-8" />
+                        <div>
+                            <h4 class="font-bold text-slate-800">Google Cloud Platform</h4>
+                            <p class="text-xs text-slate-500">Install via Service Account & GCE</p>
+                        </div>
+                    </div>
+                </div>
+                <div onclick="selectDeploy('docker')" id="dep-docker"
+                    class="p-4 border border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <img src="https://img.icons8.com/color/48/docker.png" class="w-8 h-8" />
+                        <div>
+                            <h4 class="font-bold text-slate-800">Kubernetes / Docker</h4>
+                            <p class="text-xs text-slate-500">Local environment simulation</p>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="goToStep(2)" class="w-full mt-6 btn-primary py-3 text-sm">Proceed</button>
+            </div>
+
+            <!-- STEP 2: IAM / Service Account Setup -->
+            <div id="wizard-step-2" class="hidden space-y-4">
+                <div id="setup-instructions-aws" class="hidden text-sm">
+                    <h4 class="font-bold text-slate-800 mb-2">IAM Identity Setup</h4>
+                    <ol class="list-decimal ml-4 space-y-2 text-slate-600 mb-4 text-xs">
+                        <li>Go to <a href="#" class="text-blue-500 hover:underline">AWS IAM Console</a> → Create Role.
+                        </li>
+                        <li>Attach policies: <code>AmazonEC2FullAccess</code>, <code>AmazonEKSClusterPolicy</code> (if
+                            EKS).</li>
+                        <li>Create programmatic access key.</li>
+                        <li>Paste Access Key & Secret below.</li>
+                    </ol>
+                    <div class="space-y-3">
+                        <input id="aws-ak" type="text" placeholder="Access Key ID"
+                            class="w-full text-sm p-2 bg-white border border-slate-300 rounded focus:border-blue-500 outline-none">
+                        <input id="aws-sk" type="password" placeholder="Secret Access Key"
+                            class="w-full text-sm p-2 bg-white border border-slate-300 rounded focus:border-blue-500 outline-none">
+                    </div>
+                </div>
+
+                <div id="setup-instructions-gcp" class="hidden text-sm">
+                    <h4 class="font-bold text-slate-800 mb-2">Service Account Setup</h4>
+                    <ol class="list-decimal ml-4 space-y-2 text-slate-600 mb-4 text-xs">
+                        <li>Go to <a href="#" class="text-blue-500 hover:underline">GCP Console</a> → IAM & Admin →
+                            Service Accounts.</li>
+                        <li>Click "Create Service Account" and name it <code>sre-control-plane</code>.</li>
+                        <li>Assign roles: <code>Compute Admin</code>, <code>OS Admin Login</code>,
+                            <code>Kubernetes Admin</code>.
+                        </li>
+                        <li>Create key → JSON format.</li>
+                        <li>Upload key file below.</li>
+                    </ol>
+                    <label
+                        class="block w-full text-center border-2 border-dashed border-slate-300 rounded-lg p-6 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <span class="text-4xl block mb-2">📁</span>
+                        <span id="gcp-upload-text" class="text-sm font-semibold text-blue-600">Upload Service Account
+                            JSON</span>
+                        <input type="file" id="gcp-key-file" class="hidden" accept=".json"
+                            onchange="document.getElementById('gcp-upload-text').innerText = '✔ ' + this.files[0].name" />
+                    </label>
+                </div>
+
+                <div id="setup-instructions-docker" class="hidden text-sm">
+                    <h4 class="font-bold text-slate-800 mb-2">Local Runtime Preparation</h4>
+                    <p class="text-xs text-slate-600 mb-2">Your local container runtime (Docker Desktop / Colima) will
+                        be utilized for this simulation. No cloud credentials are required.</p>
+                </div>
+
+                <button onclick="validateCredentials()" id="btn-validate"
+                    class="w-full mt-4 btn-primary py-3 text-sm flex items-center justify-center gap-2">Verify
+                    Credentials</button>
+            </div>
+
+            <!-- STEP 3: Target Infrastructure -->
+            <div id="wizard-step-3" class="hidden space-y-4">
+                <h4 class="font-bold text-slate-800 mb-2">Target Infrastructure</h4>
+
+                <div id="infra-aws" class="hidden space-y-3">
+                    <select
+                        class="w-full text-sm p-2 bg-white border border-slate-300 rounded outline-none cursor-pointer">
+                        <option>Create New EC2 VM</option>
+                        <option>Use Existing EC2 Instance</option>
+                        <option>Deploy to EKS</option>
+                    </select>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs font-mono text-slate-600">
+                        AMI: Ubuntu 22.04 LTS<br />
+                        Instance Type: t3.medium<br />
+                        Security Group: Allow 8000 (HTTP), 4317 (OTLP)
+                    </div>
+                </div>
+
+                <div id="infra-gcp" class="hidden space-y-3">
+                    <select
+                        class="w-full text-sm p-2 bg-white border border-slate-300 rounded outline-none cursor-pointer">
+                        <option>Create New GCE VM</option>
+                        <option>Use Existing GCE VM</option>
+                        <option>Deploy to GKE</option>
+                    </select>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs font-mono text-slate-600">
+                        Machine Type: e2-medium<br />
+                        OS: Ubuntu 22.04 LTS<br />
+                        Firewall: Allow 8000, 4317
+                    </div>
+                </div>
+
+                <div id="infra-docker" class="hidden space-y-3">
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs font-mono text-slate-600">
+                        Network: sre-cp_default<br />
+                        Containers: Control Plane, Otel, Jaeger, Kafka<br />
+                        Ports: 8000, 16686, 9092
+                    </div>
+                </div>
+
+                <button onclick="executeProvisioning()" id="btn-provision"
+                    class="w-full mt-4 btn-primary py-3 text-sm flex items-center justify-center gap-2">🚀 Provision &
+                    Install Control Plane</button>
+            </div>
+
+            <!-- STEP 4: Success -->
+            <div id="wizard-step-4" class="hidden text-center py-6">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-3xl">✅</span>
+                </div>
+                <h4 class="font-bold text-xl text-slate-800 mb-2">Control Plane Live</h4>
+                <p id="success-url" class="text-sm font-mono text-blue-600 mb-2 bg-blue-50 py-2 rounded">
+                    http://10.X.X.X:8000</p>
+                <p class="text-sm text-slate-600 mb-6 mt-4">Space.Control is now autonomously observing your production
+                    infrastructure.</p>
+                <button onclick="switchToOperationalMode()" class="btn-primary px-8 py-3 text-sm">Enter Operational
+                    Mode</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Base Resolution
+        const loc = window.location;
+        const isLocal = loc.hostname === 'localhost' || loc.hostname === '127.0.0.1' || loc.protocol === 'file:';
+        const API_BASE = isLocal ? 'http://localhost:8001' : 'https://sre-space-cp.onrender.com';
+
+        async function safeFetch(url, options = {}) {
+            try {
+                const res = await fetch(url, options);
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                return await res.json();
+            } catch (err) {
+                console.error("Fetch failed:", err);
+                addLog(`<span class='text-red-400'>[ERROR] Backend unreachable: ${url}</span>`);
+                throw err;  // Re-throw so callers know it failed
+            }
+        }
+
+        let isDemoMode = true;
+        let selectedDeploy = 'aws';
+
+        function selectDeploy(platform) {
+            selectedDeploy = platform;
+            ['docker', 'aws', 'gcp'].forEach(p => {
+                const el = document.getElementById(`dep-${p}`);
+                if (p === platform) {
+                    el.className = "p-4 border border-blue-500 bg-blue-50 rounded-xl cursor-pointer transition-all flex items-center justify-between";
+                } else {
+                    el.className = "p-4 border border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all flex items-center justify-between";
+                }
+            });
+        }
+
+        function goToStep(step) {
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById(`wizard-step-${i}`);
+                if (el) el.classList.add('hidden');
+            }
+            document.getElementById(`wizard-step-${step}`).classList.remove('hidden');
+
+            // Update Progress Formatter
+            if (step > 1 && step <= 4) {
+                document.getElementById(`prog-${step}`).classList.add('text-blue-600');
+            }
+
+            if (step === 2) {
+                ['aws', 'gcp', 'docker'].forEach(p => {
+                    const el = document.getElementById(`setup-instructions-${p}`);
+                    if (el) el.classList.add('hidden');
+                });
+                document.getElementById(`setup-instructions-${selectedDeploy}`).classList.remove('hidden');
+            }
+
+            if (step === 3) {
+                ['aws', 'gcp', 'docker'].forEach(p => {
+                    const el = document.getElementById(`infra-${p}`);
+                    if (el) el.classList.add('hidden');
+                });
+                document.getElementById(`infra-${selectedDeploy}`).classList.remove('hidden');
+            }
+        }
+
+        async function validateCredentials() {
+            const btn = document.getElementById('btn-validate');
+            btn.innerHTML = `🔄 Validating via API...`;
+
+            await new Promise(r => setTimeout(r, 1200));
+
+            // Basic UI validation requirement
+            if (selectedDeploy === 'aws') {
+                const ak = document.getElementById('aws-ak').value;
+                const sk = document.getElementById('aws-sk').value;
+                if (!ak || !sk) {
+                    btn.innerHTML = `❌ Missing Credentials`;
+                    setTimeout(() => { btn.innerHTML = `Verify Credentials`; }, 2000);
+                    return;
+                }
+            } else if (selectedDeploy === 'gcp') {
+                const file = document.getElementById('gcp-key-file').files[0];
+                if (!file) {
+                    btn.innerHTML = `❌ Missing JSON File`;
+                    setTimeout(() => { btn.innerHTML = `Verify Credentials`; }, 2000);
+                    return;
+                }
+            }
+
+            btn.innerHTML = `✔ ${selectedDeploy.toUpperCase()} Credentials Verified`;
+            btn.classList.add('bg-green-600', 'hover:bg-green-700', 'border-green-600');
+
+            setTimeout(() => {
+                goToStep(3);
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700', 'border-green-600');
+                btn.innerHTML = `Verify Credentials`;
+            }, 1000);
+        }
+
+        async function executeProvisioning() {
+            const btn = document.getElementById('btn-provision');
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
+
+            if (selectedDeploy === 'docker') {
+                btn.innerHTML = `🔄 Initializing Local Environment...`;
+                await new Promise(r => setTimeout(r, 1500));
+            } else {
+                btn.innerHTML = `🔄 Create VM via API...`;
+                await new Promise(r => setTimeout(r, 1200));
+                btn.innerHTML = `🔄 SSH bootstrap...`;
+                await new Promise(r => setTimeout(r, 1000));
+                btn.innerHTML = `🔄 Pull control plane image...`;
+                await new Promise(r => setTimeout(r, 1500));
+                btn.innerHTML = `🔄 Start service...`;
+                await new Promise(r => setTimeout(r, 1000));
+            }
+
+            const mockIp = selectedDeploy === 'docker' ? 'http://localhost:8000' : `http://10.X.X.${Math.floor(Math.random() * 200) + 10}:8000`;
+            document.getElementById('success-url').innerText = mockIp;
+
+            goToStep(4);
+            btn.classList.remove('opacity-80', 'cursor-not-allowed');
+            btn.innerHTML = `🚀 Provision & Install Control Plane`;
+        }
+
+        function switchToOperationalMode() {
+            closeDeploy();
+            document.getElementById('provider-select').value = selectedDeploy === 'docker' ? 'local' : selectedDeploy;
+            updateProvider(document.getElementById('provider-select').value);
+            addLog(`<span class='text-blue-400 font-bold'>[SYSTEM]</span> Transferred into Operational Mode for ${selectedDeploy.toUpperCase()}. SRE Agents are online.`);
+        }
+
+        function addLog(msg) {
+            const div = document.createElement('div');
+            div.className = "font-mono leading-relaxed mb-2 opacity-0 transition-opacity duration-300";
+
+            // Syntax Highlight Tags
+            let formatted = msg;
+            if (msg.includes('[SCOUT]')) formatted = `<span class="text-blue-400 font-bold">[SCOUT]</span> ${msg.split('[SCOUT]')[1]}`;
+            else if (msg.includes('[BRAIN]')) formatted = `<span class="text-purple-400 font-bold">[BRAIN]</span> ${msg.split('[BRAIN]')[1]}`;
+            else if (msg.includes('[FIXER]')) formatted = `<span class="text-orange-400 font-bold">[FIXER]</span> ${msg.split('[FIXER]')[1]}`;
+            else if (msg.includes('[CURATOR]')) formatted = `<span class="text-emerald-400 font-bold">[CURATOR]</span> ${msg.split('[CURATOR]')[1]}`;
+
+            div.innerHTML = `<span class="text-slate-600 mr-2">></span>${formatted}`;
+            logContainer.appendChild(div);
+
+            // Fade in effect
+            setTimeout(() => div.classList.remove('opacity-0'), 10);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // --- Demo Streaming ---
+        function triggerSSEStream(isAnomaly) {
+            const es = new EventSource(`${API_BASE}/api/sre-loop?anomaly=${isAnomaly}&simulation=${isDemoMode}`);
+            es.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                if (data.message) addLog(data.message);
+                if (data.final_state) es.close();
+            };
+            es.onerror = () => {
+                es.close();
+            };
+        }
+
+        async function triggerSimulation(type) {
+            logContainer.innerHTML = '';
+            document.getElementById('sys-status-label').className = "text-amber-500 uppercase tracking-widest font-black flex items-center gap-2";
+            document.getElementById('sys-status-label').innerHTML = "⚠ ANOMALY DETECTED";
+
+            addLog(`System: Injecting ${type}...`);
+            try {
+                await safeFetch(`${API_BASE}/demo/chaos/trigger`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fault: type })
+                });
+                triggerSSEStream(true);
+            } catch (e) { addLog("<span class='text-red-400'>[ERROR] Chaos bridge disconnected or request failed. Ensure backend is running.</span>"); }
+
+            setTimeout(() => {
+                document.getElementById('sys-status-label').className = "text-green-400 uppercase tracking-widest";
+                document.getElementById('sys-status-label').innerHTML = "Nominal";
+            }, 8000);
+        }
+
+        async function startSandbox() {
+            logContainer.innerHTML = '';
+            addLog("<span class='text-indigo-400 font-bold'>[SANDBOX]</span> Starting Mock Environment...");
+            addLog("Loading telemetry listeners...");
+            try {
+                await safeFetch(`${API_BASE}/demo/sandbox/start`, { method: 'POST' });
+            } catch (e) { }
+            triggerSSEStream(false);
+        }
+
+        window.onload = async () => {
+            // initial query
+            try {
+                const data = await safeFetch(`${API_BASE}/api/health`);
+                if (data.env_stack) {
+                    document.getElementById('provider-select').value = data.env_stack;
+                    updateProvider(data.env_stack);
+                }
+            } catch (e) {
+                // Ignore, running local defaults
+            }
+            // Add initial welcome logs
+            addLog("SRE Control Plane initialized.");
+            addLog("Connect infrastructure sources to begin streaming telemetry.");
+
+            // Keep Render instance awake while the dashboard is open (every 5 mins)
+            setInterval(() => {
+                fetch(`${API_BASE}/api/health`).catch(() => { });
+            }, 300000);
+        };
+
+        // --- Guided Tour ---
+        const tourSteps = [
+            { icon: '🔭', title: 'Phase 1: Scout', desc: '"This is the Senses Layer — OpenTelemetry Intake." Continuously monitors for anomalous signals across the stack.' },
+            { icon: '🧠', title: 'Phase 2: Brain', desc: '"This is the Brain — LLM-based RCA." Correlates error patterns with historical fixes stored in Pinecone vector memory to decide on the proper action.' },
+            { icon: '🛠️', title: 'Phase 3: Fixer', desc: '"This is Fixer — Action Execution." Emits safe GitOps pull requests or infrastructure adapter commands.' },
+            { icon: '🛡️', title: 'Phase 4: Guardrail', desc: '"This is Guardrail — Blast Radius Control." Runs confidence gates and handles snapshot/rollback policies before taking action.' },
+            { icon: '👨‍🏫', title: 'Phase 5: Jules', desc: '"Jules — Code Reviewer." Evaluates PR code quality and prevents merge degradation.' },
+            { icon: '📝', title: 'Phase 6: Scribe', desc: '"Scribe — Post-Mortem Writer." Automatically writes the incident report out of the event logs.' },
+            { icon: '🗄️', title: 'Phase 7: Curator', desc: '"Curator — State Memory." Indexes the outcome (Pass/Fail) back into the vector database so the system learns.' },
+            { icon: '📢', title: 'Phase 8: Notifier', desc: '"Notifier — Broadcast." Sends notifications to the team if the confidence drops below the threshold.' }
+        ];
+
+        let currentTourStep = 0;
+
+        function startTour() {
+            currentTourStep = 0;
+            renderTourStep();
+            document.getElementById('tour-overlay').classList.remove('hidden');
+        }
+
+        function closeTour() {
+            document.getElementById('tour-overlay').classList.add('hidden');
+        }
+
+        function nextTour() {
+            currentTourStep++;
+            if (currentTourStep >= tourSteps.length) {
+                closeTour();
+            } else {
+                renderTourStep();
+            }
+        }
+
+        function renderTourStep() {
+            const step = tourSteps[currentTourStep];
+            document.getElementById('tour-icon').innerText = step.icon;
+            document.getElementById('tour-title').innerText = step.title;
+            document.getElementById('tour-desc').innerText = step.desc;
+
+            for (let i = 0; i < 8; i++) {
+                document.getElementById(`dot-${i}`).className = i === currentTourStep
+                    ? 'w-2 h-2 rounded-full bg-blue-600'
+                    : 'w-2 h-2 rounded-full bg-slate-200';
+            }
+        }
+
+        const logContainer = document.getElementById('logs');
+
+        function updateProvider(val) {
+            document.querySelectorAll('[id^="setup-panel-"]').forEach(el => el.classList.add('hidden'));
+            const panel = document.getElementById(`setup-panel-${val}`);
+            if (panel) panel.classList.remove('hidden');
+
+            const badgeCloud = document.getElementById('badge-cloud');
+            const badgeLocal = document.getElementById('badge-local');
+            const adapterVal = document.getElementById('status-adapter-val');
+
+            if (val === 'local') {
+                isDemoMode = true;
+                badgeCloud.classList.add('hidden');
+                badgeLocal.classList.remove('hidden');
+                adapterVal.innerText = 'LOCAL';
+            } else {
+                isDemoMode = false;
+                badgeCloud.classList.remove('hidden');
+                badgeLocal.classList.add('hidden');
+                adapterVal.innerText = val.toUpperCase();
+            }
+        }
+
+        function deployControlPlanePlatform(platform) {
+            selectDeploy(platform);
+            goToStep(2);
+            document.getElementById('deploy-overlay').classList.remove('hidden');
+        }
+
+        function deployControlPlane() {
+            goToStep(1);
+            document.getElementById('deploy-overlay').classList.remove('hidden');
+        }
+        function closeDeploy() {
+            document.getElementById('deploy-overlay').classList.add('hidden');
+        }
+    </script>
+</body>
+
+</html>

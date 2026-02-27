@@ -127,16 +127,21 @@ body {
 
 /* Custom Component Radii & Shadows */
 .liquid-glass {
-    border-radius: 20px !important;
+    border-radius: 40px !important;
+}
+
+.rounded-3xl {
+    border-radius: 30px !important;
 }
 
 .btn-premium {
-    box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 10px 30px -5px rgba(37, 99, 235, 0.25);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .btn-premium:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.3);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 20px 40px -5px rgba(37, 99, 235, 0.35);
 }
 
 .scroll-hide::-webkit-scrollbar {
