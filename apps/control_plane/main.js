@@ -1,129 +1,50 @@
 /**
  * SRE.SPACE v6.0 - THE HARD RESET
- * Logic Inspired by v4.0 (Commit 40bfc41)
- * Functional Onboarding, System Health, and Chaos Controls
+ * Sidebar Navigation & Agentic Loop Sync
+ * Inspired by commit 314c6d8
  */
 
-let activeEnv = 'local';
 let currentSSE = null;
-let currentTourStep = 0;
-
-const tourSteps = [
-    {
-        title: "Phase 1: Scout",
-        desc: "The Senses Layer — OpenTelemetry Intake. Scout monitors for metric drift and anomalous traces without creating alert fatigue.",
-        icon: "binoculars"
-    },
-    {
-        title: "Phase 2: Brain",
-        desc: "The Cognitive Layer. Performs LLM-driven Root Cause Analysis (RCA) by correlating high-cardinality data with historical memory.",
-        icon: "brain"
-    },
-    {
-        title: "Phase 3: Guardrail",
-        desc: "Deterministic Safety. Validates proposed fixes against production safety policies before any code is pushed.",
-        icon: "shield-alert"
-    },
-    {
-        title: "Phase 4: Fixer",
-        desc: "Autonomous Remediation. Generates GitOps patches and executes canary deployments to restore Service Level Objectives (SLOs).",
-        icon: "wrench"
-    }
-];
 
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
     connectSRELoop();
 });
 
-/* --- ENVIRONMENT & PROVISIONING --- */
-window.setEnv = (env) => {
-    activeEnv = env;
-    const isLocal = env === 'local';
+/* --- NAVIGATION BUS --- */
+window.switchTab = (tab) => {
+    // Update Sidebar state
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    event?.currentTarget?.classList.add('active');
 
-    document.getElementById('btn-env-local').className = `wizard-track-btn ${isLocal ? 'active' : 'border-transparent bg-white shadow-sm border border-slate-100'}`;
-    document.getElementById('btn-env-cloud').className = `wizard-track-btn ${!isLocal ? 'active' : 'border-transparent bg-white shadow-sm border border-slate-100'}`;
+    showToast(`Navigated to: ${tab.toUpperCase()}`);
 
-    document.getElementById('setup-local-desc').classList.toggle('hidden', !isLocal);
-    document.getElementById('setup-cloud-desc').classList.toggle('hidden', isLocal);
-
-    showToast(`Environment Strategy: ${env.toUpperCase()} Normalized.`);
-};
-
-window.provisionCloud = async () => {
-    const stack = document.querySelector('input[name="cloud-stack"]:checked').value;
-    showToast(`Provisioning ${stack.toUpperCase()} Infrastructure...`);
-
-    // Simulate legacy progress
-    appendReasoning(`Initiating Cloud Handshake for ${stack.toUpperCase()}`, 'SYSTEM');
-    await new Promise(r => setTimeout(r, 1000));
-    appendReasoning("Validating IAM Role SRE-Space-ControlPlane", 'SYSTEM');
-    await new Promise(r => setTimeout(r, 1000));
-    appendReasoning("Infrastructure Ready. Agent Hot-Link Established.", 'SYSTEM');
-
-    showToast(`${stack.toUpperCase()} Provisioning Complete.`);
+    // In a real app we would switch panes here. 
+    // For this dashboard, we focused on the integrated Dashboard view.
 };
 
 /* --- SYSTEM INITIALIZATION --- */
 window.initializeSpace = async () => {
-    const btn = document.getElementById('btn-initialize');
+    const btn = event?.currentTarget || document.querySelector('button[onclick="initializeSpace()"]');
     btn.disabled = true;
 
     const steps = [
-        "1. Scanning OTel Strata...",
-        "2. Verifying Pinecone Memory...",
-        "3. Synchronizing Cloud Drivers...",
-        "4. Status: NOMINAL"
+        "Scanning OTel Strata...",
+        "Verifying Pinecone Memory...",
+        "Synchronizing Cloud Drivers...",
+        "Authority: GRANTED"
     ];
 
     for (const msg of steps) {
         btn.innerText = msg;
         appendReasoning(msg, 'SYSTEM');
-        await new Promise(r => setTimeout(r, 800));
+        await new Promise(r => setTimeout(r, 600));
     }
 
-    btn.innerText = "SPACE INITIALIZED";
+    btn.innerText = "INITIALIZED";
     btn.classList.add('!bg-emerald-600');
-    showToast("Control Plane Online. Authority Granted.");
+    showToast("Control Plane Online.");
 };
-
-/* --- TOUR LOGIC --- */
-window.startTour = () => {
-    currentTourStep = 0;
-    document.getElementById('tour-modal').classList.remove('hidden');
-    updateTourUI();
-};
-
-window.closeTour = () => {
-    document.getElementById('tour-modal').classList.add('hidden');
-};
-
-window.nextTour = () => {
-    if (currentTourStep < tourSteps.length - 1) {
-        currentTourStep++;
-        updateTourUI();
-    } else {
-        closeTour();
-        showToast("Initialization Tour Complete.");
-    }
-};
-
-function updateTourUI() {
-    const step = tourSteps[currentTourStep];
-    document.getElementById('tour-step-title').innerText = step.title;
-    document.getElementById('tour-step-desc').innerText = step.desc;
-    document.getElementById('tour-step-icon').innerHTML = `<i data-lucide="${step.icon}" class="w-8 h-8"></i>`;
-
-    // Dots
-    const dots = document.getElementById('tour-dots');
-    dots.innerHTML = tourSteps.map((_, i) => `
-        <div class="w-2 h-2 rounded-full ${i === currentTourStep ? 'bg-blue-600' : 'bg-slate-200'}"></div>
-    `).join('');
-
-    document.getElementById('btn-next-tour').innerText = currentTourStep === tourSteps.length - 1 ? "Finish Tour" : "Next Protocol";
-
-    lucide.createIcons();
-}
 
 /* --- CORE SRE LOOP (SSE) --- */
 function connectSRELoop() {
@@ -147,14 +68,15 @@ function connectSRELoop() {
 function appendLog(msg, agent) {
     const container = document.getElementById('terminal-feed');
     const entry = document.createElement('div');
-    entry.className = "terminal-entry animate-entrance";
-    const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+    entry.className = "terminal-entry animate-entrance mb-1 flex items-start gap-3";
+    const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
 
-    const agentClass = `agent-${agent?.toLowerCase() || 'system'}`;
+    const agentColor = agent?.toLowerCase() === 'scout' ? 'text-blue-500' : 'text-purple-500';
+
     entry.innerHTML = `
-        <span class="terminal-timestamp">${time}</span>
-        <span class="terminal-agent ${agentClass}">${agent}</span>
-        <span class="text-slate-600">${msg}</span>
+        <span class="text-[10px] text-slate-300 font-bold font-mono">${time}</span>
+        <span class="text-[10px] font-black uppercase tracking-wider ${agentColor} min-w-[60px]">[${agent}]</span>
+        <span class="text-slate-600 text-[11px] font-medium font-sans">${msg}</span>
     `;
 
     container.appendChild(entry);
@@ -164,21 +86,20 @@ function appendLog(msg, agent) {
 function appendReasoning(thought, agent) {
     const container = document.getElementById('terminal-feed');
     const entry = document.createElement('div');
-    entry.className = "terminal-entry animate-entrance border-l-2 border-blue-600 pl-4 my-4 bg-blue-50/20 py-3 rounded-r-xl";
-    const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+    entry.className = "animate-entrance my-4 p-4 bg-slate-50 border border-slate-100 rounded-2xl border-l-4 border-l-blue-600";
 
     entry.innerHTML = `
-        <div class="flex items-center gap-2 mb-1">
-            <span class="text-[9px] font-black text-blue-600 uppercase tracking-widest italic">${agent} THOUGHT</span>
+        <div class="flex items-center gap-2 mb-2">
+            <span class="text-[9px] font-black text-blue-600 uppercase tracking-[0.2em] italic">Internal Reasoning Pipeline</span>
         </div>
-        <p class="text-slate-800 font-medium italic text-xs">"${thought.trim()}"</p>
+        <p class="text-[12px] text-slate-800 font-bold italic leading-relaxed">"${thought.trim()}"</p>
     `;
 
     container.appendChild(entry);
     container.scrollTop = container.scrollHeight;
 }
 
-/* --- ACTIONS --- */
+/* --- CHAOS CONTROLS --- */
 window.triggerChaos = async (fault) => {
     showToast(`Injecting Fault: ${fault}`);
     const status = document.getElementById('sys-status');
@@ -191,7 +112,7 @@ window.triggerChaos = async (fault) => {
         body: JSON.stringify({ fault })
     });
 
-    // Auto-restore after 30s
+    // Auto-restore nominal status in UI after 30s
     setTimeout(() => {
         status.className = "px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-2";
         status.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span> NOMINAL`;
@@ -199,18 +120,18 @@ window.triggerChaos = async (fault) => {
 };
 
 window.clearTerminal = () => {
-    document.getElementById('terminal-feed').innerHTML = '<div class="italic text-slate-400 text-[11px]"># Cache flushed. Strata normalized.</div>';
+    document.getElementById('terminal-feed').innerHTML = '<div class="italic text-slate-400 text-[11px]"># Strata buffer flushed. Monitoring normalized.</div>';
 };
 
 window.showToast = (msg) => {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
-    toast.className = "bg-slate-900/90 backdrop-blur-md text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 animate-entrance border border-white/10";
-    toast.innerHTML = `<i data-lucide="info" class="w-5 h-5 text-blue-400"></i> <span class="text-[10px] font-black uppercase tracking-widest">${msg}</span>`;
+    toast.className = "bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 animate-entrance border border-white/10";
+    toast.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-blue-400"></i> <span class="text-[10px] font-black uppercase tracking-widest">${msg}</span>`;
     container.appendChild(toast);
     lucide.createIcons();
     setTimeout(() => {
         toast.classList.add('opacity-0', 'translate-x-10');
         setTimeout(() => toast.remove(), 500);
-    }, 4000);
+    }, 3000);
 };
