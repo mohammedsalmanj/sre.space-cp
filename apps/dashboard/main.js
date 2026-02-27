@@ -1,7 +1,6 @@
 /**
- * SRE.SPACE v6.0 - THE HARD RESET
- * Sidebar Navigation & Agentic Loop Sync
- * Inspired by commit 314c6d8
+ * SRE.SPACE | Enterprise APM Controller
+ * Logic for Real-Time OODA Progress and High-Density Feed
  */
 
 let currentSSE = null;
@@ -11,39 +10,34 @@ document.addEventListener('DOMContentLoaded', () => {
     connectSRELoop();
 });
 
-/* --- NAVIGATION BUS --- */
-window.switchTab = (tab) => {
-    // Update Sidebar state
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    event?.currentTarget?.classList.add('active');
-
-    showToast(`Navigated to: ${tab.toUpperCase()}`);
-
-    // In a real app we would switch panes here. 
-    // For this dashboard, we focused on the integrated Dashboard view.
+/* --- UI CONTROLS --- */
+window.toggleDrawer = () => {
+    document.getElementById('onboarding-drawer').classList.toggle('collapsed');
 };
 
-/* --- SYSTEM INITIALIZATION --- */
-window.initializeSpace = async () => {
-    const btn = event?.currentTarget || document.querySelector('button[onclick="initializeSpace()"]');
-    btn.disabled = true;
+window.startSandbox = () => {
+    addLog("PROVISIONING: Initializing local container strata...", "SYSTEM");
+    showToast("Sandbox Environment Initializing...");
+    setTimeout(() => {
+        addLog("SYSTEM: Local Simulation Protocol Activated.", "SYSTEM");
+    }, 1000);
+};
 
-    const steps = [
-        "Scanning OTel Strata...",
-        "Verifying Pinecone Memory...",
-        "Synchronizing Cloud Drivers...",
-        "Authority: GRANTED"
-    ];
+window.initializeCloud = async () => {
+    const provider = document.getElementById('cloud-provider').value;
+    const stack = document.getElementById('stack-type').value;
 
-    for (const msg of steps) {
-        btn.innerText = msg;
-        appendReasoning(msg, 'SYSTEM');
-        await new Promise(r => setTimeout(r, 600));
-    }
+    addLog(`INIT: Initiating Credential Handshake with ${provider.toUpperCase()}...`, "SYSTEM");
+    showToast(`Establishing ${provider.toUpperCase()} Connection...`);
 
-    btn.innerText = "INITIALIZED";
-    btn.classList.add('!bg-emerald-600');
-    showToast("Control Plane Online.");
+    await new Promise(r => setTimeout(r, 1500));
+    addLog(`AUTH: Handshake Successful. Role: SRE-Control-Plane.`, "SYSTEM");
+
+    await new Promise(r => setTimeout(r, 1000));
+    addLog(`STACK: Detected Target [${stack.toUpperCase()}]. Starting monitoring handshake...`, "SYSTEM");
+
+    showToast("Enterprise Control Plane Online.");
+    toggleDrawer();
 };
 
 /* --- CORE SRE LOOP (SSE) --- */
@@ -56,78 +50,115 @@ function connectSRELoop() {
             const data = JSON.parse(e.data);
             if (data.message) {
                 if (data.message.includes('REASONING:')) {
-                    appendReasoning(data.message.replace('REASONING:', ''), data.agent || 'BRAIN');
+                    const thought = data.message.replace('REASONING:', '');
+                    showThought(thought);
                 } else {
-                    appendLog(data.message, data.agent || 'SCOUT');
+                    addLog(data.message, data.agent || 'SCOUT');
                 }
+                updateOODAPress(data.message);
+            }
+            if (data.memories) {
+                updateMemories(data.memories);
             }
         } catch (err) { }
     };
 }
 
-function appendLog(msg, agent) {
-    const container = document.getElementById('terminal-feed');
-    const entry = document.createElement('div');
-    entry.className = "terminal-entry animate-entrance mb-1 flex items-start gap-3";
-    const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+function updateOODAPress(msg) {
+    const stages = ['OBSERVE', 'ORIENT', 'DECIDE', 'ACT'];
+    let currentStage = -1;
 
+    if (msg.includes('OBSERVE')) currentStage = 0;
+    else if (msg.includes('REASONING') || msg.includes('ORIENT')) currentStage = 1;
+    else if (msg.includes('DECIDE')) currentStage = 2;
+    else if (msg.includes('ACT') || msg.includes('FIXER')) currentStage = 3;
+
+    if (currentStage >= 0) {
+        for (let i = 0; i <= currentStage; i++) {
+            const stage = stages[i].toLowerCase();
+            const bar = document.getElementById(`progress-${stage}`);
+            const label = document.getElementById(`status-${stage}`);
+            if (bar) bar.style.width = '100%';
+            if (label) {
+                label.innerText = 'ACTIVE';
+                label.className = 'stage-status text-emerald-500';
+            }
+        }
+    }
+
+    if (msg.includes('NOMINAL') || msg.includes('COMPLETE')) {
+        setTimeout(resetOODA, 3000);
+    }
+}
+
+function resetOODA() {
+    const stages = ['observe', 'orient', 'decide', 'act'];
+    stages.forEach(s => {
+        const bar = document.getElementById(`progress-${s}`);
+        const label = document.getElementById(`status-${s}`);
+        if (bar) bar.style.width = '0%';
+        if (label) {
+            label.innerText = 'IDLE';
+            label.className = 'stage-status text-slate-400';
+        }
+    });
+    document.getElementById('thought-bubble').classList.add('hidden');
+}
+
+function addLog(msg, agent) {
+    const logContainer = document.getElementById('event-log');
+    const entry = document.createElement('div');
+    entry.className = "log-entry";
+
+    const time = new Date().toLocaleTimeString('en-US', { hour12: false });
     const agentColor = agent?.toLowerCase() === 'scout' ? 'text-blue-500' : 'text-purple-500';
 
     entry.innerHTML = `
-        <span class="text-[10px] text-slate-300 font-bold font-mono">${time}</span>
-        <span class="text-[10px] font-black uppercase tracking-wider ${agentColor} min-w-[60px]">[${agent}]</span>
-        <span class="text-slate-600 text-[11px] font-medium font-sans">${msg}</span>
+        <span class="log-ts">${time}</span>
+        <span class="${agentColor} font-bold">[${agent.toUpperCase()}]</span>
+        <span class="log-msg">${msg}</span>
     `;
 
-    container.appendChild(entry);
-    container.scrollTop = container.scrollHeight;
+    logContainer.prepend(entry); // APM standard: Newest on top
 }
 
-function appendReasoning(thought, agent) {
-    const container = document.getElementById('terminal-feed');
-    const entry = document.createElement('div');
-    entry.className = "animate-entrance my-4 p-4 bg-slate-50 border border-slate-100 rounded-2xl border-l-4 border-l-blue-600";
+function showThought(thought) {
+    const bubble = document.getElementById('thought-bubble');
+    bubble.classList.remove('hidden');
+    bubble.innerHTML = `<p class="text-[13px] font-bold text-blue-900 leading-relaxed italic">"${thought.trim()}"</p>`;
+}
 
-    entry.innerHTML = `
-        <div class="flex items-center gap-2 mb-2">
-            <span class="text-[9px] font-black text-blue-600 uppercase tracking-[0.2em] italic">Internal Reasoning Pipeline</span>
+function updateMemories(memories) {
+    const container = document.getElementById('memory-list');
+    if (!memories.length) return;
+
+    container.innerHTML = memories.map(m => `
+        <div class="memory-card animate-entrance">
+            <div class="memory-match">
+                <span class="text-[10px] font-bold uppercase text-slate-400">Match Pattern</span>
+                <span class="match-score">${Math.round(m.score * 100)}% Match</span>
+            </div>
+            <p class="text-[11px] font-medium text-slate-700">${m.metadata?.title || 'Unknown Incident'}</p>
         </div>
-        <p class="text-[12px] text-slate-800 font-bold italic leading-relaxed">"${thought.trim()}"</p>
-    `;
-
-    container.appendChild(entry);
-    container.scrollTop = container.scrollHeight;
+    `).join('');
 }
 
 /* --- CHAOS CONTROLS --- */
 window.triggerChaos = async (fault) => {
-    showToast(`Injecting Fault: ${fault}`);
-    const status = document.getElementById('sys-status');
-    status.className = "px-3 py-1 bg-red-50 text-red-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-red-100 flex items-center gap-2";
-    status.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span> ANOMALY DETECTED`;
-
+    showToast(`Injecting Anomaly: ${fault}`);
+    resetOODA();
     await fetch('/demo/chaos/trigger', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fault })
     });
-
-    // Auto-restore nominal status in UI after 30s
-    setTimeout(() => {
-        status.className = "px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-2";
-        status.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span> NOMINAL`;
-    }, 30000);
-};
-
-window.clearTerminal = () => {
-    document.getElementById('terminal-feed').innerHTML = '<div class="italic text-slate-400 text-[11px]"># Strata buffer flushed. Monitoring normalized.</div>';
 };
 
 window.showToast = (msg) => {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
-    toast.className = "bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 animate-entrance border border-white/10";
-    toast.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-blue-400"></i> <span class="text-[10px] font-black uppercase tracking-widest">${msg}</span>`;
+    toast.className = "bg-slate-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4 animate-entrance";
+    toast.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-blue-400"></i> <span class="text-[10px] font-bold uppercase tracking-widest">${msg}</span>`;
     container.appendChild(toast);
     lucide.createIcons();
     setTimeout(() => {
