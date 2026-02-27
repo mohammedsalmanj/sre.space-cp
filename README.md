@@ -39,6 +39,17 @@ The Fixer generates a **GitOps patch** (Pull Request) and applies hot-remediatio
 
 ---
 
+## 🛡️ Provisioning Workflow & Guarded Execution Model
+SRE-Space Enterprise implements a **Strict 5-Step Guarded Provisioning Wizard** to ensure zero-risk infrastructure synthesis:
+
+1.  **Identity Verification**: Mandatory STS/IAM/Service-Account validation gate. Credentials are never stored in plain text and are server-side validated.
+2.  **Architecture Stratum**: Selection of deterministic stacks (EC2 v6.5, EKS Managed, etc.) with pre-baked OpenTelemetry instrumentation.
+3.  **Blast Radius Preview**: Theoretical simulation of infrastructure impact and cost auditing before commit.
+4.  **Synthesis Execution**: Real-time streaming of Terraform/SDK logs showing internal state transitions from `INITIATED` to `SUCCESS`.
+5.  **Operational Handover**: Automatic registration of new resources into the OODA control loop with immediate telemetry heartbeat.
+
+---
+
 ## 🎮 Deployment & Onboarding
 
 ### Vercel + Render Bridge

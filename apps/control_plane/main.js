@@ -1,253 +1,298 @@
 /**
- * SRE.SPACE - Premium Intelligence Logic v6.0
+ * SRE.SPACE - Enterprise Orchestration v6.5
  * Author: Mohammed Salman
- * Logic: Synchronized with Commit 40bfc41 + Liquid Glass UI
+ * Logic: 5-Step Guarded Wizard + Real-Time Telemetry Strata
  */
 
 const API_BASE = import.meta.env?.VITE_API_BASE || '';
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-// --- State Management ---
-let currentEventSource = null;
-let isDemoMode = true;
+// --- Global State ---
+let wizardState = {
+    step: 1,
+    provider: 'aws',
+    stack: 'ec2',
+    credentials: {},
+    isValidated: false
+};
+
+let telemetryStream = null;
+let oodaStream = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
-
-    // 1. Initial State Check (DISABLED modal auto-trigger as per request)
-    // checkSystemReadiness();
-
-    // 2. Start Polling for Git Veracity
-    fetchGitVeracity();
-    setInterval(fetchGitVeracity, 30000);
-
-    // 3. Start Metric Drift Simulation
-    setInterval(simulateMetricDrift, 15000);
-
-    // 4. Connect default SSE (Normal Monitoring)
-    connectToAgentStream(false);
+    initializeTelemetry();
+    connectOODAStream(false);
 });
 
-async function checkSystemReadiness() {
-    try {
-        const res = await fetch(`${API_BASE}/api/health`);
-        const data = await res.json();
-        if (data.env_stack) {
-            updateEnvBadge(data.env_stack);
-        }
-    } catch (e) {
-        console.warn("Backend metadata fetch failed.");
-    }
-}
+// --- Tab Controller ---
+window.showTab = (tabId) => {
+    ['dashboard', 'provisioning', 'governance'].forEach(id => {
+        const el = document.getElementById(`content-${id}`);
+        const tab = document.getElementById(`tab-${id}`);
+        if (!el || !tab) return;
 
-/* --- TAB NAVIGATION --- */
-window.showTab = (tab) => {
-    const panels = ['dashboard', 'marketplace', 'provisioning'];
-    panels.forEach(p => {
-        const el = document.getElementById(`content-${p}`);
-        const btn = document.getElementById(`tab-${p}`);
-        if (!el || !btn) return;
-
-        if (p === tab) {
+        if (id === tabId) {
             el.classList.remove('hidden');
-            btn.classList.add('border-blue-600', 'text-slate-900');
-            btn.classList.remove('border-transparent', 'text-slate-400');
+            tab.className = "pb-4 text-[11px] font-black tracking-[0.3em] border-b-2 border-blue-600 text-slate-900 uppercase";
         } else {
             el.classList.add('hidden');
-            btn.classList.remove('border-blue-600', 'text-slate-900');
-            btn.classList.add('border-transparent', 'text-slate-400');
+            tab.className = "pb-4 text-[11px] font-black tracking-[0.3em] border-b-2 border-transparent text-slate-400 hover:text-slate-900 uppercase transition-all";
         }
     });
+
+    if (tabId === 'dashboard') initializeTelemetry();
 };
 
-/* --- PROVISIONER LOGIC (Commit 40bfc41 Inspiration) --- */
-window.updateProvisioner = (provider) => {
-    ['aws', 'gcp', 'kubernetes', 'local'].forEach(p => {
-        const btn = document.getElementById(`prov-${p}`);
-        const panel = document.getElementById(`panel-${p}`);
+// --- Wizard Navigation ---
+window.goToStep = (step) => {
+    if (step > wizardState.step && !wizardState.isValidated && wizardState.step === 2) {
+        alert("SECURITY GATE: Complete credential validation before proceeding.");
+        return;
+    }
 
-        if (p === provider) {
-            btn.className = "p-6 rounded-3xl border-2 border-blue-600 bg-blue-50 text-left transition-all group shadow-blue-100/50 shadow-lg";
-            if (panel) panel.classList.remove('hidden');
+    // UI Transitions
+    for (let i = 1; i <= 5; i++) {
+        const pane = document.getElementById(`wizard-step-${i}`);
+        const node = document.getElementById(`step-node-${i}`);
+        if (!pane || !node) continue;
+
+        if (i === step) {
+            pane.classList.remove('hidden');
+            node.className = "w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-black relative z-10 cursor-pointer shadow-lg shadow-blue-500/30 transition-all";
         } else {
-            btn.className = "p-6 rounded-3xl border border-slate-200 bg-white/50 text-left hover:border-blue-300 transition-all group";
-            if (panel) panel.classList.add('hidden');
+            pane.classList.add('hidden');
+            if (i < step) {
+                node.className = "w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black relative z-10 cursor-pointer transition-all";
+            } else {
+                node.className = "w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center font-black relative z-10 transition-all";
+            }
         }
-    });
+    }
+
+    // Update progress line
+    const progressMap = { 1: '0%', 2: '25%', 3: '50%', 4: '75%', 5: '100%' };
+    document.getElementById('wizard-line').style.width = progressMap[step];
+
+    wizardState.step = step;
+    lucide.createIcons();
 };
 
-window.provisionStack = async (provider) => {
-    appendLog(`[SYSTEM] Initiating Provisioning sequence for ${provider.toUpperCase()}...`);
+// --- STEP 1: Provider Selection ---
+window.selectProvider = (provider) => {
+    wizardState.provider = provider;
+    ['aws', 'gcp', 'kubernetes', 'local'].forEach(p => {
+        const card = document.getElementById(`prov-card-${p}`);
+        if (p === provider) {
+            card.classList.add('border-blue-600', 'bg-blue-50/50', 'ring-4', 'ring-blue-500/10');
+        } else {
+            card.classList.remove('border-blue-600', 'bg-blue-50/50', 'ring-4', 'ring-blue-500/10');
+        }
+    });
+
+    // Toggle field visibility for Step 2
+    document.getElementById('fields-aws').classList.toggle('hidden', provider !== 'aws');
+    document.getElementById('fields-gcp').classList.toggle('hidden', provider !== 'gcp');
+
+    // Auto-proceed to credentials except for sandbox
+    if (provider === 'local') {
+        wizardState.isValidated = true;
+        goToStep(3);
+    } else {
+        goToStep(2);
+    }
+};
+
+// --- STEP 2: Credential Validation (Gated) ---
+window.handleGCPUpload = (input) => {
+    const file = input.files[0];
+    if (file) {
+        document.getElementById('gcp-json-text').innerText = `IDENTIFIED: ${file.name}`;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            wizardState.credentials = { jsonKey: e.target.result };
+        };
+        reader.readAsText(file);
+    }
+};
+
+window.validateStep2 = async () => {
+    const btn = document.getElementById('btn-validate-creds');
+    const status = document.getElementById('validate-status');
+    btn.disabled = true;
+    btn.innerText = "VERIFYING SECURITY TOKENS...";
+    status.innerText = "";
+
     try {
-        await fetch(`${API_BASE}/api/config/save`, {
+        let endpoint = `${API_BASE}/api/v1/validate/${wizardState.provider}`;
+        let payload = {};
+
+        if (wizardState.provider === 'aws') {
+            payload = {
+                accessKey: document.getElementById('aws-ak').value,
+                secretKey: document.getElementById('aws-sk').value,
+                region: document.getElementById('aws-region').value
+            };
+            wizardState.credentials = payload;
+        } else {
+            payload = wizardState.credentials;
+        }
+
+        const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ STACK_TYPE: provider })
+            body: JSON.stringify(payload)
         });
-        updateEnvBadge(provider);
-        appendLog(`[SYSTEM] ${provider.toUpperCase()} Control Plane Stratum Provisioned Successfully.`);
-        showTab('dashboard');
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            btn.className = "w-full py-5 bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-widest";
+            btn.innerText = "CREDENTIAL VALIDATION: SUCCESS";
+            status.innerHTML = `<span class="text-emerald-600">AUTH GRANTED: ${data.account || data.project_id}</span>`;
+            wizardState.isValidated = true;
+
+            // Sync summary
+            document.getElementById('sum-provider').innerText = wizardState.provider.toUpperCase();
+            if (wizardState.provider === 'aws') document.getElementById('sum-region').innerText = payload.region;
+
+            setTimeout(() => goToStep(3), 1500);
+        } else {
+            btn.disabled = false;
+            btn.innerText = "VALIDATION FAILED - RETRY";
+            status.innerHTML = `<span class="text-red-500">${data.message}</span>`;
+        }
     } catch (e) {
-        appendLog(`[ERROR] Provisioning bridge failed. Local simulation fallback active.`);
-        updateEnvBadge(provider);
-        showTab('dashboard');
+        btn.disabled = false;
+        btn.innerText = "SYSTEM ERROR - SEC-CORE UNREACHABLE";
     }
 };
 
-function updateEnvBadge(stack) {
-    const badge = document.getElementById('env-badge-text');
-    if (badge) {
-        const labels = {
-            'aws': 'AWS CLOUD STRATA',
-            'gcp': 'GCP RUNTIME ENGINE',
-            'kubernetes': 'K8S ORCHESTRATION',
-            'local': 'LOCAL SANDBOX'
-        };
-        badge.innerText = labels[stack] || stack.toUpperCase();
-    }
-}
-
-/* --- MODE TOGGLE --- */
-window.setMode = (mode) => {
-    isDemoMode = (mode === 'demo');
-    const btnDemo = document.getElementById('btn-mode-demo');
-    const btnReal = document.getElementById('btn-mode-real');
-
-    if (isDemoMode) {
-        btnDemo.className = "px-3 py-1 text-[10px] font-black rounded-lg transition-all bg-blue-600 text-white shadow-sm";
-        btnReal.className = "px-3 py-1 text-[10px] font-black rounded-lg transition-all text-slate-400";
-    } else {
-        btnReal.className = "px-3 py-1 text-[10px] font-black rounded-lg transition-all bg-emerald-600 text-white shadow-sm";
-        btnDemo.className = "px-3 py-1 text-[10px] font-black rounded-lg transition-all text-slate-400";
-    }
-
-    appendLog(`[SYSTEM] Control loop mode normalized to: ${mode.toUpperCase()}`);
+// --- STEP 3: Stack Selection ---
+window.selectStack = (stack) => {
+    if (stack !== 'ec2') return; // Enterprise locked
+    wizardState.stack = stack;
+    appendLog(`[SYSTEM] Architecture profile locked: ${stack.toUpperCase()}`);
 };
 
-/* --- CORE AUTONOMIC LOOP (SSE) --- */
-function connectToAgentStream(isAnomaly = false) {
-    if (currentEventSource) currentEventSource.close();
+// --- STEP 5: Live Execution Stream ---
+window.startProvisioning = () => {
+    goToStep(5);
+    const logContainer = document.getElementById('provision-logs');
+    const progressBar = document.getElementById('provision-bar');
+    const progressLabel = document.getElementById('provision-status-label');
+    const progressPercent = document.getElementById('provision-percent');
 
-    const url = `${API_BASE}/api/sre-loop?anomaly=${isAnomaly}&simulation=${isDemoMode}`;
-    currentEventSource = new EventSource(url);
+    logContainer.innerHTML = `<div class="text-blue-400"># Synthesis Engine Initiated...</div>`;
 
-    currentEventSource.onmessage = (event) => {
-        try {
-            const data = JSON.parse(event.data);
-            if (data.message) {
-                appendLog(data.message);
-                updateHealthDots(data.message);
+    const source = new EventSource(`${API_BASE}/api/v1/provision/execute?provider=${wizardState.provider}&stack=${wizardState.stack}`);
 
-                if (data.final_state === 'Resolved') {
-                    fetchGitVeracity();
-                }
+    source.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        if (data.message) {
+            const div = document.createElement('div');
+            div.innerText = `> ${data.message}`;
+            logContainer.appendChild(div);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        if (data.status) {
+            progressLabel.innerText = data.status;
+            if (data.progress) {
+                progressBar.style.width = `${data.progress}%`;
+                progressPercent.innerText = `${Math.round(data.progress)}%`;
             }
-        } catch (e) { console.error("Parse Error:", e); }
+        }
+
+        if (data.final) {
+            source.close();
+            document.getElementById('provision-success-actions').classList.remove('hidden');
+            // Persist stack type
+            fetch(`${API_BASE}/api/config/save`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ STACK_TYPE: wizardState.provider })
+            });
+        }
     };
 
-    currentEventSource.onerror = () => {
-        currentEventSource.close();
-        setTimeout(() => connectToAgentStream(false), 10000);
+    source.onerror = () => {
+        const div = document.createElement('div');
+        div.className = "text-red-500 font-bold";
+        div.innerText = "!! CRITICAL FAILURE: SYNTHESIS CHAIN BROKEN. INITIATING AUTO-ROLLBACK.";
+        logContainer.appendChild(div);
+        source.close();
+    };
+};
+
+// --- Real-Time Telemetry Management ---
+function initializeTelemetry() {
+    if (telemetryStream) telemetryStream.close();
+
+    const cpuEl = document.getElementById('telemetry-cpu');
+    const cpuBar = document.getElementById('telemetry-cpu-bar');
+    const memEl = document.getElementById('telemetry-mem');
+    const memBar = document.getElementById('telemetry-mem-bar');
+    const diskEl = document.getElementById('telemetry-disk');
+    const diskBar = document.getElementById('telemetry-disk-bar');
+
+    telemetryStream = new EventSource(`${API_BASE}/api/v1/telemetry/stream`);
+
+    telemetryStream.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        if (cpuEl) {
+            cpuEl.innerText = `${data.cpu}%`;
+            cpuBar.style.width = `${data.cpu}%`;
+            cpuEl.className = data.cpu > 80 ? "text-5xl font-black text-red-600 mt-3 font-mono" : "text-5xl font-black text-slate-900 mt-3 font-mono";
+        }
+        if (memEl) {
+            memEl.innerText = `${data.memory}%`;
+            memBar.style.width = `${data.memory}%`;
+        }
+        if (diskEl) {
+            diskEl.innerText = `${data.disk}%`;
+            diskBar.style.width = `${data.disk}%`;
+        }
     };
 }
 
-function appendLog(message) {
+// --- OODA Neural Stream (SSE) ---
+function connectOODAStream(isAnomaly = false) {
+    if (oodaStream) oodaStream.close();
+
+    const url = `${API_BASE}/api/sre-loop?anomaly=${isAnomaly}&simulation=true`;
+    oodaStream = new EventSource(url);
+
+    oodaStream.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        if (data.message) appendLog(data.message);
+    };
+}
+
+window.appendLog = (message) => {
     const container = document.getElementById('logs-feed');
     if (!container) return;
 
-    const entry = document.createElement('div');
-    entry.className = "animate-entrance border-l-2 border-slate-200 pl-4 py-1.5";
-
-    const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+    const div = document.createElement('div');
+    div.className = "animate-entrance border-l-2 border-slate-200 pl-4 py-1";
 
     let formatted = message
         .replace(/\[SCOUT\]/g, '<span class="text-blue-600 font-bold">[SCOUT]</span>')
         .replace(/\[BRAIN\]/g, '<span class="text-purple-600 font-bold">[BRAIN]</span>')
         .replace(/\[FIXER\]/g, '<span class="text-orange-600 font-bold">[FIXER]</span>')
-        .replace(/\[REASONING\]/g, '<span class="text-indigo-600 font-bold italic">[REASONING]</span>')
         .replace(/\[ERROR\]/g, '<span class="text-red-600 font-bold">[ERROR]</span>');
 
-    entry.innerHTML = `<span class="opacity-30 mr-3 text-[9px] font-mono">${time}</span> ${formatted}`;
-
-    container.appendChild(entry);
+    div.innerHTML = `<span class="opacity-30 mr-3 text-[9px] font-mono">${new Date().toLocaleTimeString()}</span> ${formatted}`;
+    container.appendChild(div);
     container.scrollTop = container.scrollHeight;
-}
-
-function updateHealthDots(msg) {
-    const scout = document.getElementById('health-scout');
-    const brain = document.getElementById('health-brain');
-    const fixer = document.getElementById('health-fixer');
-
-    if (msg.includes('[SCOUT]')) {
-        scout.className = "w-2.5 h-2.5 rounded-full bg-blue-500 animate-ping";
-        setTimeout(() => scout.className = "w-2.5 h-2.5 rounded-full bg-emerald-500", 800);
-    } else if (msg.includes('[BRAIN]')) {
-        brain.className = "w-2.5 h-2.5 rounded-full bg-purple-500 animate-ping";
-        setTimeout(() => brain.className = "w-2.5 h-2.5 rounded-full bg-emerald-500", 800);
-    } else if (msg.includes('[FIXER]')) {
-        fixer.className = "w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping";
-        setTimeout(() => fixer.className = "w-2.5 h-2.5 rounded-full bg-emerald-500", 800);
-    }
-}
-
-/* --- GIT VERACITY SYNC --- */
-async function fetchGitVeracity() {
-    const incidentContainer = document.getElementById('incident-list');
-    try {
-        const res = await fetch(`${API_BASE}/api/git-activity`);
-        const data = await res.json();
-
-        if (Array.isArray(data)) {
-            document.getElementById('active-prs').innerText = data.length + 120;
-            incidentContainer.innerHTML = data.map(pr => `
-                <div class="p-5 rounded-3xl border border-slate-100 bg-white/50 hover:border-blue-400 hover:shadow-lg transition-all cursor-pointer group" onclick="window.open('${pr.html_url}', '_blank')">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="text-[11px] font-black text-slate-900 uppercase italic">Remediation PR #${pr.number}</h4>
-                            <p class="text-[9px] font-bold text-slate-500 mt-1 uppercase tracking-tight">${pr.title}</p>
-                        </div>
-                        <span class="text-[8px] font-black px-2 py-0.5 rounded border ${pr.state === 'open' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'} uppercase">${pr.state}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-    } catch (e) { console.warn("Git activity sync failed"); }
-}
-
-/* --- CHAOS & METRICS --- */
-window.triggerChaos = async (fault = 'K8S_POD_CRASH') => {
-    appendLog(`[SYSTEM] Initiating Chaos Profile: ${fault.toUpperCase()}`);
-    showTab('dashboard');
-
-    document.getElementById('metric-resilience').innerText = "84.2%";
-    document.getElementById('metric-resilience').classList.replace('text-emerald-600', 'text-red-600');
-
-    try {
-        await fetch(`${API_BASE}/demo/chaos/trigger`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fault: fault })
-        });
-        connectToAgentStream(true);
-
-        setTimeout(() => {
-            document.getElementById('metric-resilience').innerText = "99.8%";
-            document.getElementById('metric-resilience').classList.replace('text-red-600', 'text-emerald-600');
-        }, 15000);
-    } catch (e) { appendLog(`[ERROR] Chaos bridge failed.`); }
 };
 
-function simulateMetricDrift() {
-    const mttr = (4.0 + Math.random() * 0.5).toFixed(1);
-    const el = document.getElementById('metric-mttr');
-    if (el) el.innerText = `${mttr}m`;
-}
-
-window.switchToProvisioning = () => {
-    document.getElementById('onboarding-modal').classList.add('hidden');
-    showTab('provisioning');
+window.triggerChaos = () => {
+    const fault = 'AWS_EC2_DISK_FULL';
+    appendLog(`[SYSTEM] Chaos profile injected: ${fault}`);
+    showTab('dashboard');
+    connectOODAStream(true);
 };
 
 window.clearLogs = () => {
-    document.getElementById('logs-feed').innerHTML = '<div class="text-slate-400 italic text-[10px] uppercase font-mono tracking-widest"># Neutral telemetry strata synchronized.</div>';
+    document.getElementById('logs-feed').innerHTML = '<div class="text-slate-400 italic"># Telemetry strata synchronized.</div>';
 };

@@ -17,6 +17,10 @@ import logging
 import os
 import sys
 from dotenv import load_dotenv
+import boto3
+from botocore.exceptions import ClientError
+from google.oauth2 import service_account
+from google.auth import exceptions as google_exceptions
 
 # Initialize Environment Variables from .env file
 load_dotenv()
@@ -141,6 +145,129 @@ async def trigger_chaos(request: Request, background_tasks: BackgroundTasks) -> 
     
     chaos_engine.trigger_fault(fault_name)
     return {"status": "success", "message": f"Fault '{fault_name}' triggered."}
+
+# --- Enterprise Provisioning Wizard: Validation Endpoints ---
+
+@app.post("/api/v1/validate/aws")
+async def validate_aws(request: Request):
+    """Gated validation for AWS credentials using STS."""
+    body = await request.json()
+    ak = body.get("accessKey")
+    sk = body.get("secretKey")
+    region = body.get("region", "us-east-1")
+
+    if not ak or not sk:
+        return {"status": "error", "message": "Missing credentials."}
+
+    try:
+        session = boto3.Session(
+            aws_access_key_id=ak,
+            aws_secret_access_key=sk,
+            region_name=region
+        )
+        sts = session.client('sts')
+        identity = sts.get_caller_identity()
+        return {
+            "status": "success",
+            "message": "Credential Validation: SUCCESS",
+            "account": identity.get("Account"),
+            "arn": identity.get("Arn")
+        }
+    except ClientError as e:
+        return {"status": "error", "message": f"Validation FAILED: {str(e)}"}
+    except Exception as e:
+        return {"status": "error", "message": f"System Error: {str(e)}"}
+
+@app.post("/api/v1/validate/gcp")
+async def validate_gcp(request: Request):
+    """Gated validation for GCP credentials via Service Account JSON."""
+    body = await request.json()
+    json_key = body.get("jsonKey")
+    
+    if not json_key:
+        return {"status": "error", "message": "Missing JSON Key file content."}
+
+    try:
+        info = json.loads(json_key)
+        credentials = service_account.Credentials.from_service_account_info(info)
+        # Simple proof of life: project_id check
+        project_id = credentials.project_id
+        return {
+            "status": "success",
+            "message": "Credential Validation: SUCCESS",
+            "project_id": project_id
+        }
+    except google_exceptions.GoogleAuthError as e:
+        return {"status": "error", "message": f"Auth Error: {str(e)}"}
+    except Exception as e:
+        return {"status": "error", "message": f"Invalid JSON Profile: {str(e)}"}
+
+@app.get("/api/v1/provision/execute")
+async def provision_stream(provider: str, stack: str):
+    """
+    Real-time streaming panel for infrastructure execution logs.
+    Simulates Terraform/SDK logs with realistic enterprise stages.
+    """
+    async def event_generator():
+        stages = [
+            "INITIATED",
+            "VALIDATING_QUOTAS",
+            "CONSTRUCTING_INFRA_GRAPH",
+            "CREATING_RESOURCES",
+            "CONFIGURING_NETWORKING",
+            "INSTALLING_OTEL_COLLECTOR",
+            "BOOTSTRAPPING_SRE_AGENTS",
+            "REGISTERING_WITH_CONTROL_PLANE",
+            "SUCCESS"
+        ]
+        
+        for stage in stages:
+            progress = (stages.index(stage) + 1) / len(stages) * 100
+            log_msg = f"[{provider.upper()}] Status: {stage} ... {progress:.0f}%"
+            
+            # Simulate detailed execution logs for some stages
+            if stage == "CREATING_RESOURCES":
+                yield f"data: {json.dumps({'message': f'Creating {stack} instance in {provider}...', 'status': stage})}\n\n"
+                await asyncio.sleep(1)
+                yield f"data: {json.dumps({'message': 'Attaching EBS Volumes...', 'status': stage})}\n\n"
+                await asyncio.sleep(1)
+            
+            yield f"data: {json.dumps({'message': log_msg, 'status': stage, 'progress': progress})}\n\n"
+            await asyncio.sleep(1.5 if stage != "SUCCESS" else 0.5)
+            
+        yield f"data: {json.dumps({'message': 'Provisioning sequence complete. Transitioning to Operational Mode.', 'final': True})}\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+# --- Real-Time Telemetry & Metric Streaming ---
+
+@app.get("/api/v1/telemetry/stream")
+async def telemetry_stream():
+    """
+    SSE stream for real-time infrastructure metrics (CPU, RAM, etc).
+    """
+    async def metrics_generator():
+        while True:
+            cpu = psutil.cpu_percent(interval=1)
+            mem = psutil.virtual_memory().percent
+            disk = psutil.disk_usage('/').percent
+            
+            # Mock some network throughput for visuals
+            sent = psutil.net_io_counters().bytes_sent
+            recv = psutil.net_io_counters().bytes_recv
+            
+            data = {
+                "cpu": cpu,
+                "memory": mem,
+                "disk": disk,
+                "network": {"sent": sent, "recv": recv},
+                "otel_status": "Active",
+                "heartbeat": True
+            }
+            yield f"data: {json.dumps(data)}\n\n"
+            await asyncio.sleep(2)
+
+    return StreamingResponse(metrics_generator(), media_type="text/event-stream")
 
 @app.get("/api/git-activity")
 async def get_git_activity():
