@@ -9,256 +9,181 @@ const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hos
 // State
 let eventSource = null;
 let currentBackoff = 1000;
-let isDemoMode = true;
-let selectedDeploy = 'aws';
-let currentTourStep = 0;
 
-// On Load
 document.addEventListener('DOMContentLoaded', () => {
-    // Dynamic Branding
+    // Dynamic Social Links
+    lucide.createIcons();
+
+    // Auto-detect adapter mode
+    const adapterBadge = document.getElementById('status-adapter-val');
+    if (IS_LOCAL) {
+        adapterBadge.innerText = 'LOCAL_SIM_RUNTIME';
+        adapterBadge.classList.replace('text-blue-600', 'text-purple-600');
+    }
+
+    // Set About link dynamically
     const aboutLink = document.getElementById('about-link');
     if (aboutLink && API_BASE && API_BASE.startsWith('http')) {
         aboutLink.href = `${API_BASE}/about`;
     }
 
-    // Determine Mode
-    if (IS_LOCAL) {
-        document.getElementById('badge-local').classList.remove('hidden');
-    }
-
-    // Start Premium Sync Sequence (Optional, but user liked it)
-    // We only show it if first visit in session
-    if (!sessionStorage.getItem('init_complete')) {
-        startInitializationSequence();
+    // First visit initialization
+    if (!sessionStorage.getItem('space_initialized')) {
+        startInitialization();
     } else {
         connectSSE();
-        fetchSystemStatus();
+        fetchHealth();
     }
-
-    lucide.createIcons();
 });
 
-/* --- INITIALIZATION OVERLAY LOGIC --- */
-function startInitializationSequence() {
-    const overlay = document.getElementById('initialization-overlay');
-    overlay.classList.remove('hidden');
+/* --- SPACE INITIALIZATION WIZARD --- */
 
+window.startInitialization = () => {
+    const wizard = document.getElementById('init-wizard');
+    wizard.classList.remove('hidden');
+
+    // Step 1 -> 2
     setTimeout(() => {
-        document.getElementById('init-step-1').classList.replace('step-active', 'step-hidden');
-        document.getElementById('init-step-2').classList.replace('step-hidden', 'step-active');
+        document.getElementById('w-step-1').classList.add('hidden');
+        document.getElementById('w-step-2').classList.remove('hidden');
 
+        // Step 2 -> 3
         setTimeout(() => {
-            document.getElementById('init-step-2').classList.replace('step-active', 'step-hidden');
-            document.getElementById('init-step-3').classList.replace('step-hidden', 'step-active');
+            document.getElementById('w-step-2').classList.add('hidden');
+            document.getElementById('w-step-3').classList.remove('hidden');
         }, 1800);
     }, 1500);
-}
-
-window.finalizeInit = () => {
-    sessionStorage.setItem('init_complete', 'true');
-    document.getElementById('initialization-overlay').classList.add('hidden');
-    connectSSE();
-    fetchSystemStatus();
-    appendLog("SYSTEM: Neural architecture synchronized. Control link stable.");
 };
 
-/* --- CORE CONTROL PLANE LOGIC --- */
+window.finalizeInitialization = () => {
+    sessionStorage.setItem('space_initialized', 'true');
+    document.getElementById('init-wizard').classList.add('hidden');
+    connectSSE();
+    fetchHealth();
+    appendLog("SYSTEM: Control link established. Neural strata synchronized.");
+};
 
-async function fetchSystemStatus() {
-    try {
-        const res = await fetch(`${API_BASE}/api/health`);
-        const data = await res.json();
-        if (data.env_stack) {
-            updateProviderBadge(data.env_stack);
-        }
-    } catch (e) {
-        console.warn("Health check failed", e);
-    }
-}
+/* --- CORE AUTONOMIC LOOP --- */
 
-function updateProviderBadge(stack) {
-    const badge = document.getElementById('status-adapter-val');
-    if (badge) badge.innerText = stack.toUpperCase();
-}
-
-// SSE Connection
 function connectSSE(isAnomaly = false) {
     if (eventSource) eventSource.close();
 
+    const indicator = document.getElementById('sse-indicator');
     const url = `${API_BASE}/api/sre-loop?anomaly=${isAnomaly}`;
+
     eventSource = new EventSource(url);
 
-    const indicator = document.getElementById('sse-indicator');
-
     eventSource.onopen = () => {
-        indicator.innerText = "SSE: LIVE";
-        indicator.classList.add('text-cyan-400');
+        indicator.innerText = "SSE: Connected";
+        indicator.className = "text-[9px] font-black text-emerald-500 uppercase";
         currentBackoff = 1000;
     };
 
     eventSource.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.message) appendLog(data.message);
-        if (data.agent) pulseAgent(data.agent);
+        try {
+            const data = JSON.parse(event.data);
+            if (data.message) {
+                appendLog(data.message);
+
+                // Pulsing agent dots in the HUD
+                if (data.agent) pulseAgent(data.agent);
+
+                // Anomaly status tracking
+                if (data.final_state === 'Resolved') setStatus('NOMINAL');
+            }
+        } catch (e) {
+            console.error("Parse Error:", e);
+        }
     };
 
     eventSource.onerror = () => {
-        indicator.innerText = "SSE: RETRYING";
+        indicator.innerText = "SSE: Retrying...";
+        indicator.className = "text-[9px] font-black text-amber-500 uppercase";
         eventSource.close();
-        setTimeout(connectSSE, currentBackoff);
-        currentBackoff = Math.min(currentBackoff * 1.5, 30000);
+
+        setTimeout(() => {
+            currentBackoff = Math.min(currentBackoff * 1.5, 30000);
+            connectSSE(false);
+        }, currentBackoff);
     };
 }
 
 function appendLog(message) {
-    const logs = document.getElementById('logs');
+    const container = document.getElementById('logs');
     const entry = document.createElement('div');
-    entry.className = "log-entry";
+    entry.className = "animate-entrance";
 
     if (message.startsWith('REASONING:')) {
-        entry.className += " reasoning-stream";
-        entry.innerHTML = `<span class="opacity-70">${message.replace('REASONING:', '')}</span>`;
+        const cleanMsg = message.replace('REASONING:', '').trim();
+        entry.innerHTML = `<div class="reasoning-stream"><span class="font-bold text-blue-600 mr-2">THOUGHT</span> ${cleanMsg}</div>`;
     } else {
         const time = new Date().toLocaleTimeString('en-US', { hour12: false });
-        entry.innerHTML = `<span class="opacity-40 text-[9px] mr-2">[${time}]</span> ${message}`;
+        // Style specific tags
+        let formatted = message
+            .replace(/\[SCOUT\]/g, '<span class="text-blue-600 font-bold">[SCOUT]</span>')
+            .replace(/\[BRAIN\]/g, '<span class="text-purple-600 font-bold">[BRAIN]</span>')
+            .replace(/\[FIXER\]/g, '<span class="text-orange-600 font-bold">[FIXER]</span>')
+            .replace(/\[ERROR\]/g, '<span class="text-red-600 font-bold">[ERROR]</span>');
+
+        entry.innerHTML = `<span class="opacity-30 mr-2">${time}</span> ${formatted}`;
     }
 
-    logs.appendChild(entry);
-    logs.scrollTop = logs.scrollHeight;
+    container.appendChild(entry);
+    container.scrollTop = container.scrollHeight;
 }
 
 function pulseAgent(agent) {
-    const dot = document.getElementById(`agent-${agent}-status`);
+    const dot = document.getElementById(`agent-${agent.toLowerCase()}-status`);
     if (dot) {
-        dot.classList.add('animate-ping', 'shadow-[0_0_10px_#fff]');
-        setTimeout(() => dot.classList.remove('animate-ping', 'shadow-[0_0_10px_#fff]'), 1000);
+        dot.classList.add('animate-ping', 'bg-blue-300');
+        setTimeout(() => dot.classList.remove('animate-ping', 'bg-blue-300'), 1000);
     }
 }
 
-window.clearLogs = () => {
-    document.getElementById('logs').innerHTML = '<div class="text-slate-600 italic">... Terminal Recalibrated ...</div>';
-};
+function setStatus(status) {
+    const label = document.getElementById('sys-status-label');
+    if (status === 'NOMINAL') {
+        label.className = "status-badge badge-active flex items-center gap-1.5";
+        label.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-emerald"></span> NOMINAL`;
+    } else {
+        label.className = "status-badge bg-red-50 text-red-600 border border-red-100 flex items-center gap-1.5";
+        label.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> ANOMALY DETECTED`;
+    }
+}
 
-window.triggerChaos = async (type) => {
-    appendLog(`CRITICAL: INJECTING CHAOS VECTOR [${type}]`);
+async function fetchHealth() {
     try {
-        await fetch(`${API_BASE}/demo/chaos/trigger`, {
+        const res = await fetch(`${API_BASE}/api/health`);
+        const data = await res.json();
+        // Sync provider badge if it changed
+        if (data.env_stack) {
+            document.getElementById('status-adapter-val').innerText = data.env_stack.toUpperCase();
+        }
+    } catch (e) {
+        console.warn("Health sync failed");
+    }
+}
+
+window.triggerChaos = async (fault) => {
+    setStatus('ANOMALY');
+    appendLog(`[SYSTEM] Manual chaos injection requested: ${fault}`);
+
+    try {
+        const res = await fetch(`${API_BASE}/demo/chaos/trigger`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fault: type })
+            body: JSON.stringify({ fault: fault })
         });
-        connectSSE(true);
-    } catch (e) {
-        appendLog(`ERROR: Chaos injection failed: ${e.message}`);
-    }
-};
 
-/* --- DEPLOIMENT WIZARD LOGIC (RESTORED) --- */
-
-window.deployControlPlane = () => {
-    document.getElementById('deploy-overlay').classList.remove('hidden');
-    goToStep(1);
-};
-
-window.closeDeploy = () => {
-    document.getElementById('deploy-overlay').classList.add('hidden');
-};
-
-window.goToStep = (step) => {
-    [1, 2, 3, 4].forEach(s => {
-        const el = document.getElementById(`wizard-step-${s}`);
-        if (el) el.classList.add('hidden');
-    });
-    document.getElementById(`wizard-step-${step}`).classList.remove('hidden');
-
-    if (step > 1) {
-        const prog = document.getElementById(`prog-${step}`);
-        if (prog) prog.classList.add('text-cyan-400', 'bg-cyan-500/20', 'px-2', 'py-1', 'rounded', 'border', 'border-cyan-500/40');
-    }
-
-    if (step === 2) {
-        ['aws', 'gcp', 'docker'].forEach(p => document.getElementById(`setup-instructions-${p}`).classList.add('hidden'));
-        document.getElementById(`setup-instructions-${selectedDeploy}`).classList.remove('hidden');
-    }
-    if (step === 3) {
-        ['aws', 'gcp', 'docker'].forEach(p => document.getElementById(`infra-${p}`).classList.add('hidden'));
-        document.getElementById(`infra-${selectedDeploy}`).classList.remove('hidden');
-    }
-};
-
-window.selectDeploy = (platform) => {
-    selectedDeploy = platform;
-    ['aws', 'gcp', 'docker'].forEach(p => {
-        const el = document.getElementById(`dep-${p}`);
-        if (p === platform) {
-            el.className = "p-5 border border-cyan-500 bg-cyan-500/10 rounded-xl cursor-pointer transition-all flex items-center justify-between group";
-        } else {
-            el.className = "p-5 border border-white/10 bg-white/5 hover:border-cyan-500/50 hover:bg-white/10 rounded-xl cursor-pointer transition-all flex items-center justify-between group";
+        if (res.ok) {
+            // Force SSE reconnect in anomaly mode
+            connectSSE(true);
         }
-    });
-};
-
-window.validateCredentials = async () => {
-    const btn = document.getElementById('btn-validate');
-    btn.innerText = "AUTHENTICATING...";
-    await new Promise(r => setTimeout(r, 1500));
-    btn.innerText = "VALIDATED ✔";
-    btn.classList.add('bg-green-600');
-    setTimeout(() => {
-        btn.classList.remove('bg-green-600');
-        btn.innerText = "VALIDATE";
-        goToStep(3);
-    }, 1000);
-};
-
-window.executeProvisioning = async () => {
-    const btn = document.getElementById('btn-provision');
-    btn.innerText = "PROVISIONING...";
-    await new Promise(r => setTimeout(r, 2000));
-    goToStep(4);
-};
-
-window.switchToOperationalMode = () => {
-    closeDeploy();
-    appendLog("SYSTEM: Operational phase initiated. Real-mode sensors active.");
-};
-
-/* --- GUIDED TOUR --- */
-const tourSteps = [
-    { icon: '🔭', title: 'Phase 1: Scout', desc: 'Observe layer. OpenTelemetry Intake.' },
-    { icon: '🧠', title: 'Phase 2: Brain', desc: 'Orient layer. LLM-driven RCA.' },
-    { icon: '🛠️', title: 'Phase 3: Fixer', desc: 'Act layer. GitOps Remediation.' }
-];
-
-window.startTour = () => {
-    currentTourStep = 0;
-    document.getElementById('tour-overlay').classList.remove('hidden');
-    updateTourUI();
-};
-
-window.closeTour = () => document.getElementById('tour-overlay').classList.add('hidden');
-
-window.nextTour = () => {
-    currentTourStep++;
-    if (currentTourStep >= tourSteps.length) closeTour();
-    else updateTourUI();
-};
-
-function updateTourUI() {
-    const step = tourSteps[currentTourStep];
-    document.getElementById('tour-icon').innerText = step.icon;
-    document.getElementById('tour-title').innerText = step.title;
-    document.getElementById('tour-desc').innerText = step.desc;
-}
-
-window.updateProvider = (val) => {
-    selectedDeploy = val;
-    appendLog(`SYSTEM: Switched target environment to ${val.toUpperCase()}`);
-    if (val === 'local') {
-        document.getElementById('badge-local').classList.remove('hidden');
-        document.getElementById('badge-cloud').classList.add('hidden');
-    } else {
-        document.getElementById('badge-local').classList.add('hidden');
-        document.getElementById('badge-cloud').classList.remove('hidden');
+    } catch (e) {
+        appendLog(`[ERROR] Chaos injection failed. Check backend connectivity.`);
     }
+};
+
+window.clearLogs = () => {
+    document.getElementById('logs').innerHTML = '<div class="text-slate-400 italic font-mono text-[10px]"># Terminal buffer cleared. Waiting for next OODA cycle...</div>';
 };
