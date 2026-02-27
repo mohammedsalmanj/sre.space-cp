@@ -1,7 +1,7 @@
 /**
  * SRE.SPACE - Premium Intelligence Logic v6.0
  * Author: Mohammed Salman
- * Logic: Dual-Track Onboarding + Neural Telemetry Strata
+ * Logic: Dual-Track Wizard + Neural Sensory Intake
  */
 
 const API_BASE = import.meta.env?.VITE_API_BASE || '';
@@ -10,30 +10,20 @@ const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hos
 // --- State Management ---
 let currentEventSource = null;
 let isDemoMode = true;
-let currentTrack = 'local'; // local | cloud
-let selectedStack = 'aws-ec2';
+let activeWizardStep = 1;
+let selectedWizardTrack = 'local'; // local | cloud
 
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
-
-    // Initial UI state
     showTab('dashboard');
-
-    // 2. Start Polling for Git Veracity
+    setInterval(simulateMetricDrift, 10000);
     fetchGitVeracity();
-    setInterval(fetchGitVeracity, 30000);
-
-    // 3. Start Metric Drift Simulation
-    setInterval(simulateMetricDrift, 15000);
-
-    // 4. Connect default SSE (Normal Monitoring)
     connectToAgentStream(false);
 });
 
 /* --- TAB NAVIGATION --- */
 window.showTab = (tab) => {
-    const panels = ['dashboard', 'provisioning'];
-    panels.forEach(p => {
+    ['dashboard', 'wizard'].forEach(p => {
         const el = document.getElementById(`content-${p}`);
         const btn = document.getElementById(`tab-${p}`);
         if (!el || !btn) return;
@@ -50,70 +40,121 @@ window.showTab = (tab) => {
     });
 };
 
-/* --- v6.0 PROVISIONING LOGIC --- */
-window.selectProvisionTrack = (stack) => {
-    selectedStack = stack;
-    const stacks = ['aws-ec2', 'eks', 'eb'];
-    stacks.forEach(s => {
-        const el = document.getElementById(`track-${s}`);
-        if (!el) return;
-        if (s === stack) {
-            el.classList.add('border-blue-600', 'shadow-2xl', 'scale-[1.02]');
-            el.classList.remove('border-transparent', 'bg-white/60');
-        } else {
-            el.classList.remove('border-blue-600', 'shadow-2xl', 'scale-[1.02]');
-            el.classList.add('border-transparent', 'bg-white/60');
-        }
-    });
-    appendLog(`[SYSTEM] Stack Stratum adjusted to: ${stack.toUpperCase()}`);
-};
-
-window.setProvisionTrack = (track) => {
-    currentTrack = track;
-    const tracks = ['local', 'cloud'];
-    tracks.forEach(t => {
-        const el = document.getElementById(`track-option-${t}`);
-        if (!el) return;
+/* --- setup wizard logic --- */
+window.selectWizardTrack = (track) => {
+    selectedWizardTrack = track;
+    ['local', 'cloud'].forEach(t => {
+        const el = document.getElementById(`wiz-track-${t}`);
         if (t === track) {
-            el.classList.add('border-blue-600', 'bg-blue-50/50', 'shadow-2xl');
             el.classList.remove('border-transparent', 'bg-white/40');
+            el.classList.add('border-blue-600', 'bg-blue-50/50', 'shadow-2xl');
+            document.getElementById(`status-${track === 'cloud' ? 'aws' : 'docker'}`).classList.add('connected');
         } else {
             el.classList.remove('border-blue-600', 'bg-blue-50/50', 'shadow-2xl');
             el.classList.add('border-transparent', 'bg-white/40');
         }
     });
-    appendLog(`[SYSTEM] Onboarding track transitioned to: ${track.toUpperCase()}`);
+    showToast(`Environment Strategy: ${track.toUpperCase()} Normalized.`);
 };
 
-window.copyCmd = (type) => {
-    const ids = {
-        'docker': 'cmd-docker',
-        'helm': 'cmd-helm',
-        'kubeverify': 'cmd-kubeverify'
-    };
-    const el = document.getElementById(ids[type]);
-    if (!el) return;
-
-    const text = el.innerText;
-    navigator.clipboard.writeText(text).then(() => {
-        appendLog(`[SYSTEM] Command copied to clipboard: ${type.toUpperCase()}`);
-    });
+window.wizardNext = () => {
+    if (activeWizardStep >= 3) return;
+    activeWizardStep++;
+    updateWizardUI();
 };
 
-window.finalHandshake = async () => {
-    appendLog(`[SYSTEM] Initiating Final Handshake protocol...`);
-    appendLog(`[SCOUT] Verifying OTel Endpoint veracity...`);
+window.wizardPrev = () => {
+    if (activeWizardStep <= 1) return;
+    activeWizardStep--;
+    updateWizardUI();
+};
 
-    await new Promise(r => setTimeout(r, 1000));
-    appendLog(`[BRAIN] Checking Cloud Provider API authorities...`);
+function updateWizardUI() {
+    // Hide all steps
+    for (let i = 1; i <= 3; i++) {
+        document.getElementById(`wizard-step-${i}`).classList.add('hidden');
+        document.getElementById(`step-dot-${i}`).classList.remove('wizard-active-dot', 'bg-blue-600', 'text-white');
+        document.getElementById(`step-dot-${i}`).classList.add('bg-white', 'text-slate-300', 'border-slate-100');
+        if (i < 3) document.getElementById(`step-bar-${i}`).style.width = '0%';
+    }
 
-    await new Promise(r => setTimeout(r, 1500));
-    appendLog(`[SYSTEM] Control Link Established. Initializing OODA loop.`);
+    // Show current step
+    document.getElementById(`wizard-step-${activeWizardStep}`).classList.remove('hidden');
 
-    setTimeout(() => {
-        showTab('dashboard');
-        appendLog(`[SYSTEM] Workspace Normalized. Welcome Mohammed Salman.`);
-    }, 1000);
+    // Update dots and bars
+    for (let i = 1; i <= activeWizardStep; i++) {
+        const dot = document.getElementById(`step-dot-${i}`);
+        dot.classList.add('wizard-active-dot', 'bg-blue-600', 'text-white');
+        dot.classList.remove('bg-white', 'text-slate-300', 'border-slate-100');
+        if (i < activeWizardStep) document.getElementById(`step-bar-${i}`).style.width = '100%';
+    }
+
+    // Toggle forms
+    document.getElementById('form-local-handshake').classList.add('hidden');
+    document.getElementById('form-cloud-handshake').classList.add('hidden');
+
+    if (activeWizardStep === 2) {
+        if (selectedWizardTrack === 'local') {
+            document.getElementById('form-local-handshake').classList.remove('hidden');
+        } else {
+            document.getElementById('form-cloud-handshake').classList.remove('hidden');
+        }
+    }
+
+    // Nav buttons
+    document.getElementById('btn-wiz-prev').classList.toggle('hidden', activeWizardStep === 1);
+    const nextBtn = document.getElementById('btn-wiz-next');
+    if (activeWizardStep === 3) {
+        nextBtn.innerHTML = 'Initialize Data Plane';
+        startHeartbeatRotation();
+    } else {
+        nextBtn.innerHTML = 'Advance Protocol →';
+    }
+}
+
+window.verifyCloudConnection = async () => {
+    const spinner = document.getElementById('cred-spinner');
+    const check = document.getElementById('cred-check');
+    const btn = document.getElementById('btn-verify-cloud');
+
+    spinner.classList.remove('hidden');
+    btn.disabled = true;
+    btn.innerText = 'Verifying Cloud Authority...';
+
+    await new Promise(r => setTimeout(r, 2000));
+
+    spinner.classList.add('hidden');
+    check.classList.remove('hidden');
+    btn.innerText = 'Authority Verified';
+    btn.classList.add('bg-emerald-600');
+
+    showToast("Cloud Control Link Established.");
+};
+
+function startHeartbeatRotation() {
+    const status = document.getElementById('heartbeat-status');
+    const radar = document.getElementById('heartbeat-radar');
+
+    let count = 0;
+    const interval = setInterval(() => {
+        if (count > 2 || activeWizardStep !== 3) {
+            clearInterval(interval);
+            return;
+        }
+        count++;
+        if (count === 1) status.innerText = "Synchronizing eBPF syscall hooks...";
+        if (count === 2) {
+            status.innerText = "Packet Detected: 0x4f22ae1 (Production)";
+            status.classList.replace('text-blue-400', 'text-emerald-500');
+            radar.classList.add('border-emerald-500');
+        }
+    }, 2000);
+}
+
+window.finalizeSetup = () => {
+    showTab('dashboard');
+    showToast("Workspace Normalized. System Online.");
+    document.getElementById('status-k8s').classList.add('connected');
 };
 
 /* --- CORE AUTONOMIC LOOP (SSE) --- */
@@ -129,7 +170,7 @@ function connectToAgentStream(isAnomaly = false) {
             if (data.message) {
                 appendLog(data.message);
                 if (data.final_state === 'Resolved') {
-                    fetchGitVeracity();
+                    resetIncidentState();
                 }
             }
         } catch (e) { console.error("Parse Error:", e); }
@@ -146,42 +187,52 @@ function appendLog(message) {
     if (!container) return;
 
     const entry = document.createElement('div');
-    entry.className = "animate-entrance border-l-2 border-slate-200 pl-4 py-2 bg-white/50 rounded-r-xl border-l-blue-500 shadow-sm";
+    entry.className = "animate-entrance border-l-3 border-blue-500 pl-6 py-3 bg-white/40 rounded-r-2xl shadow-sm border-l-[4px]";
 
     const time = new Date().toLocaleTimeString('en-US', { hour12: false });
 
+    // Linguistic Markers
     let formatted = message
-        .replace(/\[SCOUT\]/g, '<span class="text-blue-600 font-black tracking-widest">[SCOUT]</span>')
-        .replace(/\[BRAIN\]/g, '<span class="text-purple-600 font-black tracking-widest">[BRAIN]</span>')
-        .replace(/\[FIXER\]/g, '<span class="text-orange-600 font-black tracking-widest">[FIXER]</span>')
-        .replace(/\[REASONING\]/g, '<span class="text-indigo-600 font-black italic">[REASONING]</span>')
-        .replace(/\[SYSTEM\]/g, '<span class="text-slate-900 font-black uppercase">[SYSTEM]</span>')
-        .replace(/\[ERROR\]/g, '<span class="text-red-600 font-black">[ERROR]</span>');
+        .replace(/\[SCOUT\]/g, '<span class="text-blue-600 font-black tracking-widest">[SCOUT Agent]</span>')
+        .replace(/\[BRAIN\]/g, '<span class="text-purple-600 font-black tracking-widest">[BRAIN Core]</span>')
+        .replace(/\[FIXER\]/g, '<span class="text-orange-600 font-black tracking-widest">[FIXER Drone]</span>')
+        .replace(/\[SYSTEM\]/g, '<span class="text-slate-900 font-black uppercase">[CONTROL PLANE]</span>')
+        .replace(/\[ERROR\]/g, '<span class="text-red-600 font-black">[ANOMALY]</span>')
+        .replace(/\{(.+?)\}/g, '<span class="log-json-sys">{$1}</span>');
 
-    entry.innerHTML = `<span class="opacity-30 mr-3 text-[9px] font-mono">${time}</span> ${formatted}`;
+    // Syntax-highlighted JSON simulation for terminal logs
+    if (message.includes('{')) {
+        formatted = formatted.replace(/"(\w+)"\s*:/g, '<span class="log-json-key">"$1"</span>:');
+        formatted = formatted.replace(/:\s*"([^"]+)"/g, ': <span class="log-json-val">"$1"</span>');
+    }
+
+    entry.innerHTML = `<span class="opacity-20 mr-4 text-[10px] font-bold">${time}</span> ${formatted}`;
 
     container.appendChild(entry);
     container.scrollTop = container.scrollHeight;
+
+    // Trigger visual effects on specific words
+    if (message.includes('ANOMALY') || message.includes('CRITICAL')) {
+        triggerVisualFault('critical');
+    }
 }
 
-/* --- GIT VERACITY SYNC --- */
-async function fetchGitVeracity() {
-    try {
-        const res = await fetch(`${API_BASE}/api/git-activity`);
-        const data = await res.json();
-        if (Array.isArray(data)) {
-            document.getElementById('active-prs').innerText = data.length + 124;
-        }
-    } catch (e) { console.warn("Git activity sync failed"); }
+function triggerVisualFault(level) {
+    const glow = document.getElementById('ambient-glow');
+    glow.className = `fixed inset-0 pointer-events-none opacity-40 transition-all duration-500 bg-fault-${level}`;
+    setTimeout(() => glow.className = "fixed inset-0 pointer-events-none opacity-20", 3000);
 }
 
-/* --- CHAOS & MODE --- */
+/* --- CHAOS & FAULT INJECTION --- */
 window.triggerChaos = async (fault) => {
-    appendLog(`[SYSTEM] Injecting Anomaly Profile: ${fault.toUpperCase()}`);
     showTab('dashboard');
+    showToast(`Injecting Fault Profile: ${fault}...`);
 
     document.getElementById('metric-resilience').innerText = "84.2%";
     document.getElementById('metric-resilience').classList.replace('text-emerald-600', 'text-red-600');
+
+    appendLog(`[SYSTEM] Chaos Laboratory Execution: ${fault.toUpperCase()}`);
+    appendLog(`[SCOUT] { "event": "METRIC_THRESHOLD_EXCEEDED", "source": "Node-01", "impact": "High" }`);
 
     try {
         await fetch(`${API_BASE}/demo/chaos/trigger`, {
@@ -191,36 +242,80 @@ window.triggerChaos = async (fault) => {
         });
         connectToAgentStream(true);
 
+        // Show approval gate after a delay (simulating Fixer thinking)
         setTimeout(() => {
-            document.getElementById('metric-resilience').innerText = "99.8%";
-            document.getElementById('metric-resilience').classList.replace('text-red-600', 'text-emerald-600');
-        }, 20000);
-    } catch (e) { appendLog(`[ERROR] Chaos bridge failed.`); }
+            document.getElementById('approval-gate').classList.remove('hidden');
+            appendLog(`[FIXER] { "action": "PATCH_CONFIG", "status": "PENDING_APPROVAL", "branch": "fix/node-01-disk" }`);
+        }, 8000);
+
+    } catch (e) { console.warn("Chaos bridge failed."); }
 };
 
-window.setMode = (mode) => {
-    isDemoMode = (mode === 'demo');
-    const btnDemo = document.getElementById('btn-mode-demo');
-    const btnReal = document.getElementById('btn-mode-real');
+window.approveRemediation = () => {
+    document.getElementById('approval-gate').classList.add('hidden');
+    appendLog(`[SYSTEM] Human-in-The-Loop Approval Received. Executing Merge Protocol...`);
+    appendLog(`[FIXER] Merge successful. Deploying eBPF reload...`);
 
-    if (isDemoMode) {
-        btnDemo.className = "px-4 py-1.5 text-[10px] font-black rounded-xl transition-all bg-blue-600 text-white shadow-xl uppercase tracking-widest";
-        btnReal.className = "px-4 py-1.5 text-[10px] font-black rounded-xl transition-all text-slate-400 uppercase tracking-widest";
-    } else {
-        btnReal.className = "px-4 py-1.5 text-[10px] font-black rounded-xl transition-all bg-emerald-600 text-white shadow-xl uppercase tracking-widest";
-        btnDemo.className = "px-4 py-1.5 text-[10px] font-black rounded-xl transition-all text-slate-400 uppercase tracking-widest";
-    }
-
-    appendLog(`[SYSTEM] Control loop mode transitioned to: ${mode.toUpperCase()} MODE`);
-    connectToAgentStream(false);
+    setTimeout(() => {
+        resetIncidentState();
+    }, 5000);
 };
+
+function resetIncidentState() {
+    document.getElementById('metric-resilience').innerText = "99.8%";
+    document.getElementById('metric-resilience').classList.replace('text-red-600', 'text-emerald-600');
+    appendLog(`[SYSTEM] SLO Restoration Verified. Incident #1042 Closed.`);
+    fetchGitVeracity();
+}
+
+/* --- UTILS --- */
+window.copyCmd = (type) => {
+    const ids = { 'docker': 'cmd-docker', 'helm': 'cmd-helm' };
+    const el = document.getElementById(ids[type]);
+    if (!el) return;
+    navigator.clipboard.writeText(el.innerText).then(() => showToast("Command Copied to Stratum."));
+};
+
+function showToast(msg) {
+    const container = document.getElementById('hud-toast-container');
+    const toast = document.createElement('div');
+    toast.className = "hud-toast font-black uppercase tracking-widest text-[10px]";
+    toast.innerHTML = `<i data-lucide="info" class="w-4 h-4 inline mr-2 text-blue-400"></i> ${msg}`;
+    container.appendChild(toast);
+    lucide.createIcons();
+    setTimeout(() => toast.remove(), 4000);
+}
+
+async function fetchGitVeracity() {
+    try {
+        const res = await fetch(`${API_BASE}/api/git-activity`);
+        const data = await res.json();
+        const list = document.getElementById('incident-list');
+        if (Array.isArray(data)) {
+            document.getElementById('active-prs').innerText = data.length + 124;
+            list.innerHTML = data.map(pr => `
+                <div class="p-6 rounded-3xl border border-slate-100 bg-white shadow-sm hover:border-blue-400 transition-all cursor-pointer group" onclick="window.open('${pr.html_url}', '_blank')">
+                    <h4 class="text-[11px] font-black text-slate-900 uppercase">Patch #${pr.number}</h4>
+                    <p class="text-[9px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">${pr.title}</p>
+                </div>
+            `).join('');
+        }
+    } catch (e) { }
+}
 
 function simulateMetricDrift() {
-    const mttr = (4.0 + Math.random() * 0.5).toFixed(1);
+    const mttr = (4.0 + Math.random() * 0.4).toFixed(1);
     const el = document.getElementById('metric-mttr');
     if (el) el.innerText = `${mttr}m`;
 }
 
 window.clearLogs = () => {
-    document.getElementById('logs-feed').innerHTML = '<div class="text-slate-400 italic text-[10px] uppercase font-mono tracking-widest"># Neutral telemetry strata synchronized.</div>';
+    document.getElementById('logs-feed').innerHTML = '<div class="text-slate-400 italic text-[11px] uppercase font-mono"># Telemetry strata synchronized.</div>';
+};
+
+window.setMode = (mode) => {
+    isDemoMode = (mode === 'demo');
+    document.getElementById('btn-mode-demo').className = isDemoMode ? "px-4 py-1.5 text-[10px] font-black rounded-xl transition-all bg-blue-600 text-white shadow-xl uppercase tracking-widest" : "px-4 py-1.5 text-[10px] font-black rounded-xl transition-all text-slate-400 uppercase tracking-widest";
+    document.getElementById('btn-mode-real').className = !isDemoMode ? "px-4 py-1.5 text-[10px] font-black rounded-xl transition-all bg-emerald-600 text-white shadow-xl uppercase tracking-widest" : "px-4 py-1.5 text-[10px] font-black rounded-xl transition-all text-slate-400 uppercase tracking-widest";
+    appendLog(`[SYSTEM] Operational mode shifted: ${mode.toUpperCase()} Strata.`);
 };
