@@ -120,10 +120,21 @@ async def about_page(request: Request):
 @app.get("/api/v1/meta")
 async def get_meta():
     """Returns platform metadata for the 'Liquid Glass' UI system."""
+    has_pinecone = False
+    try:
+        from packages.drivers.registry import get_vector_driver
+        driver = get_vector_driver()
+        # Simple health check for Pinecone if it's the active driver
+        if driver.__class__.__name__ == "PineconeMemoryDriver":
+            has_pinecone = True
+    except:
+        pass
+
     return {
         "lead": "Mohammed Salman",
         "role": "SRE · AIOps Engineer",
         "philosophy": "Reasoning for High-Scale Reliability.",
+        "has_pinecone": has_pinecone,
         "stack_icons": {
             "ec2": "aws",
             "k8s": "kubernetes",
@@ -201,6 +212,36 @@ async def validate_gcp(request: Request):
         return {"status": "error", "message": f"Auth Error: {str(e)}"}
     except Exception as e:
         return {"status": "error", "message": f"Invalid JSON Profile: {str(e)}"}
+
+@app.post("/api/v1/provision/generate")
+async def generate_provision_assets(request: Request):
+    """
+    Generates dynamic infrastructure assets (Helm/Cloud-Init) based on proven context.
+    """
+    body = await request.json()
+    provider = body.get("provider", "local")
+    stack = body.get("stack", "standalone")
+    cp_url = os.getenv("CONTROL_PLANE_URL", "https://sre-space-cp.vercel.app")
+
+    if provider == "k8s":
+        helm_cmd = (
+            f"helm repo add sre-space http://charts.sre.space ;\n"
+            f"helm upgrade --install sre-space-agent sre-space/agent \\\n"
+            f"  --set controlPlane.url={cp_url} \\\n"
+            f"  --namespace sre-pilot --create-namespace"
+        )
+        return {"status": "success", "asset": helm_cmd, "type": "helm"}
+    
+    elif provider == "aws" and stack == "ec2":
+        cloud_init = (
+            "#cloud-config\n"
+            "runcmd:\n"
+            "  - curl -sSL https://install.sre.space/otel-collector.sh | bash\n"
+            f"  - echo 'CP_URL={cp_url}' >> /etc/sre-space/config"
+        )
+        return {"status": "success", "asset": cloud_init, "type": "cloud-init"}
+    
+    return {"status": "error", "message": "Unsupported configuration."}
 
 @app.get("/api/v1/provision/execute")
 async def provision_stream(provider: str, stack: str):
@@ -320,6 +361,9 @@ async def sre_loop_stream(anomaly: bool = False):
                     if state.get("status"):
                         message = f"System Status: {state['status']}"
                         yield f"data: {json.dumps({'message': message})}\n\n"
+                    
+                    if state.get("top_incidents"):
+                        yield f"data: {json.dumps({'top_incidents': state['top_incidents']})}\n\n"
 
             yield f"data: {json.dumps({'message': '--- END OF LOOP ---', 'final_state': 'Resolved' if not is_anomaly else 'Resolved'})}\n\n"
         except Exception as e:

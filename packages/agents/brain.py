@@ -43,18 +43,23 @@ def brain_agent(state: dict) -> dict:
         try:
             stack_type = os.getenv("STACK_TYPE", "ec2")
             results = memory.query_memory(query_text=msg, stack_type=stack_type, top_k=3)
+            state["top_incidents"] = results # Export for Dashboard Sidebar
+            
             if results:
                 match = results[0]
                 state["confidence_score"] = 0.88 
                 state["root_cause"] = f"Identified via historical match on {stack_type}. Original Pattern: {match.get('root_cause', 'Unknown')}"
                 state["remediation"] = match.get('remediation') or match.get('solution') or "Apply standard patch."
                 logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] [ORIENT] 📚 Memory Agent Context Found (Top-{len(results)} matches). Pattern matching successful.")
+                logs.append(f"REASONING: Thought: Historical incident match found in Pinecone. Root Cause: {state['root_cause']}. Proposing fix: {state['remediation']}")
                 rag_hit = True
+            else:
+                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] [ORIENT] Initializing Long-Term Memory... No relevant historical context found.")
         except Exception as e:
             logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] RAG query failed ({str(e)}), escalating to deep reasoning cluster.")
 
         if not rag_hit:
-            logs.append(f"REASONING: No historical match in vector memory. Escalating to high-reasoning LLM cluster.") 
+            logs.append(f"REASONING: Thought: No historical match in vector memory. Escalating to high-reasoning LLM cluster to synthesize new recovery logic.") 
         
         if state.get("simulation_mode"):
             logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [BRAIN] [SIMULATION] 🛡️ Shadow Reasoning Active. Synthesizing diagnostic proof...")

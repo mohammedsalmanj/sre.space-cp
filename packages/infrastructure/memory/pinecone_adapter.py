@@ -124,7 +124,7 @@ class PineconeMemoryDriver(MemoryAdapter):
                 filter={"stack_type": {"$eq": stack_type}},
                 include_metadata=True
             )
-            return [match.metadata for match in results.matches]
+            return [{**match.metadata, "score": match.score} for match in results.matches]
         except Exception as e:
             print(f"⚠️ Pinecone Cloud Query Failed: {e}")
             return []

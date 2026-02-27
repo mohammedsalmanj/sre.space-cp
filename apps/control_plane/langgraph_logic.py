@@ -46,6 +46,7 @@ class SREState(TypedDict):
     blast_radius: int                   # Impact score assessment (1-10)
     issue_number: int                   # GitHub issue ID for governance tracking
     simulation_mode: bool               # Enables shadow execution (Dry-run mode)
+    top_incidents: List[Dict[str, Any]]  # RAG-retrieved historical context
 
 def create_sre_graph():
     """
@@ -121,7 +122,8 @@ def get_initial_state(is_anomaly: bool = False, simulation_mode: bool = False) -
         "status": "Observation Phase", "logs": [], "is_anomaly": is_anomaly,
         "anomaly_frequency": 1 if is_anomaly else 0, "decision": "", "service": "policy-service", 
         "namespace": "default", "env": "prod", "confidence_score": 1.0,
-        "blast_radius": 0, "issue_number": 0, "simulation_mode": simulation_mode
+        "blast_radius": 0, "issue_number": 0, "simulation_mode": simulation_mode,
+        "top_incidents": []
     }
 
 # --- Single Instance Pre-compiled Graph (Optimization) ---

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRE.SPACE | Autonomous Control Plane v6.0</title>
+    <title>AGENTIC SRE.SPACE v6.0 | Autonomous Control Plane</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
@@ -13,112 +13,95 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-<body class="p-4 md:p-8">
-    <!-- ANNEX: TERMINAL BACKGROUND GLOW -->
-    <div id="ambient-glow" class="fixed inset-0 pointer-events-none opacity-20 transition-all duration-1000"></div>
+<body class="p-6 md:p-10 font-[Inter]">
+    <div id="ambient-glow"
+        class="fixed inset-0 pointer-events-none opacity-20 transition-all duration-1000 bg-gradient-to-br from-blue-50/50 to-white">
+    </div>
 
-    <div class="max-w-[1750px] mx-auto min-h-screen flex flex-col gap-8 animate-entrance relative z-10">
+    <div class="max-w-[1800px] mx-auto min-h-screen flex flex-col gap-10 animate-entrance relative z-10">
 
         <!-- BRANDING HEADER v6.0 -->
         <header
-            class="liquid-glass p-8 flex flex-wrap items-center justify-between gap-8 border-b-2 border-white/60 shadow-2xl relative overflow-hidden">
-            <div class="flex items-center gap-8">
+            class="liquid-glass p-10 flex flex-wrap items-center justify-between gap-10 border-b-2 border-white/80 shadow-2xl relative overflow-hidden backdrop-blur-[30px]">
+            <div class="flex items-center gap-10">
                 <div
-                    class="w-16 h-16 bg-blue-600 rounded-[24px] flex items-center justify-center shadow-2xl shadow-blue-500/40 relative group">
-                    <i data-lucide="shield-check" class="text-white w-9 h-9"></i>
-                    <div
-                        class="absolute -inset-2 bg-blue-400/20 rounded-[28px] blur-xl opacity-0 group-hover:opacity-100 transition-all">
-                    </div>
+                    class="w-20 h-20 bg-slate-900 rounded-[28px] flex items-center justify-center shadow-2xl relative group">
+                    <i data-lucide="shield-check" class="text-white w-10 h-10"></i>
                 </div>
                 <div>
-                    <h1 class="text-4xl font-black tracking-tighter text-slate-900 uppercase italic leading-none">
-                        AGENTIC SRE.SPACE <span class="text-blue-600 italic">|</span> <span class="font-black">Mohammed
-                            Salman</span></h1>
-                    <p class="text-[11px] font-black text-slate-500 uppercase tracking-[0.5em] mt-3">REASONING FOR
-                        HIGH-SCALE RELIABILITY.</p>
+                    <h1 class="text-5xl font-black tracking-tighter text-slate-900 uppercase italic leading-none">
+                        SRE.SPACE <span class="text-blue-600">v6.0</span></h1>
+                    <p class="text-[12px] font-black text-slate-500 uppercase tracking-[0.6em] mt-4">Autonomous Control
+                        Plane | Hard Reset</p>
                 </div>
             </div>
 
             <!-- PRECISION ENGINEERING PILLARS -->
-            <div class="flex gap-4 items-center bg-white/30 p-2 rounded-[32px] border border-white/50 backdrop-blur-md">
-                <div class="flex items-center gap-3 px-6 py-3 bg-white rounded-2xl shadow-sm border border-slate-100 group cursor-help"
-                    title="Scout Agent: Telemetry Ingestion & Anomaly Detection">
-                    <span class="w-2.5 h-2.5 rounded-full pulse-pillar-green"></span>
+            <div class="flex gap-4 items-center bg-white/40 p-3 rounded-[36px] border border-white/60">
+                <div class="flex items-center gap-4 px-8 py-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+                    <span class="w-3 h-3 rounded-full pulse-pillar-green"></span>
                     <div class="flex flex-col">
-                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Scout</span>
-                        <span class="text-[10px] font-bold text-slate-800 uppercase tracking-tighter">Observe</span>
+                        <span
+                            class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Scout</span>
+                        <span class="text-[12px] font-bold text-slate-800 uppercase mt-1">Observe</span>
                     </div>
                 </div>
-                <div class="flex items-center gap-3 px-6 py-3 bg-white rounded-2xl shadow-sm border border-slate-100 group cursor-help"
-                    title="Brain Core: RAG-Enhanced Root Cause Analysis (Pinecone)">
-                    <span class="w-2.5 h-2.5 rounded-full pulse-pillar-blue"></span>
+                <div class="flex items-center gap-4 px-8 py-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+                    <span class="w-3 h-3 rounded-full pulse-pillar-blue"></span>
                     <div class="flex flex-col">
-                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Brain</span>
-                        <span class="text-[10px] font-bold text-slate-800 uppercase tracking-tighter">Orient</span>
+                        <span
+                            class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Brain</span>
+                        <span class="text-[12px] font-bold text-slate-800 uppercase mt-1">Orient</span>
                     </div>
                 </div>
-                <div class="flex items-center gap-3 px-6 py-3 bg-white rounded-2xl shadow-sm border border-slate-100 group cursor-help"
-                    title="Guardrail: Risk Assessment & Blast Radius Calculation">
-                    <span class="w-2.5 h-2.5 rounded-full pulse-pillar-amber"></span>
+                <div class="flex items-center gap-4 px-8 py-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+                    <span class="w-3 h-3 rounded-full pulse-pillar-amber"></span>
                     <div class="flex flex-col">
-                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Guardrail</span>
-                        <span class="text-[10px] font-bold text-slate-800 uppercase tracking-tighter">Decide</span>
+                        <span
+                            class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Guard</span>
+                        <span class="text-[12px] font-bold text-slate-800 uppercase mt-1">Decide</span>
                     </div>
                 </div>
-                <div class="flex items-center gap-3 px-6 py-3 bg-white rounded-2xl shadow-sm border border-slate-100 group cursor-help"
-                    title="Fixer Drone: Automated Remediation & GitOps Integration">
-                    <span class="w-2.5 h-2.5 rounded-full pulse-pillar-purple"></span>
+                <div class="flex items-center gap-4 px-8 py-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+                    <span class="w-3 h-3 rounded-full pulse-pillar-purple"></span>
                     <div class="flex flex-col">
-                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Fixer</span>
-                        <span class="text-[10px] font-bold text-slate-800 uppercase tracking-tighter">Act</span>
+                        <span
+                            class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Fixer</span>
+                        <span class="text-[12px] font-bold text-slate-800 uppercase mt-1">Act</span>
                     </div>
                 </div>
             </div>
 
             <!-- STACK INDICATORS -->
-            <div class="flex items-center gap-4 px-6 border-l border-slate-200">
+            <div class="flex items-center gap-5 px-8 border-l border-slate-200">
                 <div id="status-aws"
-                    class="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center opacity-20 transition-all grayscale shadow-sm hover:scale-110 active-glow-aws">
-                    <img src="https://img.icons8.com/color/48/amazon-web-services.png" class="w-6 h-6" />
+                    class="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center opacity-20 transition-all grayscale shadow-sm hover:scale-110">
+                    <img src="https://img.icons8.com/color/48/amazon-web-services.png" class="w-7 h-7" />
                 </div>
                 <div id="status-gcp"
-                    class="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center opacity-20 transition-all grayscale shadow-sm hover:scale-110 active-glow-gcp">
-                    <img src="https://img.icons8.com/color/48/google-logo.png" class="w-6 h-6" />
+                    class="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center opacity-20 transition-all grayscale shadow-sm hover:scale-110">
+                    <img src="https://img.icons8.com/color/48/google-logo.png" class="w-7 h-7" />
                 </div>
                 <div id="status-k8s"
-                    class="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center opacity-20 transition-all grayscale shadow-sm hover:scale-110 active-glow-k8s">
-                    <img src="https://img.icons8.com/color/48/kubernetes.png" class="w-6 h-6" />
+                    class="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center opacity-20 transition-all grayscale shadow-sm hover:scale-110">
+                    <img src="https://img.icons8.com/color/48/kubernetes.png" class="w-7 h-7" />
                 </div>
                 <div id="status-docker"
-                    class="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center opacity-100 transition-all shadow-sm border-blue-200 scale-110">
-                    <img src="https://img.icons8.com/color/48/docker.png" class="w-6 h-6" />
-                </div>
-            </div>
-
-            <!-- PROFILE & AUTH -->
-            <div class="flex items-center gap-6">
-                <div class="flex items-center gap-4 pl-8 border-l border-slate-200">
-                    <div class="text-right hidden xl:block">
-                        <p class="text-[12px] font-black text-slate-900 uppercase leading-none">Mohammed Salman</p>
-                        <p class="text-[9px] font-bold text-blue-600 uppercase tracking-tighter mt-1">SRE · AIOps
-                            Engineer</p>
-                    </div>
-                    <img src="./profile11.png"
-                        class="w-14 h-14 rounded-[22px] border-4 border-white shadow-2xl object-cover"
-                        alt="Mohammed Salman">
+                    class="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center opacity-100 transition-all shadow-md border-blue-200 scale-110">
+                    <img src="https://img.icons8.com/color/48/docker.png" class="w-7 h-7" />
                 </div>
             </div>
         </header>
 
         <!-- TAB NAVIGATION -->
-        <div class="flex gap-16 border-b border-slate-200 px-8">
+        <nav class="flex gap-20 border-b border-slate-200 px-10">
             <button onclick="showTab('dashboard')" id="tab-dashboard"
-                class="pb-5 text-[12px] font-black tracking-[0.4em] border-b-4 border-blue-600 text-slate-900 uppercase transition-all">Command
+                class="pb-6 text-[13px] font-black tracking-[0.5em] border-b-4 border-blue-600 text-slate-900 uppercase transition-all">Command
                 Center</button>
             <button onclick="showTab('wizard')" id="tab-wizard"
-                class="pb-5 text-[12px] font-black tracking-[0.4em] border-b-4 border-transparent text-slate-400 hover:text-slate-900 uppercase transition-all">Provisioning
+                class="pb-6 text-[13px] font-black tracking-[0.5em] border-b-4 border-transparent text-slate-400 hover:text-slate-900 uppercase transition-all">Provisioning
                 Wizard</button>
-        </div>
+        </nav>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 flex-1">
 
@@ -126,363 +109,321 @@
             <main id="content-dashboard"
                 class="lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-10 animate-entrance">
 
-                <!-- LEFT TRACK: TELEMETRY & SENSORY INTAKE -->
-                <div class="lg:col-span-8 space-y-10">
-                    <!-- METRICS PERFORMANCE -->
-                    <div class="grid grid-cols-3 gap-8">
-                        <div class="liquid-glass p-10 group hover:shadow-blue-500/10 transition-all">
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-[0.5em]">Real-Time
-                                MTTR</span>
-                            <div id="metric-mttr"
-                                class="text-5xl font-black text-slate-900 mt-4 font-mono tracking-tighter italic">4.2m
-                            </div>
-                            <p class="text-[9px] font-bold text-slate-400 mt-2 uppercase">Mean Time To Resolution</p>
-                        </div>
+                <!-- LEFT TRACK: OODA TERMINAL SPLIT -->
+                <div class="lg:col-span-9 space-y-10">
+                    <!-- KNOWLEDGE SIDEBAR (RECALL) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
                         <div
-                            class="liquid-glass p-10 group hover:shadow-emerald-500/10 transition-all border-l-4 border-l-emerald-500">
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-[0.5em]">System
-                                Veracity</span>
-                            <div id="metric-resilience"
-                                class="text-5xl font-black text-emerald-600 mt-4 font-mono tracking-tighter italic">
-                                99.8%</div>
-                            <p class="text-[9px] font-bold text-slate-400 mt-2 uppercase">Recovery Confidence Score</p>
-                        </div>
-                        <div class="liquid-glass p-10 group hover:shadow-blue-500/10 transition-all">
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-[0.5em]">Active
-                                Patches</span>
-                            <div id="active-prs"
-                                class="text-5xl font-black text-blue-600 mt-4 font-mono tracking-tighter italic">124
+                            class="lg:col-span-3 liquid-glass flex flex-col min-h-[700px] shadow-2xl relative overflow-hidden border-2 border-white/80">
+                            <div
+                                class="px-10 py-6 border-b border-slate-100 bg-white/70 flex justify-between items-center backdrop-blur-2xl">
+                                <h3
+                                    class="text-[13px] font-black text-slate-900 uppercase tracking-[0.5em] flex items-center gap-4">
+                                    <i data-lucide="activity" class="w-5 h-5 text-blue-600"></i> Real-Time OODA Terminal
+                                </h3>
+                                <div class="flex items-center gap-8">
+                                    <div
+                                        class="flex items-center gap-3 px-4 py-2 bg-slate-900 rounded-full text-[10px] font-mono text-emerald-400">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        STREAMING OTel
+                                    </div>
+                                    <button onclick="clearLogs()"
+                                        class="text-slate-400 hover:text-blue-600 uppercase text-[10px] font-black tracking-widest transition-all">Flush</button>
+                                </div>
                             </div>
-                            <p class="text-[9px] font-bold text-slate-400 mt-2 uppercase">GitOps Remediation Streams</p>
-                        </div>
-                    </div>
 
-                    <!-- HUD: SENSORY INTAKE TERMINAL -->
-                    <div
-                        class="liquid-glass flex flex-col min-h-[600px] shadow-2xl relative overflow-hidden border-2 border-white/80">
-                        <div
-                            class="px-10 py-6 border-b border-slate-100 bg-white/60 flex justify-between items-center backdrop-blur-xl">
-                            <h3
-                                class="text-[12px] font-black text-slate-900 uppercase tracking-[0.4em] flex items-center gap-4">
-                                <i data-lucide="terminal" class="w-5 h-5 text-blue-600"></i> Sensory Intake Terminal
-                            </h3>
-                            <div class="flex items-center gap-6 font-mono text-[10px]">
-                                <span class="flex items-center gap-2 text-emerald-600 font-bold uppercase"><span
-                                        class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Stream
-                                    Active</span>
-                                <button onclick="clearLogs()"
-                                    class="text-slate-300 hover:text-blue-600 uppercase tracking-[0.3em] transition-all font-black">Flush</button>
+                            <!-- SPLIT TERMINAL -->
+                            <div class="flex-1 grid grid-cols-2 divide-x divide-slate-100 bg-slate-50/30">
+                                <!-- RAW OTel FEEDS -->
+                                <div class="flex flex-col">
+                                    <div
+                                        class="bg-white/50 px-6 py-2 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                        Sensory Intake (OTel)</div>
+                                    <div id="logs-raw"
+                                        class="p-8 overflow-y-auto flex-1 font-mono text-[12px] space-y-4 scroll-hide text-slate-600">
+                                        <div class="italic text-slate-400"># Listening for OTLP span signatures...</div>
+                                    </div>
+                                </div>
+                                <!-- AGENT REASONING (CoT) -->
+                                <div class="flex flex-col bg-white">
+                                    <div
+                                        class="bg-slate-900 px-6 py-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                        Neural Chain of Thought</div>
+                                    <div id="logs-reasoning"
+                                        class="p-8 overflow-y-auto flex-1 font-mono text-[12px] space-y-6 scroll-hide">
+                                        <div class="italic text-slate-300"># Waiting for diagnostic trigger...</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div id="logs-feed"
-                            class="p-10 overflow-y-auto flex-1 font-mono text-[12px] space-y-5 bg-slate-900/5 scroll-hide">
-                            <div class="text-slate-400 italic"># Handshaking with telemetry strata...</div>
+
+                        <!-- RECALL SIDEBAR (PINE CONE) -->
+                        <div class="lg:col-span-1 space-y-8">
+                            <div class="liquid-glass p-8 border-2 border-white min-h-[700px] flex flex-col">
+                                <h4
+                                    class="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] mb-8 border-b pb-4">
+                                    Memory Recall
+                                </h4>
+                                <div id="recall-list" class="flex-1 space-y-6">
+                                    <div class="text-[10px] text-slate-400 italic leading-relaxed">Initializing
+                                        Long-Term Memory...</div>
+                                </div>
+                                <div
+                                    class="mt-8 pt-6 border-t border-slate-100 italic text-[10px] text-slate-400 font-medium">
+                                    Vector Search: Pinecone v6.0 Serverless
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- RIGHT TRACK: OPS & FAULT INJECTION -->
-                <aside class="lg:col-span-4 space-y-10">
-                    <!-- CHAOS LABORATORY -->
-                    <div
-                        class="liquid-glass p-8 space-y-8 bg-white/80 transition-all hover:bg-white border-2 border-white">
-                        <div class="flex items-center justify-between border-b pb-5 border-slate-100">
-                            <h3 class="text-[12px] font-black text-slate-900 uppercase tracking-[0.3em]">Chaos
-                                Laboratory</h3>
-                            <span
-                                class="text-[9px] font-black text-red-500 bg-red-50 px-3 py-1 rounded-full border border-red-100 font-mono tracking-tighter">FAULT
-                                MODE</span>
-                        </div>
+                <!-- RIGHT TRACK: GOVERNANCE & CHAOS -->
+                <aside class="lg:col-span-3 space-y-10">
+                    <!-- FAULT INJECTION -->
+                    <div class="liquid-glass p-8 space-y-10 border-2 border-white">
+                        <h3 class="text-[12px] font-black text-slate-900 uppercase tracking-[0.4em]">Chaos Laboratory
+                        </h3>
                         <div class="grid grid-cols-1 gap-4">
                             <button onclick="triggerChaos('AWS_EC2_DISK_FULL')"
-                                class="w-full p-6 rounded-3xl border border-slate-100 bg-slate-50/50 hover:bg-red-50 hover:border-red-200 transition-all text-left group flex justify-between items-center shadow-sm">
-                                <div>
-                                    <span
-                                        class="text-[13px] font-black text-slate-800 uppercase block group-hover:text-red-800 tracking-tight">EBS
-                                        VOLUME EXHAUST</span>
-                                    <span
-                                        class="text-[9px] text-slate-400 font-bold uppercase mt-1 block tracking-wider">Infrastructure
-                                        Stress</span>
-                                </div>
-                                <i data-lucide="activity"
+                                class="flex items-center justify-between p-6 rounded-[24px] bg-slate-50 border border-slate-100 hover:bg-red-50 hover:border-red-200 transition-all group shadow-sm">
+                                <span
+                                    class="text-[12px] font-black text-slate-800 uppercase group-hover:text-red-800 italic tracking-tight">EBS
+                                    Volume Exhaust</span>
+                                <i data-lucide="alert-triangle"
                                     class="w-5 h-5 text-slate-300 group-hover:text-red-500 transition-all"></i>
                             </button>
                             <button onclick="triggerChaos('K8S_POD_CRASH')"
-                                class="w-full p-6 rounded-3xl border border-slate-100 bg-slate-50/50 hover:bg-orange-50 hover:border-orange-200 transition-all text-left group flex justify-between items-center shadow-sm">
-                                <div>
-                                    <span
-                                        class="text-[13px] font-black text-slate-800 uppercase block group-hover:text-orange-800 tracking-tight">POD
-                                        CRASHLOOPBACKOFF</span>
-                                    <span
-                                        class="text-[9px] text-slate-400 font-bold uppercase mt-1 block tracking-wider">Orchestration
-                                        Failure</span>
-                                </div>
+                                class="flex items-center justify-between p-6 rounded-[24px] bg-slate-50 border border-slate-100 hover:bg-orange-50 hover:border-orange-200 transition-all group shadow-sm">
+                                <span
+                                    class="text-[12px] font-black text-slate-800 uppercase group-hover:text-orange-800 italic tracking-tight">K8s
+                                    CrashLoop</span>
                                 <i data-lucide="layers"
-                                    class="w-5 h-5 text-slate-400 group-hover:text-orange-500 transition-all"></i>
-                            </button>
-                            <button onclick="triggerChaos('GCE_CPU_BURN')"
-                                class="w-full p-6 rounded-3xl border border-slate-100 bg-slate-50/50 hover:bg-purple-50 hover:border-purple-200 transition-all text-left group flex justify-between items-center shadow-sm">
-                                <div>
-                                    <span
-                                        class="text-[13px] font-black text-slate-800 uppercase block group-hover:text-purple-800 tracking-tight">CPU
-                                        SOFT LOCKUP</span>
-                                    <span
-                                        class="text-[9px] text-slate-400 font-bold uppercase mt-1 block tracking-wider">Performance
-                                        Anomaly</span>
-                                </div>
-                                <i data-lucide="zap"
-                                    class="w-5 h-5 text-slate-300 group-hover:text-purple-500 transition-all"></i>
+                                    class="w-5 h-5 text-slate-300 group-hover:text-orange-500 transition-all"></i>
                             </button>
                         </div>
                     </div>
 
-                    <!-- ACTIVE REMEDIATION PRs -->
-                    <div class="liquid-glass p-8 flex flex-col min-h-[350px]">
-                        <h3 class="text-[12px] font-black text-slate-400 uppercase tracking-[0.4em] mb-6 border-b pb-4">
-                            Active Remediation
-                        </h3>
-                        <div id="incident-list" class="space-y-4 overflow-y-auto flex-1 scroll-hide">
-                            <div class="text-[10px] text-slate-400 italic font-mono uppercase"># Waiting for veracity
-                                event...</div>
+                    <!-- ACTIVE REMEDIATION -->
+                    <div class="liquid-glass p-8 min-h-[350px] border-2 border-white flex flex-col">
+                        <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] mb-8 pb-4 border-b">
+                            Autonomous Fixes</h3>
+                        <div id="incident-list" class="flex-1 space-y-4 overflow-y-auto scroll-hide">
+                            <!-- Populated via main.js -->
                         </div>
-                        <!-- Mock Approval Button -->
-                        <div id="approval-gate" class="hidden mt-6 animate-entrance">
+                        <div id="approval-gate" class="hidden mt-8">
                             <button onclick="approveRemediation()"
-                                class="w-full py-5 bg-emerald-600 text-white rounded-3xl font-black uppercase tracking-[0.3em] shadow-xl shadow-emerald-500/40 hover:scale-[1.02] transition-all">Approve
+                                class="w-full py-6 bg-slate-900 text-white rounded-3xl font-black uppercase tracking-[0.4em] shadow-2xl hover:bg-black transition-all transform active:scale-95">Approve
                                 Fixer Patch</button>
                         </div>
                     </div>
 
-                    <!-- FOOTER CREDITS -->
-                    <div class="text-center space-y-4 pt-10">
-                        <div class="flex justify-center gap-8 mb-4">
-                            <a href="https://github.com/mohammedsalmanj" target="_blank"
-                                class="text-slate-300 hover:text-slate-900 transition-all"><i data-lucide="github"
-                                    class="w-6 h-6"></i></a>
-                            <a href="https://linkedin.com/in/mohammed-salman" target="_blank"
-                                class="text-slate-300 hover:text-blue-600 transition-all"><i data-lucide="linkedin"
-                                    class="w-6 h-6"></i></a>
+                    <!-- PROFILE CREDITING -->
+                    <footer class="text-center pt-10 space-y-6">
+                        <div class="flex justify-center gap-10">
+                            <a href="#" class="text-slate-300 hover:text-slate-900 transition-all"><i
+                                    data-lucide="github" class="w-6 h-6"></i></a>
+                            <a href="#" class="text-slate-300 hover:text-blue-600 transition-all"><i
+                                    data-lucide="linkedin" class="w-6 h-6"></i></a>
                         </div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] italic">Building
-                            Autonomous Reliability</p>
-                    </div>
+                        <div class="space-y-1">
+                            <p class="text-[11px] font-black text-slate-900 uppercase leading-none">Mohammed Salman</p>
+                            <p class="text-[9px] font-bold text-blue-600 uppercase tracking-widest mt-1">SRE · AIOps
+                                Engineer</p>
+                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mt-3 italic">
+                                Reasoning for High-Scale Reliability.</p>
+                        </div>
+                    </footer>
                 </aside>
             </main>
 
-            <!-- PRODUCTION ONBOARDING WIZARD -->
-            <main id="content-wizard" class="hidden lg:col-span-12 space-y-16 animate-entrance p-10">
-                <div class="max-w-5xl mx-auto space-y-12">
-                    <div class="text-center space-y-4">
-                        <h2 class="text-6xl font-black text-slate-900 tracking-tighter uppercase italic">Control Plane
-                            Promotions</h2>
-                        <p class="text-slate-500 font-bold uppercase tracking-[0.3em] text-[13px]">Promote to
-                            enterprise-grade management strata</p>
-                    </div>
+            <!-- PROVISIONING WIZARD (STATE MACHINE) -->
+            <main id="content-wizard" class="hidden lg:col-span-12 space-y-20 animate-entrance max-w-6xl mx-auto p-10">
+                <div class="text-center space-y-6">
+                    <h2 class="text-7xl font-black text-slate-900 tracking-tighter uppercase italic">Hard Reset Wizard
+                    </h2>
+                    <p class="text-slate-500 font-bold uppercase tracking-[0.4em] text-[14px]">Promote from Simulation
+                        to Enterprise Strata</p>
+                </div>
 
-                    <!-- 3-STEP WIZARD PROGRESS -->
-                    <div class="flex justify-between items-center px-20">
-                        <div class="flex flex-col items-center gap-3">
-                            <div id="step-dot-1"
-                                class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-black text-lg shadow-xl shadow-blue-500/20">
-                                1</div>
-                            <span
-                                class="text-[9px] font-black text-slate-900 uppercase tracking-widest">Environment</span>
-                        </div>
-                        <div class="h-1 flex-1 bg-slate-200 mx-6 rounded-full overflow-hidden">
-                            <div id="step-bar-1" class="h-full bg-blue-600 w-0 transition-all duration-700"></div>
-                        </div>
-                        <div class="flex flex-col items-center gap-3">
-                            <div id="step-dot-2"
-                                class="w-12 h-12 bg-white text-slate-300 border-2 border-slate-100 rounded-full flex items-center justify-center font-black text-lg transition-all">
-                                2</div>
-                            <span
-                                class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Handshake</span>
-                        </div>
-                        <div class="h-1 flex-1 bg-slate-200 mx-6 rounded-full overflow-hidden">
-                            <div id="step-bar-2" class="h-full bg-blue-600 w-0 transition-all duration-700"></div>
-                        </div>
-                        <div class="flex flex-col items-center gap-3">
-                            <div id="step-dot-3"
-                                class="w-12 h-12 bg-white text-slate-300 border-2 border-slate-100 rounded-full flex items-center justify-center font-black text-lg transition-all">
-                                3</div>
-                            <span
-                                class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Instrumentation</span>
+                <!-- 4-STEP PROGRESS -->
+                <div class="flex justify-between items-center px-10 relative">
+                    <div
+                        class="absolute top-[24px] left-[10%] right-[10%] h-1 bg-slate-100 -z-10 rounded-full overflow-hidden">
+                        <div id="wiz-progress-bar" class="h-full bg-slate-900 w-0 transition-all duration-700"></div>
+                    </div>
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center gap-4">
+                        <div id="step-1-dot"
+                            class="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center font-black text-xl shadow-xl">
+                            1</div>
+                        <span class="text-[10px] font-black text-slate-900 uppercase tracking-widest">Injection</span>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center gap-4">
+                        <div id="step-2-dot"
+                            class="w-12 h-12 rounded-full bg-white border-2 border-slate-100 text-slate-300 flex items-center justify-center font-black text-xl transition-all">
+                            2</div>
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Validation</span>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center gap-4">
+                        <div id="step-3-dot"
+                            class="w-12 h-12 rounded-full bg-white border-2 border-slate-100 text-slate-300 flex items-center justify-center font-black text-xl transition-all">
+                            3</div>
+                        <span
+                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Instrumentation</span>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="flex flex-col items-center gap-4">
+                        <div id="step-4-dot"
+                            class="w-12 h-12 rounded-full bg-white border-2 border-slate-100 text-slate-300 flex items-center justify-center font-black text-xl transition-all">
+                            4</div>
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Promotion</span>
+                    </div>
+                </div>
+
+                <!-- STEP 1: PROVIDER SELECTION -->
+                <div id="wiz-step-1" class="grid grid-cols-2 md:grid-cols-4 gap-10 animate-entrance">
+                    <button onclick="selectProvider('aws')"
+                        class="provider-card liquid-glass p-10 flex flex-col items-center gap-8 border-4 border-transparent hover:border-slate-300 transition-all group">
+                        <img src="https://img.icons8.com/color/144/amazon-web-services.png"
+                            class="w-24 h-24 group-hover:scale-110 transition-all" />
+                        <span class="text-[13px] font-black text-slate-900 uppercase tracking-widest">AWS CLOUD</span>
+                    </button>
+                    <button onclick="selectProvider('gcp')"
+                        class="provider-card liquid-glass p-10 flex flex-col items-center gap-8 border-4 border-transparent hover:border-slate-300 transition-all group">
+                        <img src="https://img.icons8.com/color/144/google-logo.png"
+                            class="w-24 h-24 group-hover:scale-110 transition-all" />
+                        <span class="text-[13px] font-black text-slate-900 uppercase tracking-widest">GCP ORBIT</span>
+                    </button>
+                    <button onclick="selectProvider('k8s')"
+                        class="provider-card liquid-glass p-10 flex flex-col items-center gap-8 border-4 border-transparent hover:border-slate-300 transition-all group">
+                        <img src="https://img.icons8.com/color/144/kubernetes.png"
+                            class="w-24 h-24 group-hover:scale-110 transition-all" />
+                        <span class="text-[13px] font-black text-slate-900 uppercase tracking-widest">K8S CLUSTER</span>
+                    </button>
+                    <button onclick="selectProvider('local')"
+                        class="provider-card liquid-glass p-10 flex flex-col items-center gap-8 border-4 border-transparent hover:border-slate-300 transition-all group">
+                        <img src="https://img.icons8.com/color/144/docker.png"
+                            class="w-24 h-24 group-hover:scale-110 transition-all" />
+                        <span class="text-[13px] font-black text-slate-900 uppercase tracking-widest">SANDBOX
+                            MODE</span>
+                    </button>
+                </div>
+
+                <!-- STEP 2: CREDENTIAL VALIDATION -->
+                <div id="wiz-step-2"
+                    class="hidden liquid-glass p-16 max-w-2xl mx-auto space-y-12 animate-entrance border-2 border-white">
+                    <div class="flex items-center gap-8 border-b pb-8 border-slate-100">
+                        <i data-lucide="key" class="w-12 h-12 text-blue-600"></i>
+                        <div>
+                            <h3 class="text-3xl font-black text-slate-900 uppercase italic">Authority Injection</h3>
+                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Gated
+                                Real-Time Validation</p>
                         </div>
                     </div>
-
-                    <!-- STEP 1: ENVIRONMENT SELECTION -->
-                    <div id="wizard-step-1" class="grid grid-cols-1 md:grid-cols-2 gap-10 animate-entrance">
-                        <div onclick="selectWizardTrack('local')" id="wiz-track-local"
-                            class="liquid-glass p-12 border-4 border-blue-600 bg-blue-50/50 shadow-2xl cursor-pointer group relative">
-                            <div class="text-6xl mb-8 group-hover:scale-110 transition-transform">🧪</div>
-                            <h3 class="text-3xl font-black text-slate-900 uppercase italic">Local Simulation</h3>
-                            <p class="text-[11px] font-black text-blue-600 uppercase tracking-widest mt-2 mb-8">
-                                Docker-First Containment</p>
-                            <p class="text-sm text-slate-600 font-medium leading-relaxed">Instant OODA loop
-                                synchronization within the host environment. Uses local Docker daemon to orchestrate
-                                agents and chaos profiles.</p>
-                            <div class="mt-10 pt-8 border-t border-blue-100 flex items-center justify-between">
-                                <span class="text-[10px] font-black text-blue-600 uppercase">Detection: Docker Engine
-                                    Found</span>
-                                <i data-lucide="check-circle-2" class="text-blue-600 w-6 h-6"></i>
-                            </div>
+                    <div class="space-y-8">
+                        <div class="space-y-3">
+                            <label id="label-cred-1"
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Access Key
+                                ID</label>
+                            <input type="text" id="input-cred-1"
+                                class="w-full p-6 bg-slate-50 border border-slate-100 rounded-[28px] font-mono text-sm outline-none focus:ring-4 focus:ring-blue-100 transition-all shadow-inner">
                         </div>
-                        <div onclick="selectWizardTrack('cloud')" id="wiz-track-cloud"
-                            class="liquid-glass p-12 border-4 border-transparent bg-white/40 cursor-pointer group relative hover:border-slate-300">
-                            <div class="text-6xl mb-8 group-hover:scale-110 transition-transform">🚀</div>
-                            <h3 class="text-3xl font-black text-slate-900 uppercase italic">Enterprise Cloud</h3>
-                            <p
-                                class="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-2 mb-8 group-hover:text-blue-600">
-                                Production Integration</p>
-                            <p class="text-sm text-slate-500 font-medium leading-relaxed">Promote the Control Plane to
-                                cloud-resident Pilot. Execute direct infrastructure synthesis on AWS, GCP, or Managed
-                                K8s.</p>
-                            <div class="mt-10 pt-8 border-t border-slate-100 flex items-center justify-between">
-                                <span class="text-[10px] font-black text-slate-300 uppercase">Promote to Orbit</span>
-                                <i data-lucide="arrow-right"
-                                    class="text-slate-300 w-6 h-6 group-hover:text-blue-500"></i>
-                            </div>
+                        <div class="space-y-3">
+                            <label id="label-cred-2"
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Secret Access
+                                Key</label>
+                            <input type="password" id="input-cred-2"
+                                class="w-full p-6 bg-slate-50 border border-slate-100 rounded-[28px] font-mono text-sm outline-none focus:ring-4 focus:ring-blue-100 transition-all shadow-inner">
                         </div>
+                        <button onclick="validateAuthority()" id="btn-validate"
+                            class="w-full py-6 bg-slate-900 text-white rounded-[32px] font-black uppercase tracking-[0.4em] shadow-2xl hover:bg-black transition-all">Verify
+                            Handshake</button>
                     </div>
+                </div>
 
-                    <!-- STEP 2: HANDSHAKE (HIDDEN BY DEFAULT) -->
-                    <div id="wizard-step-2"
-                        class="hidden liquid-glass p-12 space-y-12 animate-entrance max-w-3xl mx-auto border-2 border-white">
-                        <div class="flex items-center gap-8 border-b pb-8 border-slate-100">
+                <!-- STEP 3: INSTRUMENTATION -->
+                <div id="wiz-step-3" class="hidden grid grid-cols-1 md:grid-cols-2 gap-10 animate-entrance">
+                    <div class="liquid-glass p-12 space-y-10 border-2 border-white bg-white">
+                        <h3 class="text-2xl font-black text-slate-900 uppercase italic flex items-center gap-4">
+                            <i data-lucide="cpu" class="text-emerald-500"></i> Instrumentation Plane
+                        </h3>
+                        <div class="bg-slate-900 p-10 rounded-[40px] shadow-2xl relative group overflow-hidden">
                             <div
-                                class="w-16 h-16 bg-blue-50 rounded-3xl flex items-center justify-center border border-blue-100 shadow-sm">
-                                <i data-lucide="unplug" class="text-blue-600 w-8 h-8"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-black text-slate-900 uppercase italic">Connection Handshake
-                                </h3>
-                                <p id="wizard-handshake-desc"
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                                    Verifying Cloud Authority...</p>
-                            </div>
+                                class="absolute top-4 right-6 text-[9px] font-black text-slate-600 uppercase tracking-widest">
+                                Deployment Snippet</div>
+                            <pre id="instrument-snippet"
+                                class="text-emerald-400 font-mono text-xs leading-relaxed mt-4 whitespace-pre-wrap"></pre>
+                            <button onclick="copySnippet()"
+                                class="absolute bottom-6 right-6 px-6 py-2 bg-white/10 text-white text-[9px] font-black uppercase tracking-widest rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-white/20">Copy
+                                Code</button>
                         </div>
-
-                        <!-- LOCAL HANDSHAKE FORM -->
-                        <div id="form-local-handshake" class="space-y-6">
+                    </div>
+                    <div
+                        class="liquid-glass p-12 flex flex-col items-center justify-center gap-10 bg-slate-50 border-2 border-white">
+                        <div
+                            class="w-56 h-56 rounded-full border-4 border-slate-100 relative flex items-center justify-center">
                             <div
-                                class="bg-slate-900 p-8 rounded-[32px] font-mono text-sm text-emerald-400 shadow-inner">
-                                <p class="text-slate-500 mb-2"># Initializing Local Probe...</p>
-                                <p>> Checking Docker socket (/var/run/docker.sock)... <span
-                                        class="text-emerald-500 font-bold">READY</span></p>
-                                <p>> Registering Local Control Hub... <span
-                                        class="text-emerald-500 font-bold">SUCCESS</span></p>
+                                class="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin">
                             </div>
-                            <div class="flex items-center gap-4 p-6 bg-blue-50 rounded-2xl border border-blue-100">
-                                <i data-lucide="info" class="w-5 h-5 text-blue-600"></i>
-                                <p class="text-[10px] font-black text-blue-600 uppercase">Local host identified. Sandbox
-                                    mode normalized for zero-friction testing.</p>
-                            </div>
+                            <i data-lucide="activity" class="w-16 h-16 text-slate-300"></i>
                         </div>
-
-                        <!-- CLOUD HANDSHAKE FORM -->
-                        <div id="form-cloud-handshake" class="hidden space-y-8">
-                            <div class="space-y-4">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Authority
-                                    IAM Role ARN / Service Account</label>
-                                <div class="relative">
-                                    <input type="text" id="cloud-cred"
-                                        placeholder="arn:aws:iam::123456789012:role/SRE-Space-Pilot"
-                                        class="w-full p-5 rounded-3xl border border-slate-100 bg-slate-50 font-mono text-sm outline-none focus:ring-4 focus:ring-blue-100 transition-all shadow-inner">
-                                    <div id="cred-spinner" class="hidden absolute right-5 top-1/2 -translate-y-1/2">
-                                        <div
-                                            class="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin">
-                                        </div>
-                                    </div>
-                                    <div id="cred-check"
-                                        class="hidden absolute right-5 top-1/2 -translate-y-1/2 text-emerald-500">
-                                        <i data-lucide="check-circle-2" class="w-7 h-7"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <button id="btn-verify-cloud" onclick="verifyCloudConnection()"
-                                class="w-full py-6 bg-slate-900 text-white rounded-[32px] font-black uppercase tracking-[0.4em] shadow-2xl hover:bg-black transition-all">Verify
-                                Cloud Authority</button>
+                        <div class="text-center space-y-2">
+                            <p class="text-slate-900 font-black uppercase italic tracking-widest">Waiting for OTel
+                                Ping...</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Heartbeat Target:
+                                sre-space-probe-01</p>
                         </div>
                     </div>
+                </div>
 
-                    <!-- STEP 3: INSTRUMENTATION (HIDDEN BY DEFAULT) -->
-                    <div id="wizard-step-3" class="hidden grid grid-cols-1 md:grid-cols-2 gap-10 animate-entrance">
-                        <div class="liquid-glass p-12 space-y-10 border-2 border-white">
-                            <div class="flex items-center gap-6 border-b pb-6 border-slate-100">
+                <!-- STEP 4: PROMOTION -->
+                <div id="wiz-step-4"
+                    class="hidden liquid-glass p-20 text-center space-y-12 animate-entrance max-w-4xl mx-auto border-4 border-emerald-500/20 shadow-emerald-500/5">
+                    <div
+                        class="w-24 h-24 bg-emerald-500 text-white rounded-[36px] flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/30">
+                        <i data-lucide="rocket" class="w-12 h-12"></i>
+                    </div>
+                    <div class="space-y-6">
+                        <h3 class="text-5xl font-black text-slate-900 uppercase italic tracking-tighter">System
+                            Promotion Ready</h3>
+                        <p class="text-slate-500 font-medium leading-relaxed max-w-2xl mx-auto">Authority verified.
+                            Instrumentation normalized. Promoting Control Plane to **STRICT_MODE**. All agents will now
+                            target real-world infrastructure APIs.</p>
+                    </div>
+                    <div class="flex items-center justify-center gap-10">
+                        <div class="flex items-center gap-4">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="strict-toggle" class="sr-only peer" checked>
                                 <div
-                                    class="w-14 h-14 bg-emerald-50 rounded-[24px] flex items-center justify-center border border-emerald-100">
-                                    <i data-lucide="cpu" class="text-emerald-500 w-8 h-8"></i></div>
-                                <h3 class="text-2xl font-black text-slate-900 uppercase italic">eBPF Data Plane</h3>
-                            </div>
-                            <div class="space-y-6">
-                                <div class="flex flex-col gap-2">
-                                    <label
-                                        class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Deployment
-                                        Method</label>
-                                    <select
-                                        class="w-full p-5 rounded-2xl border border-slate-100 bg-slate-50 font-mono text-[11px] uppercase cursor-pointer outline-none shadow-inner">
-                                        <option>Autopilot (eBPF Kernel Agent)</option>
-                                        <option>Managed Sidecar (Envoy)</option>
-                                    </select>
+                                    class="w-16 h-8 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-7 after:transition-all peer-checked:bg-emerald-600">
                                 </div>
-                                <div
-                                    class="bg-slate-900 p-8 rounded-[32px] space-y-6 font-mono text-[11px] text-slate-300 shadow-2xl">
-                                    <div
-                                        class="flex justify-between items-center text-slate-500 uppercase font-black text-[9px]">
-                                        <span>Command Execution</span>
-                                        <button onclick="copyCmd('helm')"
-                                            class="hover:text-white transition-all">COPY</button>
-                                    </div>
-                                    <code class="block text-emerald-400 leading-relaxed" id="cmd-helm">
-                                        helm repo add sre-space http://charts.sre.space ;<br/>
-                                        helm upgrade --install sre-space-pilot sre-space/agent --namespace sre-pilot --create-namespace
-                                    </code>
-                                </div>
-                            </div>
+                            </label>
+                            <span class="text-[11px] font-black text-slate-900 uppercase tracking-widest">STRICT MODE
+                                LOCK</span>
                         </div>
-                        <div class="liquid-glass p-12 space-y-10 border-2 border-white bg-slate-900">
-                            <h3
-                                class="text-xl font-black text-white uppercase italic tracking-widest flex items-center gap-4">
-                                <span class="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></span> Neural Heartbeat
-                            </h3>
-                            <div class="flex-1 flex flex-col items-center justify-center gap-8 py-10">
-                                <div id="heartbeat-radar"
-                                    class="relative w-48 h-48 rounded-full border border-blue-500/30 flex items-center justify-center">
-                                    <div
-                                        class="absolute inset-0 rounded-full border border-blue-500/50 animate-ping opacity-20">
-                                    </div>
-                                    <i data-lucide="activity" class="text-blue-500 w-16 h-16"></i>
-                                </div>
-                                <div class="text-center space-y-2">
-                                    <p id="heartbeat-status"
-                                        class="text-blue-400 font-mono text-[11px] uppercase tracking-widest">Waiting
-                                        for first eBPF packet...</p>
-                                    <p class="text-slate-600 text-[10px] italic">Target:
-                                        kernel.sre_space_probe.telemetry</p>
-                                </div>
-                            </div>
-                            <button onclick="finalizeSetup()"
-                                class="w-full py-6 bg-blue-600 text-white rounded-[32px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-blue-500/40 hover:scale-[1.05] transition-all">Normalize
-                                Workplace</button>
-                        </div>
+                        <button onclick="finalizePromotion()"
+                            class="px-20 py-8 bg-slate-900 text-white rounded-[40px] font-black uppercase tracking-[0.6em] shadow-2xl hover:scale-[1.05] transition-all transform active:scale-95">Go
+                            Enterprise</button>
                     </div>
+                </div>
 
-                    <!-- WIZARD NAVIGATION -->
-                    <div id="wizard-nav" class="flex justify-between items-center px-10">
-                        <button id="btn-wiz-prev" onclick="wizardPrev()"
-                            class="hidden text-[11px] font-black text-slate-400 hover:text-slate-900 uppercase tracking-[0.4em] transition-all">←
-                            Backtrack</button>
-                        <button id="btn-wiz-next" onclick="wizardNext()"
-                            class="ml-auto px-12 py-5 bg-slate-900 text-white rounded-3xl font-black uppercase tracking-[0.4em] shadow-2xl hover:scale-[1.05] transition-all transform active:scale-95">Advance
-                            Protocol →</button>
-                    </div>
+                <!-- WIZARD NAV -->
+                <div id="wizard-nav" class="flex justify-between items-center px-10">
+                    <button id="btn-wiz-prev" onclick="wizardPrev()"
+                        class="hidden text-[11px] font-black text-slate-400 hover:text-slate-900 uppercase tracking-[0.5em] transition-all">←
+                        Backtrack</button>
+                    <button id="btn-wiz-next" onclick="wizardNext()"
+                        class="ml-auto px-16 py-6 bg-slate-900 text-white rounded-[32px] font-black uppercase tracking-[0.5em] shadow-2xl hover:scale-[1.05] transition-all active:scale-95 disabled:opacity-20 disabled:pointer-events-none">Advance
+                        Protocol →</button>
                 </div>
             </main>
         </div>
     </div>
 
-    <!-- GLOBAL HUD TOASTS -->
-    <div id="hud-toast-container" class="fixed bottom-10 right-10 flex flex-col gap-4 z-[3000]"></div>
+    <!-- HUD TOASTS -->
+    <div id="hud-toast-container" class="fixed bottom-10 right-10 flex flex-col gap-4 z-[5000]"></div>
 
     <script type="module" src="./main.js"></script>
     <script>lucide.createIcons();</script>
