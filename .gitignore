@@ -8,8 +8,6 @@ venv/
 
 # Node (Ignored to prevent Vercel auto-detection)
 node_modules/
-package.json
-package-lock.json
 *.js.map
 
 # Vercel

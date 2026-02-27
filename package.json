@@ -1,0 +1,13 @@
+{
+    "name": "sre-control-plane-ui",
+    "version": "6.0.0",
+    "description": "Static frontend for SRE Control Plane",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "devDependencies": {
+        "vite": "^5.0.0"
+    }
+}
