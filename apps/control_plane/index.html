@@ -4,237 +4,469 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRE.Space | Control Plane</title>
+    <title>SPACE.CONTROL | Agentic SRE Playground</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="./style.css">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script type="module" src="./main.js" defer></script>
 </head>
 
-<body class="text-slate-200 font-sans tracking-tight min-h-screen">
+<body class="p-6 md:p-10 text-slate-200">
+    <div class="ambient-bg"></div>
+    <div class="cyber-grid"></div>
 
-    <!-- Initialization Overlay -->
-    <div id="init-overlay"
-        class="fixed inset-0 z-[100] bg-[#0D0D0D] flex items-center justify-center transition-opacity duration-700">
-        <div class="max-w-md w-full p-8 liquid-glass text-center space-y-8">
-            <div class="flex justify-center">
-                <div
-                    class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center animate-pulse-glow border border-blue-400/30">
-                    <i data-lucide="zap" class="text-blue-400 w-8 h-8"></i>
+    <div class="max-w-7xl mx-auto space-y-8 relative z-10">
+        <!-- Top Header -->
+        <header
+            class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6 border-b border-white/10 pb-6">
+            <div>
+                <h1 class="text-4xl md:text-5xl font-black tracking-tighter text-white uppercase italic">
+                    SRE.<span
+                        class="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">SPACE</span>
+                </h1>
+                <p class="text-slate-400 font-medium mt-1 uppercase tracking-widest text-[10px]">Cognitive Reliability
+                    Control Plane</p>
+                <div class="mt-4 flex gap-3">
+                    <span id="badge-cloud"
+                        class="hidden status-badge text-cyan-300 border-cyan-500/30 bg-cyan-500/10 shadow-[0_0_10px_rgba(0,242,254,0.1)]">☁️
+                        CLOUD DEPLOYMENT MODE</span>
+                    <span id="badge-local"
+                        class="status-badge text-purple-300 border-purple-500/30 bg-purple-500/10 shadow-[0_0_10px_rgba(112,0,255,0.1)]">🧪
+                        LOCAL CONTROL PLANE (Docker)</span>
                 </div>
             </div>
 
-            <div id="init-steps" class="space-y-6">
-                <div id="step-1" class="step-active flex flex-col items-center">
-                    <h3 class="text-xl font-bold text-white mb-2 tracking-tight">Step 1: Telemetry Injection</h3>
-                    <p class="text-slate-400 text-sm">Synchronizing with OTLP Port 4317...</p>
-                    <div class="mt-4 w-full bg-white/5 h-1 rounded-full overflow-hidden">
-                        <div id="step-1-progress" class="h-full bg-blue-500 w-0 transition-all duration-1000"></div>
+            <nav class="flex flex-wrap items-center gap-6">
+                <a href="/about" id="about-link"
+                    class="text-xs font-bold text-slate-400 hover:text-white transition-colors tracking-widest uppercase">ABOUT</a>
+                <a href="https://github.com/mohammedsalmanj/sre.space-cp" target="_blank"
+                    class="text-slate-400 hover:text-white transition-colors"><i data-lucide="github"
+                        class="w-5 h-5"></i></a>
+                <button onclick="startTour()"
+                    class="px-4 py-2 text-xs font-bold text-blue-300 bg-blue-500/10 border border-blue-500/30 rounded-xl hover:bg-blue-500/20 hover:text-white transition-all flex items-center gap-2">
+                    ✨ GUIDED TOUR
+                </button>
+                <button onclick="deployControlPlane()"
+                    class="btn-primary px-6 py-2.5 text-xs tracking-wider flex items-center gap-2 uppercase">
+                    🚀 DEPLOY INFRASTRUCTURE
+                </button>
+            </nav>
+        </header>
+
+        <!-- Main Dashboard Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Environment / Provider Column -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- Environment Config -->
+                <div class="glass-card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-white tracking-tight">Active Environment</h2>
+                        <span id="provider-status" class="pulse-dot"></span>
+                    </div>
+
+                    <select id="provider-select" onchange="updateProvider(this.value)"
+                        class="w-full bg-black/40 border border-white/10 text-white text-sm font-semibold rounded-xl block p-3.5 outline-none focus:ring-2 focus:ring-cyan-500 transition-all cursor-pointer shadow-inner hover:border-cyan-500/50">
+                        <option value="local">Local (Simulation Runtime)</option>
+                        <option value="aws">AWS (Amazon Web Services)</option>
+                        <option value="gcp">GCP (Google Cloud)</option>
+                        <option value="kubernetes">Kubernetes Native</option>
+                    </select>
+
+                    <div id="setup-panel-local"
+                        class="mt-6 p-5 bg-white/5 border border-white/10 rounded-xl text-sm shadow-inner group transition-all hover:bg-white/10">
+                        <h3 class="font-bold text-white mb-3 tracking-wide uppercase text-[10px]">Local Topology</h3>
+                        <ol class="list-decimal ml-5 space-y-2 text-slate-400 font-mono text-[11px]">
+                            <li><span class="text-cyan-300">git clone</span> repository-core</li>
+                            <li><span class="text-cyan-300">docker-compose up -d</span> --build</li>
+                        </ol>
+                    </div>
+
+                    <div id="setup-panel-aws"
+                        class="hidden mt-6 p-5 bg-white/5 border border-white/10 rounded-xl text-sm shadow-inner">
+                        <h3 class="font-bold text-white mb-3 text-[11px] uppercase">AWS Target Stack</h3>
+                        <div class="flex gap-4 mb-5 text-slate-300 text-xs font-semibold">
+                            <label
+                                class="flex items-center gap-2 cursor-pointer hover:text-white transition-colors"><input
+                                    type="radio" name="aws-stack" checked class="accent-cyan-500 w-4 h-4"> EC2</label>
+                            <label
+                                class="flex items-center gap-2 cursor-pointer hover:text-white transition-colors"><input
+                                    type="radio" name="aws-stack" class="accent-cyan-500 w-4 h-4"> EKS</label>
+                        </div>
+                        <button onclick="deployControlPlanePlatform('aws')"
+                            class="w-full btn-primary py-3 text-[10px] font-bold tracking-widest flex justify-center items-center shadow-lg uppercase">PROVISION
+                            AWS</button>
+                    </div>
+
+                    <div id="setup-panel-gcp"
+                        class="hidden mt-6 p-5 bg-white/5 border border-white/10 rounded-xl text-sm shadow-inner">
+                        <h3 class="font-bold text-white mb-3 text-[11px] uppercase">GCP Target Stack</h3>
+                        <div class="flex gap-4 mb-5 text-slate-300 text-xs font-semibold">
+                            <label
+                                class="flex items-center gap-2 cursor-pointer hover:text-white transition-colors"><input
+                                    type="radio" name="gcp-stack" checked class="accent-cyan-500 w-4 h-4"> GCE</label>
+                            <label
+                                class="flex items-center gap-2 cursor-pointer hover:text-white transition-colors"><input
+                                    type="radio" name="gcp-stack" class="accent-cyan-500 w-4 h-4"> GKE</label>
+                        </div>
+                        <button onclick="deployControlPlanePlatform('gcp')"
+                            class="w-full btn-primary py-3 text-[10px] font-bold tracking-widest flex justify-center items-center shadow-lg uppercase">PROVISION
+                            GCP</button>
                     </div>
                 </div>
 
-                <div id="step-2" class="step-hidden flex flex-col items-center">
-                    <h3 class="text-xl font-bold text-white mb-2 tracking-tight">Step 2: Control Link Established</h3>
-                    <p class="text-slate-400 text-sm" id="step-2-url">Linking Registry to Brain Agent...</p>
-                    <div class="mt-4 flex justify-center space-x-2">
-                        <i data-lucide="server" class="w-5 h-5 text-blue-400"></i>
-                        <div class="w-12 h-[2px] bg-blue-500/30 mt-2.5 animate-pulse"></div>
-                        <i data-lucide="brain" class="w-5 h-5 text-indigo-400"></i>
+                <!-- Guardrails -->
+                <div class="glass-card p-6">
+                    <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2 tracking-tight">
+                        <span>🛡️</span> Safety Guardrails</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b border-white/5 pb-3">
+                            <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Snapshot
+                                First</span>
+                            <span class="status-badge text-green-400 bg-green-500/10 border-green-500/20">ACTIVE</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-white/5 pb-3">
+                            <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Auto
+                                Rollback</span>
+                            <span class="status-badge text-green-400 bg-green-500/10 border-green-500/20">ACTIVE</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-white/5 pb-3">
+                            <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">GitOps PR
+                                Mode</span>
+                            <span class="status-badge text-green-400 bg-green-500/10 border-green-500/20">ACTIVE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terminal and Actions Column -->
+            <div class="lg:col-span-8 flex flex-col gap-6">
+                <!-- Agent Map HUD -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div class="glass-card p-4 text-center group hover:bg-white/5 transition-colors">
+                        <div
+                            class="text-[9px] font-black text-slate-500 mb-2 uppercase tracking-[0.2em] group-hover:text-cyan-400 transition-colors">
+                            Scout Agent</div>
+                        <span id="agent-scout-status" class="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
+                    </div>
+                    <div class="glass-card p-4 text-center group hover:bg-white/5 transition-colors">
+                        <div
+                            class="text-[9px] font-black text-slate-500 mb-2 uppercase tracking-[0.2em] group-hover:text-purple-400 transition-colors">
+                            Brain Core</div>
+                        <span id="agent-brain-status" class="w-2 h-2 rounded-full bg-purple-500 inline-block"></span>
+                    </div>
+                    <div class="glass-card p-4 text-center group hover:bg-white/5 transition-colors">
+                        <div
+                            class="text-[9px] font-black text-slate-500 mb-2 uppercase tracking-[0.2em] group-hover:text-orange-400 transition-colors">
+                            Fixer Drone</div>
+                        <span id="agent-fixer-status" class="w-2 h-2 rounded-full bg-orange-500 inline-block"></span>
+                    </div>
+                    <div class="glass-card p-4 text-center group hover:bg-white/5 transition-colors">
+                        <div
+                            class="text-[9px] font-black text-slate-500 mb-2 uppercase tracking-[0.2em] group-hover:text-emerald-400 transition-colors">
+                            Curator</div>
+                        <span id="agent-curator-status" class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                    </div>
+                    <div class="glass-card p-4 text-center group hover:bg-white/5 transition-colors">
+                        <div
+                            class="text-[9px] font-black text-slate-500 mb-2 uppercase tracking-[0.2em] group-hover:text-blue-400 transition-colors">
+                            Adapter</div>
+                        <div id="status-adapter-val"
+                            class="text-[9px] font-black text-cyan-400 border border-cyan-500/20 rounded px-2 py-0.5 mt-1 inline-block uppercase bg-cyan-500/5">
+                            LOCAL</div>
                     </div>
                 </div>
 
-                <div id="step-3" class="step-hidden flex flex-col items-center">
-                    <h3 class="text-xl font-bold text-green-400 mb-2 tracking-tight">Step 3: Space Confirmed</h3>
-                    <p class="text-slate-400 text-sm">Control Plane is now autonomously observing your production
-                        infrastructure.</p>
-                    <button id="launch-button"
-                        class="mt-6 px-8 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold transition-all transform hover:scale-105">
-                        INITIALIZE CONTROL
-                    </button>
+                <!-- OODA Terminal Feed -->
+                <div class="hud-terminal flex-1 flex flex-col overflow-hidden min-h-[400px] relative mt-2">
+                    <div
+                        class="bg-black/40 px-6 py-4 flex justify-between items-center text-[10px] font-black tracking-widest text-slate-400 border-b border-white/5">
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_10px_#00f2fe]"></span>
+                            LIVE SENSORY INTAKE & OODA REASONING
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span id="sse-indicator" class="text-[9px] font-black text-slate-500 uppercase">SSE:
+                                DISCONNECTED</span>
+                            <div id="sys-status-label"
+                                class="text-green-400 flex items-center gap-2 bg-green-500/10 px-3 py-1 rounded shadow-[0_0_10px_rgba(16,185,129,0.1)] border border-green-500/20">
+                                ● SYSTEM NOMINAL</div>
+                        </div>
+                    </div>
+                    <div id="logs" class="p-6 overflow-y-auto flex-1 text-[11px] font-mono space-y-2 scrollbar-hide">
+                        <div class="text-slate-600 italic">... Waiting for OpenTelemetry signals ...</div>
+                    </div>
+                    <div class="p-4 border-t border-white/5 bg-black/20 flex justify-between items-center">
+                        <button onclick="window.clearLogs()"
+                            class="text-[10px] font-bold text-slate-500 hover:text-white transition-colors uppercase tracking-widest">CLEAR_TERMINAL</button>
+                    </div>
+                </div>
+
+                <!-- Chaos Controls -->
+                <div class="glass-card p-6">
+                    <div class="flex justify-between items-center mb-5">
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2"><span>🔥</span> Chaos Simulator
+                        </h2>
+                        <span
+                            class="text-[10px] font-black text-slate-500 bg-white/5 px-2 py-1 rounded border border-white/10 uppercase italic">Emulation
+                            Layer Active</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="chaos-lab-buttons">
+                        <button onclick="triggerChaos('AWS_EC2_DISK_FULL')"
+                            class="btn-chaos p-4 text-left w-full flex flex-col gap-2 group">
+                            <span
+                                class="text-xs font-bold text-white group-hover:text-red-100 transition-colors uppercase">Disk
+                                Full</span>
+                            <span
+                                class="text-[9px] font-black opacity-60 uppercase tracking-[0.1em] border-t border-red-500/30 pt-2 w-full">Inject
+                                Fault →</span>
+                        </button>
+                        <button onclick="triggerChaos('K8S_POD_CRASH')"
+                            class="btn-chaos p-4 text-left w-full flex flex-col gap-2 group">
+                            <span
+                                class="text-xs font-bold text-white group-hover:text-red-100 transition-colors uppercase">Pod
+                                Crash</span>
+                            <span
+                                class="text-[9px] font-black opacity-60 uppercase tracking-[0.1em] border-t border-red-500/30 pt-2 w-full">Inject
+                                Anomaly →</span>
+                        </button>
+                        <button onclick="triggerChaos('GCE_CPU_BURN')"
+                            class="btn-chaos p-4 text-left w-full flex flex-col gap-2 group">
+                            <span
+                                class="text-xs font-bold text-white group-hover:text-red-100 transition-colors uppercase">CPU
+                                Burn</span>
+                            <span
+                                class="text-[9px] font-black opacity-60 uppercase tracking-[0.1em] border-t border-red-500/30 pt-2 w-full">Stress
+                                Test →</span>
+                        </button>
+                        <button onclick="triggerChaos('APP_MEM_LEAK')"
+                            class="btn-chaos p-4 text-left w-full flex flex-col gap-2 group">
+                            <span
+                                class="text-xs font-bold text-white group-hover:text-red-100 transition-colors uppercase">Mem
+                                Leak</span>
+                            <span
+                                class="text-[9px] font-black opacity-60 uppercase tracking-[0.1em] border-t border-red-500/30 pt-2 w-full">App
+                                Fault →</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="text-center pt-8 border-t border-white/5 mt-12">
+            <h3 class="text-white font-bold tracking-widest uppercase mb-1 drop-shadow-lg">Mohammed Salman</h3>
+            <p class="text-blue-400 text-[10px] font-bold uppercase tracking-[0.4em] mb-4">Engineering Lead & AIOps
+                Specialist</p>
+            <div class="flex justify-center gap-6">
+                <a href="https://github.com/mohammedsalmanj" target="_blank"
+                    class="text-slate-500 hover:text-white transition-colors duration-300"><i data-lucide="github"
+                        class="w-5 h-5"></i></a>
+                <a href="https://linkedin.com/in/mohammed-salman" target="_blank"
+                    class="text-slate-500 hover:text-blue-400 transition-colors duration-300"><i data-lucide="linkedin"
+                        class="w-5 h-5"></i></a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Tour Overlay -->
+    <div id="tour-overlay"
+        class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full p-10 relative">
+            <button onclick="closeTour()"
+                class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors bg-white/5 rounded-full p-1"><i
+                    data-lucide="x" class="w-5 h-5"></i></button>
+            <div id="tour-icon" class="text-5xl mb-6 text-center drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">🔭</div>
+            <h3 id="tour-title" class="text-2xl font-black text-white mb-3 text-center tracking-tight">Phase 1: Scout
+            </h3>
+            <p id="tour-desc" class="text-slate-400 leading-relaxed mb-8 text-sm text-center">OpenTelemetry Sensory
+                Intake.</p>
+            <div class="flex justify-between items-center bg-black/30 p-4 rounded-xl border border-white/5">
+                <div class="flex gap-2" id="tour-dots-container">
+                    <div id="dot-0" class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f2fe]"></div>
+                    <div id="dot-1" class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-0.5"></div>
+                    <div id="dot-2" class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-0.5"></div>
+                    <div id="dot-3" class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-0.5"></div>
+                    <div id="dot-4" class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-0.5"></div>
+                    <div id="dot-5" class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-0.5"></div>
+                    <div id="dot-6" class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-0.5"></div>
+                    <div id="dot-7" class="w-1.5 h-1.5 rounded-full bg-slate-600 mt-0.5"></div>
+                </div>
+                <button onclick="nextTour()"
+                    class="btn-primary px-5 py-2 text-xs font-bold tracking-wider uppercase">NEXT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deploy Overlay -->
+    <div id="deploy-overlay"
+        class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[100] hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full p-10 relative border-blue-500/30">
+            <button onclick="closeDeploy()"
+                class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors bg-white/5 rounded-full p-1"><i
+                    data-lucide="x" class="w-5 h-5"></i></button>
+            <h3
+                class="text-3xl font-black text-white mb-2 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300 uppercase italic">
+                Space Initialization</h3>
+            <p
+                class="text-[9px] text-slate-400 mb-8 border-l-2 border-cyan-500/50 pl-3 uppercase font-bold tracking-[0.2em]">
+                Deterministic Infrastructure Injection</p>
+
+            <div class="flex items-center gap-2 mb-8 text-[9px] font-black uppercase tracking-widest text-slate-600 bg-black/40 p-3 rounded-lg border border-white/5"
+                id="wizard-progress">
+                <span class="text-cyan-400 bg-cyan-500/20 px-2 py-1 rounded border border-cyan-500/40">STEP 1</span>
+                <span>→</span>
+                <span id="prog-2">STEP 2</span> <span>→</span>
+                <span id="prog-3">STEP 3</span> <span>→</span>
+                <span id="prog-4">CONFIRM</span>
+            </div>
+
+            <div id="wizard-step-1" class="space-y-4">
+                <div onclick="selectDeploy('aws')" id="dep-aws"
+                    class="p-5 border border-cyan-500 bg-cyan-500/10 rounded-xl cursor-pointer transition-all flex items-center justify-between group">
+                    <div class="flex items-center gap-4">
+                        <div class="text-3xl">☁️</div>
+                        <div>
+                            <h4 class="font-bold text-white group-hover:text-cyan-300 transition-colors uppercase">AWS
+                            </h4>
+                            <p class="text-[9px] text-slate-500 mt-1 uppercase font-bold">IAM & EC2 Target</p>
+                        </div>
+                    </div>
+                </div>
+                <div onclick="selectDeploy('gcp')" id="dep-gcp"
+                    class="p-5 border border-white/10 bg-white/5 hover:border-cyan-500/50 hover:bg-white/10 rounded-xl cursor-pointer transition-all flex items-center justify-between group">
+                    <div class="flex items-center gap-4">
+                        <div class="text-3xl">☁️</div>
+                        <div>
+                            <h4 class="font-bold text-white group-hover:text-cyan-300 transition-colors uppercase">GCP
+                            </h4>
+                            <p class="text-[9px] text-slate-500 mt-1 uppercase font-bold">Service Account & GKE</p>
+                        </div>
+                    </div>
+                </div>
+                <div onclick="selectDeploy('docker')" id="dep-docker"
+                    class="p-5 border border-white/10 bg-white/5 hover:border-cyan-500/50 hover:bg-white/10 rounded-xl cursor-pointer transition-all flex items-center justify-between group">
+                    <div class="flex items-center gap-4">
+                        <div class="text-3xl">💻</div>
+                        <div>
+                            <h4 class="font-bold text-white group-hover:text-cyan-300 transition-colors uppercase">
+                                DOCKER</h4>
+                            <p class="text-[9px] text-slate-500 mt-1 uppercase font-bold">Local Simulation</p>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="goToStep(2)"
+                    class="w-full mt-6 btn-primary py-3.5 text-xs font-bold tracking-widest uppercase">PROCEED</button>
+            </div>
+
+            <div id="wizard-step-2" class="hidden space-y-5">
+                <div id="setup-instructions-aws" class="hidden text-sm">
+                    <h4 class="font-bold text-white mb-3">AWS IAM Credentials</h4>
+                    <div class="space-y-4">
+                        <input id="aws-ak" type="text" placeholder="Access Key ID"
+                            class="w-full text-xs p-3 bg-black/40 border border-white/10 rounded-xl outline-none text-white focus:border-cyan-500 font-mono">
+                        <input id="aws-sk" type="password" placeholder="Secret Access Key"
+                            class="w-full text-xs p-3 bg-black/40 border border-white/10 rounded-xl outline-none text-white focus:border-cyan-500 font-mono">
+                    </div>
+                </div>
+                <div id="setup-instructions-gcp" class="hidden text-sm">
+                    <h4 class="font-bold text-white mb-3">GCP Key Upload</h4>
+                    <label
+                        class="block w-full text-center border-2 border-dashed border-white/20 bg-black/40 rounded-xl p-8 cursor-pointer hover:border-cyan-500 transition-all">
+                        <span id="gcp-upload-text"
+                            class="text-[9px] font-black text-cyan-400 uppercase tracking-widest">DRAG AND DROP SERVICE
+                            JSON</span>
+                        <input type="file" id="gcp-key-file" class="hidden" accept=".json"
+                            onchange="document.getElementById('gcp-upload-text').innerText = '✔ ' + this.files[0].name" />
+                    </label>
+                </div>
+                <div id="setup-instructions-docker" class="hidden text-sm">
+                    <h4 class="font-bold text-white mb-3 uppercase tracking-widest text-[10px]">Docker Simulation Mode
+                    </h4>
+                    <p
+                        class="text-[11px] text-slate-500 bg-black/40 p-4 rounded-xl border border-white/10 font-mono leading-relaxed">
+                        > Binding to local CIDR 172.18.0.0/16...</p>
+                </div>
+                <button onclick="validateCredentials()" id="btn-validate"
+                    class="w-full mt-6 btn-primary py-3.5 text-xs font-bold tracking-widest uppercase">VALIDATE</button>
+            </div>
+
+            <!-- Steps 3 and 4 follow same logic as Step 2 -->
+            <div id="wizard-step-3" class="hidden space-y-5">
+                <h4 class="font-bold text-white mb-3 uppercase text-[10px] tracking-widest">Infrastructure Profile</h4>
+                <div id="infra-aws" class="hidden space-y-4">
+                    <select
+                        class="w-full text-xs p-3 bg-black/40 border border-white/10 rounded-xl text-white font-mono uppercase">
+                        <option>Generate New EC2</option>
+                        <option>Use Existing Cluster</option>
+                    </select>
+                </div>
+                <div id="infra-gcp" class="hidden space-y-4">
+                    <select
+                        class="w-full text-xs p-3 bg-black/40 border border-white/10 rounded-xl text-white font-mono uppercase">
+                        <option>Generate New GCE</option>
+                        <option>Use Hot GKE Pod</option>
+                    </select>
+                </div>
+                <div id="infra-docker" class="hidden space-y-4 text-[10px] font-mono text-cyan-400 opacity-60">
+                    > MOUNT /var/run/docker.sock<br>> CAP_ADD NET_ADMIN
+                </div>
+                <button onclick="executeProvisioning()" id="btn-provision"
+                    class="w-full mt-6 btn-primary py-3.5 text-xs font-bold tracking-widest uppercase">IGNITE
+                    PROVISIONING</button>
+            </div>
+
+            <div id="wizard-step-4" class="hidden text-center py-8">
+                <div
+                    class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-green-500/40 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                    <span class="text-3xl">✅</span>
+                </div>
+                <h4 class="font-black text-xl text-white mb-3 uppercase italic">CONTROL LINK ESTABLISHED</h4>
+                <p id="success-url"
+                    class="text-xs font-mono text-cyan-400 mb-6 bg-cyan-500/10 py-3 rounded-xl border border-cyan-500/20">
+                    http://18.234.X.X:8000</p>
+                <button onclick="switchToOperationalMode()"
+                    class="btn-primary w-full py-3.5 text-xs font-bold tracking-widest uppercase">LAUNCH OPERATIONAL
+                    PHASE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Initialization Overlay (Liquid Glass Style) -->
+    <div id="initialization-overlay"
+        class="fixed inset-0 bg-black/90 z-[200] flex items-center justify-center backdrop-blur-3xl hidden">
+        <div class="max-w-md w-full p-8 liquid-glass text-center animate-slide-up">
+            <h2 class="text-4xl font-black text-white italic tracking-tighter mb-4 uppercase">INITIALIZING_SPACE</h2>
+            <div id="initialization-steps" class="space-y-6">
+                <!-- Step 1 -->
+                <div id="init-step-1" class="step-active flex flex-col items-center">
+                    <div class="w-12 h-12 rounded-full border-4 border-t-blue-500 border-white/5 animate-spin mb-4">
+                    </div>
+                    <p class="text-xs font-bold text-blue-400 tracking-[0.3em] uppercase">SYNCING_STELLAR_TELEMETRY</p>
+                </div>
+                <!-- Step 2 -->
+                <div id="init-step-2" class="step-hidden flex flex-col items-center">
+                    <div class="w-12 h-12 rounded-full border-4 border-t-purple-500 border-white/5 animate-spin mb-4">
+                    </div>
+                    <p class="text-xs font-bold text-purple-400 tracking-[0.3em] uppercase">LINKING_NEURAL_CONTROL</p>
+                </div>
+                <!-- Step 3 -->
+                <div id="init-step-3" class="step-hidden flex flex-col items-center">
+                    <div
+                        class="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mb-4 status-glow-green border border-green-400/30">
+                        <i data-lucide="check" class="text-green-400 w-8 h-8"></i>
+                    </div>
+                    <p class="text-xs font-bold text-green-400 tracking-[0.3em] uppercase mb-8">SPACE_CONFIRMED</p>
+                    <button id="launch-button" onclick="finalizeInit()"
+                        class="btn-primary px-10 py-4 text-sm tracking-widest uppercase animate-pulse-glow">REACH_ORBIT</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Header -->
-    <header class="sticky top-0 z-50 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between p-4 liquid-glass">
-            <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-2">
-                    <i data-lucide="activity" class="text-blue-400 w-6 h-6"></i>
-                    <h1 class="text-xl font-bold text-white tracking-widest uppercase">SRE.SPACE</h1>
-                </div>
-                <div id="stack-logo-container" class="border-l border-white/10 pl-4 flex items-center space-x-3">
-                    <!-- Dynamic Stack Logo -->
-                    <i id="stack-icon" data-lucide="cloud" class="w-5 h-5 text-slate-400"></i>
-                    <span class="text-xs font-mono text-slate-500 uppercase tracking-tighter"
-                        id="header-env-badge">CLOUD_MODE</span>
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-6">
-                <!-- Status -->
-                <div class="flex items-center space-x-3 bg-white/5 px-4 py-1.5 rounded-full border border-white/10">
-                    <div id="global-status-indicator"
-                        class="w-2 h-2 rounded-full bg-green-400 animate-pulse status-glow-green"></div>
-                    <span id="global-status-text"
-                        class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">NOMINAL_STATE</span>
-                </div>
-
-                <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
-                    <a href="/about" class="text-slate-400 hover:text-white transition-colors">ABOUT</a>
-                    <a href="https://github.com/mohammedsalmanj/sre.space-cp" target="_blank"
-                        class="text-slate-400 hover:text-white transition-colors"><i data-lucide="github"
-                            class="w-5 h-5"></i></a>
-                </nav>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-6 py-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
-
-        <!-- Left Column: Observability Map -->
-        <div class="lg:col-span-1 space-y-6">
-
-            <!-- Infrastructure Context -->
-            <section class="liquid-glass p-6 animate-slide-up">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest">INFRA_STRATUM</h2>
-                    <i data-lucide="database" class="w-4 h-4 text-slate-500"></i>
-                </div>
-                <div class="space-y-5">
-                    <div class="flex justify-between items-center group">
-                        <span class="text-[11px] text-slate-500 font-bold uppercase">Provider</span>
-                        <div class="flex items-center space-x-2">
-                            <i data-lucide="server" class="w-4 h-4 text-blue-400"></i>
-                            <span class="text-sm font-mono text-white" id="provider-badge">DETECTION...</span>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[11px] text-slate-500 font-bold uppercase">Memory DB</span>
-                        <span class="text-sm font-mono text-white" id="vector-db-badge">-</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[11px] text-slate-500 font-bold uppercase">Latency</span>
-                        <span class="text-sm font-mono text-[#00D1FF]" id="latency-val">-- ms</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Active Agents -->
-            <section class="liquid-glass p-6 animate-slide-up" style="animation-delay: 0.1s">
-                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">AGENT_SQUAD</h2>
-                <div class="space-y-4">
-                    <div
-                        class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 transition-all hover:bg-white/10">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-2 h-2 rounded-full bg-blue-500" id="agent-scout-status"></div>
-                            <span class="text-xs font-bold text-slate-200 uppercase">Scout</span>
-                        </div>
-                        <i data-lucide="eye" class="w-4 h-4 text-slate-500"></i>
-                    </div>
-                    <div
-                        class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 transition-all hover:bg-white/10">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-2 h-2 rounded-full bg-indigo-500" id="agent-brain-status"></div>
-                            <span class="text-xs font-bold text-slate-200 uppercase">Brain</span>
-                        </div>
-                        <i data-lucide="zap" class="w-4 h-4 text-slate-500"></i>
-                    </div>
-                    <div
-                        class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 transition-all hover:bg-white/10">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-2 h-2 rounded-full bg-green-500" id="agent-fixer-status"></div>
-                            <span class="text-xs font-bold text-slate-200 uppercase">Fixer</span>
-                        </div>
-                        <i data-lucide="tool" class="w-4 h-4 text-slate-500"></i>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Chaos Lab -->
-            <section class="liquid-glass p-6 animate-slide-up" style="animation-delay: 0.2s">
-                <h2 class="text-xs font-bold text-red-400 uppercase tracking-widest mb-6 flex items-center">
-                    <i data-lucide="flame" class="w-4 h-4 mr-2"></i> CHAOS_LAB
-                </h2>
-                <div class="space-y-3">
-                    <button onclick="window.triggerChaos('AWS_EC2_DISK_FULL')"
-                        class="w-full text-left px-4 py-2 hover:bg-red-500/10 border border-white/5 rounded text-[11px] font-bold uppercase tracking-tighter text-slate-300 transition-all flex justify-between items-center group">
-                        <span>EBS_EXHAUSTION</span>
-                        <i data-lucide="plus" class="w-3 h-3 opacity-0 group-hover:opacity-100"></i>
-                    </button>
-                    <button onclick="window.triggerChaos('K8S_POD_CRASH')"
-                        class="w-full text-left px-4 py-2 hover:bg-orange-500/10 border border-white/5 rounded text-[11px] font-bold uppercase tracking-tighter text-slate-300 transition-all flex justify-between items-center group">
-                        <span>POD_CRASH_LOOP</span>
-                        <i data-lucide="plus" class="w-3 h-3 opacity-0 group-hover:opacity-100"></i>
-                    </button>
-                    <button id="local-init-button"
-                        class="hidden w-full mt-4 py-2 px-4 bg-green-600/20 border border-green-500/30 text-green-400 rounded text-[11px] font-bold uppercase tracking-widest hover:bg-green-600/40 transition-all">
-                        INIT_OPERATIONAL_PHASE
-                    </button>
-                </div>
-            </section>
-        </div>
-
-        <!-- Center/Right: Sensory Control Center -->
-        <div class="lg:col-span-3 space-y-6 flex flex-col">
-
-            <section class="liquid-glass flex-1 flex flex-col min-h-[600px] animate-slide-up"
-                style="animation-delay: 0.3s">
-                <div class="flex justify-between items-center p-6 border-b border-white/5">
-                    <div class="flex flex-col">
-                        <h2 class="text-sm font-bold text-white uppercase tracking-[0.2em] mb-1">Sensory Command Center
-                        </h2>
-                        <p class="text-[10px] text-slate-500 font-mono tracking-tighter uppercase">Real-time Autonomous
-                            Decision Stream</p>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <div id="sse-indicator"
-                            class="text-[9px] font-mono font-bold px-3 py-1 rounded-full bg-white/5 text-slate-500 border border-white/10 uppercase tracking-widest">
-                            OFFLINE</div>
-                        <button onclick="window.clearLogs()" class="text-white hover:text-red-400 transition-colors">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div id="logs-container" class="p-6 flex-1 overflow-y-auto font-mono text-xs space-y-2 bg-black/20">
-                    <div class="text-slate-600 italic">SYSTEM_IDLE: Synchronizing OODA cognitive shards...</div>
-                </div>
-            </section>
-
-            <!-- Bottom Credits -->
-            <footer class="liquid-glass p-6 text-center animate-slide-up" style="animation-delay: 0.4s">
-                <div class="flex flex-col md:flex-row items-center justify-between">
-                    <div class="text-left mb-4 md:mb-0">
-                        <h3 class="text-white font-bold tracking-widest text-lg uppercase">Mohammed Salman</h3>
-                        <p class="text-blue-400 text-[10px] font-bold uppercase tracking-[0.3em]">SRE · AIOps Engineer
-                        </p>
-                        <p class="text-slate-500 text-[9px] mt-1 font-mono uppercase tracking-tighter">Reasoning for
-                            High-Scale Reliability.</p>
-                    </div>
-                    <div class="flex space-x-6">
-                        <a href="https://github.com/mohammedsalmanj" target="_blank"
-                            class="br-github text-slate-500 transition-all transform hover:scale-125">
-                            <i data-lucide="github" class="w-6 h-6"></i>
-                        </a>
-                        <a href="https://linkedin.com/in/mohammedsalmanj" target="_blank"
-                            class="br-linkedin text-slate-500 transition-all transform hover:scale-125">
-                            <i data-lucide="linkedin" class="w-6 h-6"></i>
-                        </a>
-                    </div>
-                </div>
-            </footer>
-        </div>
-    </main>
-
-    <script>
-        // Init Lucide Icons
-        window.onload = () => lucide.createIcons();
-    </script>
+    <script type="module" src="./main.js"></script>
+    <script>lucide.createIcons();</script>
 </body>
 
 </html>
