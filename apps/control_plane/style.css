@@ -140,8 +140,35 @@ body {
 }
 
 /* Icons Animation */
+.tech-icon-active {
+    opacity: 1 !important;
+    filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.4));
+    transform: scale(1.1);
+}
+
 .pulse-emerald {
     animation: pulse 2s infinite;
+}
+
+.sub-stack-btn {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: left;
+    transition: all 0.2s ease;
+}
+
+.sub-stack-btn:hover {
+    background: #fff;
+    border-color: var(--accent-blue);
+    transform: translateY(-2px);
+}
+
+.sub-stack-btn.active {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
 }
 
 @keyframes pulse {

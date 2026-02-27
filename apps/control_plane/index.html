@@ -9,7 +9,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="./style.css">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
@@ -31,23 +31,24 @@
 
             <!-- TECH STACK CAPABILITY -->
             <div class="flex items-center gap-6 px-6 py-2 bg-slate-50/50 rounded-full border border-slate-200/50">
-                <img src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/AWS-Dark.svg"
-                    class="h-5 opacity-70 hover:opacity-100 transition-opacity" title="AWS Active">
-                <img src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GCP-Dark.svg"
-                    class="h-5 opacity-70 hover:opacity-100 transition-opacity" title="GCP Active">
-                <img src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Kubernetes.svg"
-                    class="h-5 opacity-70 hover:opacity-100 transition-opacity" title="K8s Ready">
-                <img src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Docker.svg"
-                    class="h-5 opacity-70 hover:opacity-100 transition-opacity" title="Local Simulation">
+                <img id="icon-aws" src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/AWS-Dark.svg"
+                    class="h-5 opacity-30 hover:opacity-100 transition-all cursor-crosshair" title="AWS Infrastructure">
+                <img id="icon-gcp" src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GCP-Dark.svg"
+                    class="h-5 opacity-30 hover:opacity-100 transition-all cursor-crosshair" title="GCP Infrastructure">
+                <img id="icon-k8s"
+                    src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Kubernetes.svg"
+                    class="h-5 opacity-30 hover:opacity-100 transition-all cursor-crosshair" title="K8s Clusters">
+                <img id="icon-docker" src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Docker.svg"
+                    class="h-5 opacity-30 hover:opacity-100 transition-all cursor-crosshair" title="Local Containment">
             </div>
 
             <nav class="flex items-center gap-6">
-                <a href="/about" id="about-link"
+                <a href="/about" id="about-link" target="_blank"
                     class="text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors uppercase tracking-widest">About
                     Guide</a>
                 <button onclick="startInitialization()"
-                    class="btn-premium px-5 py-2.5 rounded-xl text-xs uppercase tracking-widest">Initialize Control
-                    Plane</button>
+                    class="btn-premium px-5 py-2.5 rounded-xl text-xs uppercase tracking-widest shadow-xl">Launch
+                    Control Link</button>
             </nav>
         </header>
 
@@ -62,9 +63,10 @@
                             <i data-lucide="user" class="text-slate-400 w-6 h-6"></i>
                         </div>
                         <div>
-                            <h2 class="text-sm font-extrabold text-slate-800 uppercase">Mohammed Salman</h2>
-                            <p class="text-[10px] font-bold text-blue-600 uppercase tracking-wide">SRE · AIOps Engineer
-                            </p>
+                            <h2 class="text-sm font-extrabold text-slate-800 uppercase leading-none">Mohammed Salman
+                            </h2>
+                            <p class="text-[10px] font-bold text-blue-600 uppercase tracking-wide mt-1">SRE · AIOps
+                                Engineer</p>
                         </div>
                     </div>
                     <div class="space-y-2 pt-2 border-t border-slate-200/50">
@@ -96,7 +98,7 @@
                         <div class="flex justify-between items-center">
                             <span class="text-[11px] font-bold text-slate-500 uppercase">Environment</span>
                             <span id="status-adapter-val"
-                                class="text-[10px] font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">LOCAL_SIM</span>
+                                class="text-[10px] font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">STBY</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-[11px] font-bold text-slate-500 uppercase">Memory Index</span>
@@ -147,7 +149,7 @@
                     </div>
                     <div id="logs"
                         class="p-6 overflow-y-auto flex-1 text-[11px] font-mono space-y-2 scroll-hide bg-[#fafafa]/50">
-                        <div class="text-slate-400 italic">Waiting for autonomic loop heartbeat...</div>
+                        <div class="text-slate-400 italic">... Waiting for Autonomic Control Link ...</div>
                     </div>
                 </div>
 
@@ -196,35 +198,92 @@
         </div>
     </div>
 
-    <!-- SPACE INITIALIZATION WIZARD -->
+    <!-- CONTROL PLANE INITIALIZATION WIZARD -->
     <div id="init-wizard"
-        class="fixed inset-0 bg-slate-900/40 backdrop-blur-xl z-[100] flex items-center justify-center p-4 hidden">
-        <div class="liquid-glass max-w-lg w-full p-10 space-y-8 animate-entrance border-blue-200/50">
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
+        <div class="liquid-glass max-w-2xl w-full p-10 space-y-8 animate-entrance border-blue-200/50">
             <div class="text-center space-y-2">
-                <h2 class="text-3xl font-black text-slate-800 italic tracking-tighter uppercase">Control Plane
-                    Initialization
+                <h2 class="text-3xl font-black text-slate-800 italic tracking-tighter uppercase">Space Initialization
                 </h2>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Autonomic Setup Sequence</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] font-mono">> Autonomic Setup
+                    v5.0 Active</p>
             </div>
 
-            <!-- WIZARD STEPS -->
+            <!-- PROVISIONING STEPS -->
             <div id="wizard-steps" class="space-y-6">
-                <!-- STEP 1: OTEL SCAN -->
-                <div id="w-step-1" class="space-y-4">
+
+                <!-- STEP 1: TARGET SELECTION (MAX CONTENT RESTORED) -->
+                <div id="w-step-0" class="space-y-6">
+                    <div>
+                        <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Select Target
+                            Environment</h4>
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                            <button onclick="selectProvider('local')" class="provider-btn sub-stack-btn active"
+                                id="btn-local">
+                                <span class="text-xs font-bold uppercase block">Local</span>
+                                <span class="text-[8px] opacity-60 uppercase block">Docker Sim</span>
+                            </button>
+                            <button onclick="selectProvider('aws')" class="provider-btn sub-stack-btn" id="btn-aws">
+                                <span class="text-xs font-bold uppercase block">AWS</span>
+                                <span class="text-[8px] opacity-60 uppercase block">Amazon Cloud</span>
+                            </button>
+                            <button onclick="selectProvider('gcp')" class="provider-btn sub-stack-btn" id="btn-gcp">
+                                <span class="text-xs font-bold uppercase block">GCP</span>
+                                <span class="text-[8px] opacity-60 uppercase block">Google Cloud</span>
+                            </button>
+                            <button onclick="selectProvider('k8s')" class="provider-btn sub-stack-btn" id="btn-k8s">
+                                <span class="text-xs font-bold uppercase block">K8S</span>
+                                <span class="text-[8px] opacity-60 uppercase block">Clusters</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="sub-stacks-panel" class="hidden">
+                        <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Operational
+                            Sub-Stack</h4>
+                        <div id="aws-sub-stacks" class="hidden grid grid-cols-2 gap-4 animate-entrance">
+                            <button onclick="selectSubStack('ec2')" class="sub-stack-btn flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-orange-400"></div>
+                                <span class="text-[10px] font-bold uppercase">EC2 Instances</span>
+                            </button>
+                            <button onclick="selectSubStack('eks')" class="sub-stack-btn flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-blue-400"></div>
+                                <span class="text-[10px] font-bold uppercase">EKS Elastic K8s</span>
+                            </button>
+                            <button onclick="selectSubStack('ebs')" class="sub-stack-btn flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-slate-400"></div>
+                                <span class="text-[10px] font-bold uppercase">EBS Storage</span>
+                            </button>
+                        </div>
+                        <div id="gcp-sub-stacks" class="hidden grid grid-cols-2 gap-4 animate-entrance">
+                            <button onclick="selectSubStack('gce')" class="sub-stack-btn flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                                <span class="text-[10px] font-bold uppercase">Compute Engine</span>
+                            </button>
+                            <button onclick="selectSubStack('gke')" class="sub-stack-btn flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                <span class="text-[10px] font-bold uppercase">GKE K8s Engine</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button onclick="goToWizardStep(1)"
+                        class="w-full btn-premium py-4 rounded-xl text-xs uppercase tracking-[0.2em] font-black shadow-lg">Proceed
+                        to Credentials</button>
+                </div>
+
+                <!-- STEP 2: OTEL SCAN -->
+                <div id="w-step-1" class="hidden space-y-4 animate-entrance">
                     <div class="flex items-center gap-4 p-4 bg-blue-50/50 border border-blue-100 rounded-xl">
                         <div class="w-8 h-8 rounded-full border-4 border-t-blue-500 border-slate-200 animate-spin">
                         </div>
                         <p class="text-xs font-bold text-slate-800 uppercase tracking-widest">Telemetry Ingest: Scanning
                             OTLP Streams...</p>
                     </div>
-                    <div
-                        class="text-[10px] font-mono text-slate-400 p-4 bg-slate-50 rounded-lg border border-slate-100 shadow-inner">
-                        > PORT 4317: Listening...<br>> OTEL_RESOURCE_ATTRIBUTES: Detected
-                    </div>
                 </div>
 
-                <!-- STEP 2: CREDENTIALS -->
-                <div id="w-step-2" class="hidden space-y-4">
+                <!-- STEP 3: CREDENTIALS -->
+                <div id="w-step-2" class="hidden space-y-4 animate-entrance">
                     <div class="flex items-center gap-4 p-4 bg-emerald-50/50 border border-emerald-100 rounded-xl">
                         <i data-lucide="check-circle" class="text-emerald-500 w-6 h-6"></i>
                         <p class="text-xs font-bold text-slate-800 uppercase tracking-widest">Cloud Credentials
@@ -234,18 +293,20 @@
                         class="text-[10px] font-mono text-slate-400 p-4 bg-slate-50 rounded-lg border border-slate-100 shadow-inner">
                         > AWS_IAM_ROLE: sre-access-granted<br>> GITHUB_TOKEN: repo-scope-verified
                     </div>
+                    <button onclick="goToWizardStep(3)"
+                        class="w-full btn-premium py-4 rounded-xl text-xs uppercase tracking-[0.2em] font-black">Finalize
+                        Control Link</button>
                 </div>
 
-                <!-- STEP 3: CONTROL LINK -->
-                <div id="w-step-3" class="hidden space-y-6 text-center">
-                    <div class="p-8 bg-emerald-500/10 rounded-2xl border border-emerald-200">
+                <!-- STEP 4: FINAL STATE -->
+                <div id="w-step-3" class="hidden space-y-6 text-center animate-entrance">
+                    <div class="p-8 bg-emerald-500/10 rounded-2xl border border-emerald-200 shadow-inner">
                         <h4 class="text-lg font-black text-emerald-600 uppercase italic mb-2">Remediation Phase: OODA
-                            Cycle Active
-                        </h4>
-                        <p class="text-[11px] font-mono text-slate-500">GATEWAY: http://localhost:8000</p>
+                            Cycle Active</h4>
+                        <p class="text-[11px] font-mono text-slate-500">GATEWAY: ESTABLISHED_SECURE_LINK</p>
                     </div>
-                    <p class="text-[10px] text-slate-400 uppercase font-black">Space.Control is now autonomously
-                        observing your production infrastructure.</p>
+                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Everything is Nominally
+                        Observed.</p>
                     <button onclick="finalizeInitialization()"
                         class="btn-premium w-full py-4 rounded-xl text-xs uppercase tracking-[0.2em] font-black">Enter
                         Control Plane</button>
@@ -254,7 +315,7 @@
         </div>
     </div>
 
-    <script type="module" src="/static/main.js"></script>
+    <script type="module" src="./main.js"></script>
     <script>lucide.createIcons();</script>
 </body>
 
