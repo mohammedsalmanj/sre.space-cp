@@ -25,6 +25,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (localInitButton) localInitButton.classList.remove('hidden');
     }
 
+    // Set Dynamic About Link
+    const aboutLink = document.getElementById('about-link');
+    if (aboutLink && API_BASE) {
+        // If API_BASE is absolute (e.g. Render URL), point to its /about
+        // Otherwise it stays relative for local use
+        if (API_BASE.startsWith('http')) {
+            aboutLink.href = `${API_BASE}/about`;
+        }
+    }
+
     startInitializationSequence();
 });
 

@@ -1,0 +1,6 @@
+{
+    "version": 2,
+    "outputDirectory": "dist",
+    "cleanUrls": true,
+    "framework": "vite"
+}
