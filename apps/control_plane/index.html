@@ -679,9 +679,7 @@
 
     <!-- Scripts remain functionally identical -->
     <script>
-        const loc = window.location;
-        const isLocal = loc.hostname === 'localhost' || loc.hostname === '127.0.0.1' || loc.protocol === 'file:';
-        const API_BASE = isLocal ? 'http://localhost:8001' : 'https://sre-space-cp.onrender.com';
+        const API_BASE = window.VITE_API_BASE || 'https://api.yourdomain.com';
 
         async function safeFetch(url, options = {}) {
             try {

@@ -4,520 +4,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRE.Space | Cyber-Insurance Dashboard</title>
+    <title>SRE Control Plane</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono&display=swap"
-        rel="stylesheet">
-    <style>
-        :root {
-            --neon-blue: #00f2fe;
-            --neon-purple: #9b51e0;
-            --neon-pink: #ff0844;
-            --cyber-dark: #070714;
-            --glass-bg: rgba(20, 20, 35, 0.4);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-highlight: rgba(255, 255, 255, 0.15);
-        }
-
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--cyber-dark);
-            color: #fff;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        /* Vibrant animated backgrounds */
-        .ambient-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -2;
-            overflow: hidden;
-            background: radial-gradient(circle at 15% 50%, rgba(155, 81, 224, 0.15), transparent 40%),
-                radial-gradient(circle at 85% 30%, rgba(0, 242, 254, 0.15), transparent 40%),
-                radial-gradient(circle at 50% 80%, rgba(255, 8, 68, 0.1), transparent 50%);
-            animation: breathe 10s ease-in-out infinite alternate;
-        }
-
-        @keyframes breathe {
-            0% {
-                transform: scale(1);
-                opacity: 0.8;
-            }
-
-            100% {
-                transform: scale(1.05);
-                opacity: 1;
-            }
-        }
-
-        .cyber-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-            pointer-events: none;
-            z-index: -1;
-            perspective: 800px;
-        }
-
-        /* Liquid Glass Card */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-            transform: skewX(-20deg);
-            transition: 0.5s;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(0, 242, 254, 0.3);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 242, 254, 0.1);
-        }
-
-        .glass-card:hover::before {
-            left: 150%;
-        }
-
-        /* Buttons */
-        .btn-liquid {
-            background: linear-gradient(135deg, var(--neon-blue), #2563eb);
-            color: #fff;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-radius: 14px;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
-        }
-
-        .btn-liquid:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(0, 242, 254, 0.5);
-            background: linear-gradient(135deg, #0cebeb, #20e3b2, #29ffc6);
-            color: #070714;
-        }
-
-        .btn-chaos-liquid {
-            background: rgba(255, 8, 68, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 8, 68, 0.3);
-            color: #ff0844;
-            font-weight: 800;
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .btn-chaos-liquid:hover {
-            background: linear-gradient(135deg, #ff0844, #ffb199);
-            color: #fff;
-            box-shadow: 0 8px 20px rgba(255, 8, 68, 0.4);
-            transform: translateY(-2px);
-            border-color: transparent;
-        }
-
-        /* HUD Terminal */
-        .hud-terminal {
-            font-family: 'JetBrains Mono', monospace;
-            background: rgba(5, 5, 12, 0.7);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .hud-topbar {
-            background: linear-gradient(90deg, rgba(20, 20, 35, 0.8), rgba(10, 10, 20, 0.8));
-            border-bottom: 1px solid var(--glass-highlight);
-        }
-
-        .log-line {
-            padding: 5px 0;
-            font-size: 13px;
-            transition: all 0.2s;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* Badges & Tags */
-        .status-badge {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #10b981;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
-            font-weight: 800;
-        }
-
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+    <script type="module" src="./main.js" defer></script>
 </head>
 
-<body class="p-4 md:p-8 lg:p-12 relative min-h-screen">
-    <div class="ambient-bg"></div>
-    <div class="cyber-grid"></div>
+<body class="bg-gray-50 text-slate-800 font-sans tracking-tight min-h-screen">
 
-    <div class="max-w-7xl mx-auto relative z-10">
-        <!-- Modern Header Layout -->
-        <header
-            class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6 bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl">
-            <div>
-                <h1
-                    class="text-4xl md:text-5xl font-black italic tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-300">
-                    SRE-SPACE.DASHBOARD
-                </h1>
-                <p class="text-slate-400 mt-2 font-semibold text-sm">Autonomous Reliability Platform v5.0 — Agentic
-                    Control Overdrive</p>
+    <!-- Subtle blue gradient header -->
+    <header class="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-2xl font-semibold text-white tracking-wide">SRE Control Plane</h1>
+                <span
+                    class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 uppercase tracking-wider border border-blue-200"
+                    id="header-env-badge">Production</span>
             </div>
 
-            <div class="flex flex-wrap items-center gap-4">
-                <button onclick="startSandbox()"
-                    class="text-xs font-bold text-cyan-300 hover:text-white transition-all hover:scale-105 border border-cyan-500/30 px-4 py-2 rounded-xl bg-cyan-500/10 shadow-[0_0_15px_rgba(0,242,254,0.15)] flex items-center gap-2">
-                    <span class="text-lg">🧪</span> LAUNCH SANDBOX
-                </button>
-                <button onclick="triggerChaos()" class="btn-chaos-liquid px-6 py-2 flex items-center gap-2">
-                    <span class="text-lg">🔥</span> INJECT CHAOS
-                </button>
-            </div>
-
-            <div class="flex items-center gap-5">
-                <div class="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10"
-                    id="mode-toggle-container">
-                    <button onclick="setMode('real')" id="btn-mode-real"
-                        class="px-3 py-1.5 text-[10px] font-black rounded-lg transition-all text-slate-400">REAL</button>
-                    <button onclick="setMode('demo')" id="btn-mode-demo"
-                        class="px-3 py-1.5 text-[10px] font-black rounded-lg transition-all bg-gradient-to-r from-cyan-400 to-blue-500 text-black shadow-lg">DEMO</button>
-                </div>
-                <div id="system-status"
-                    class="status-badge text-[10px] uppercase tracking-widest px-4 py-1.5 rounded-full flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> SYSTEM NOMINAL
+            <div class="flex items-center space-x-6">
+                <!-- Status Badge -->
+                <div class="flex items-center space-x-2 bg-white/10 px-3 py-1.5 rounded-md border border-white/20">
+                    <span id="global-status-indicator" class="w-2.5 h-2.5 rounded-full bg-green-400"></span>
+                    <span id="global-status-text"
+                        class="text-sm font-medium text-white uppercase tracking-wider">Nominal</span>
                 </div>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Left Column: Marketplace Display -->
-            <div class="lg:col-span-7 space-y-8">
+    <main class="max-w-7xl mx-auto px-6 py-8">
 
-                <div class="glass-card p-10 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-3xl font-extrabold tracking-tight text-white/90">Policy Marketplace</h2>
+        <!-- Error Banner -->
+        <div id="error-banner" class="hidden mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-md shadow-sm">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800" id="error-title">Connection Error</h3>
+                    <p class="text-sm text-red-700 mt-1" id="error-message">Unable to reach the Control Plane API.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Left Column: Metrics & Controls -->
+            <div class="lg:col-span-1 space-y-6">
+
+                <!-- Infrastructure Context -->
+                <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-100 pb-2">Infrastructure
+                        Context</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500 font-medium">Cloud Provider</span>
                             <span
-                                class="bg-blue-500/20 text-blue-300 text-xs px-3 py-1 rounded-full border border-blue-500/30">Live
-                                Quotes</span>
+                                class="text-sm font-mono bg-gray-100 px-2 py-1 rounded text-gray-800 border border-gray-200"
+                                id="provider-badge">AWS</span>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Policy Card 1 -->
-                            <div class="bg-white/5 hover:bg-white/10 p-6 rounded-2xl border border-white/10 transition-all cursor-pointer group"
-                                onclick="processQuote('Life Premium')">
-                                <div
-                                    class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-300 flex items-center justify-center text-2xl mb-4 shadow-lg">
-                                    🛡️</div>
-                                <h3 class="text-xl font-bold mb-2 group-hover:text-blue-300 transition-colors">Life
-                                    Elite Tier</h3>
-                                <p class="text-slate-400 text-xs leading-relaxed mb-6">High-fidelity coverage with
-                                    embedded autonomous agents ensuring absolute zero defect tolerance.</p>
-                                <button class="btn-liquid w-full py-3 text-xs">GET QUOTE</button>
-                            </div>
-
-                            <!-- Policy Card 2 -->
-                            <div class="bg-white/5 hover:bg-white/10 p-6 rounded-2xl border border-white/10 transition-all cursor-pointer group"
-                                onclick="processQuote('Cyber Shield')">
-                                <div
-                                    class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-2xl mb-4 shadow-lg">
-                                    🌐</div>
-                                <h3 class="text-xl font-bold mb-2 group-hover:text-purple-300 transition-colors">Cyber
-                                    Shield</h3>
-                                <p class="text-slate-400 text-xs leading-relaxed mb-6">Proactive defense mechanism
-                                    securing operational logic against state mutations and anomalies.</p>
-                                <button class="btn-liquid w-full py-3 text-xs">DEPLOY COVER</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stats Footer -->
-                <div class="glass-card p-6 grid grid-cols-3 gap-6 relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
-                    <div class="text-center relative z-10">
-                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] block mb-1">MTTR
-                            SCORE</span>
-                        <div
-                            class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-300">
-                            4.2m</div>
-                    </div>
-                    <div class="text-center relative z-10 border-x border-white/10">
-                        <span
-                            class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] block mb-1">UPTIME</span>
-                        <div class="text-2xl font-black text-green-400">99.98%</div>
-                    </div>
-                    <div class="text-center relative z-10">
-                        <span
-                            class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] block mb-1">SYNAPSES</span>
-                        <div class="text-2xl font-black text-purple-400">1.2M+</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column: Agent HUD -->
-            <div class="lg:col-span-5 flex flex-col gap-8">
-                <!-- OODA Feed -->
-                <div class="hud-terminal flex-1 flex flex-col min-h-[400px] max-h-[450px]">
-                    <div
-                        class="hud-topbar px-6 py-4 flex justify-between items-center text-[10px] font-black uppercase text-slate-400 rounded-t-xl">
-                        <div class="flex items-center gap-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500 font-medium">Vector DB</span>
                             <span
-                                class="w-2.5 h-2.5 bg-blue-400 rounded-full animate-pulse shadow-[0_0_8px_#00f2fe]"></span>
-                            LIVE SENSOR STREAM
+                                class="text-sm font-mono bg-gray-100 px-2 py-1 rounded text-gray-800 border border-gray-200"
+                                id="vector-db-badge">Pinecone</span>
                         </div>
-                        <div id="stack-tag"
-                            class="text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">AWAITING
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500 font-medium">Latency (Edge)</span>
+                            <span
+                                class="text-sm font-mono text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100"
+                                id="latency-val">42ms</span>
                         </div>
                     </div>
-                    <div id="logs" class="p-6 overflow-y-auto flex-1 font-mono text-sm space-y-2 scrollbar-hide">
-                        <div class="text-slate-600 italic">... Waiting for neural telemetry ...</div>
+                </section>
+
+                <!-- Active Agents -->
+                <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-100 pb-2">Active Agents
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-100">
+                            <div class="flex items-center space-x-3">
+                                <span class="w-2 h-2 rounded-full bg-blue-500" id="agent-scout-status"></span>
+                                <span class="text-sm font-medium text-gray-800">Scout Agent</span>
+                            </div>
+                            <span
+                                class="text-xs text-blue-600 font-mono bg-blue-50 px-2 py-0.5 rounded border border-blue-100 uppercase">Observe</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-100">
+                            <div class="flex items-center space-x-3">
+                                <span class="w-2 h-2 rounded-full bg-indigo-500" id="agent-brain-status"></span>
+                                <span class="text-sm font-medium text-gray-800">Brain Agent</span>
+                            </div>
+                            <span
+                                class="text-xs text-indigo-600 font-mono bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 uppercase">Orient/Decide</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-100">
+                            <div class="flex items-center space-x-3">
+                                <span class="w-2 h-2 rounded-full bg-orange-500" id="agent-fixer-status"></span>
+                                <span class="text-sm font-medium text-gray-800">Fixer Agent</span>
+                            </div>
+                            <span
+                                class="text-xs text-orange-600 font-mono bg-orange-50 px-2 py-0.5 rounded border border-orange-100 uppercase">Act</span>
+                        </div>
                     </div>
-                    <div
-                        class="bg-black/50 p-3 text-[10px] text-center text-slate-500 font-black tracking-widest border-t border-white/5 rounded-b-xl hover:text-cyan-400 transition-colors cursor-default">
-                        /// SRE SPACE AUTONOMIC ENGINE ///
-                    </div>
-                </div>
+                </section>
 
                 <!-- Chaos Lab -->
-                <div class="glass-card p-6 border-l-4 border-l-rose-500 relative overflow-hidden">
-                    <div
-                        class="absolute -right-10 -top-10 w-32 h-32 bg-rose-500/10 blur-3xl rounded-full pointer-events-none">
-                    </div>
-                    <h3 class="text-lg font-black text-white mb-4 flex items-center gap-2">
-                        <span
-                            class="text-rose-500 bg-rose-500/20 w-8 h-8 rounded-lg flex items-center justify-center">🧪</span>
-                        Chaos Injectors
-                    </h3>
-                    <div class="space-y-3" id="chaos-lab-buttons">
-                        <button onclick="triggerSimulation('AWS_EC2_DISK_FULL')"
-                            class="w-full text-xs font-bold bg-white/5 hover:bg-rose-500/20 text-rose-300 p-3.5 rounded-xl border border-white/10 hover:border-rose-500/40 transition-all text-left flex justify-between items-center group shadow-sm hover:shadow-[0_0_15px_rgba(244,63,94,0.2)]">
-                            <span class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-rose-500"></div> [EC2] EBS Volume Exhaust */}
-                                <span class="flex items-center gap-2">
-                                    <div class="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_5px_#f43f5e]"></div> [EC2]
-                                    EBS Volume Exhaust
-                                </span>
-                                <span
-                                    class="bg-rose-500/20 px-2 py-1 rounded text-[9px] group-hover:bg-rose-500 group-hover:text-white transition-all">INJECT</span>
+                <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h2
+                        class="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-100 pb-2 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                            </path>
+                        </svg>
+                        Chaos Lab
+                    </h2>
+                    <p class="text-xs text-gray-500 mb-4">Inject simulated failure vectors to test SRE Loop resilience.
+                    </p>
+                    <div class="space-y-3">
+                        <button onclick="window.triggerChaos('AWS_EC2_DISK_FULL')"
+                            class="w-full text-left px-4 py-2 bg-white border border-red-200 text-red-700 rounded text-sm font-medium hover:bg-red-50 transition-colors flex justify-between items-center group">
+                            <span>EBS Volume Exhaust</span>
+                            <span class="opacity-0 group-hover:opacity-100 text-xs font-mono">INJECT</span>
                         </button>
-                        <button onclick="triggerSimulation('K8S_POD_CRASH')"
-                            class="w-full text-xs font-bold bg-white/5 hover:bg-rose-500/20 text-rose-300 p-3.5 rounded-xl border border-white/10 hover:border-rose-500/40 transition-all text-left flex justify-between items-center group shadow-sm hover:shadow-[0_0_15px_rgba(244,63,94,0.2)]">
-                            <span class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_5px_#f43f5e]"></div> [EKS] Pod
-                                CrashLoop
-                            </span>
-                            <span
-                                class="bg-rose-500/20 px-2 py-1 rounded text-[9px] group-hover:bg-rose-500 group-hover:text-white transition-all">INJECT</span>
+                        <button onclick="window.triggerChaos('K8S_POD_CRASH')"
+                            class="w-full text-left px-4 py-2 bg-white border border-orange-200 text-orange-700 rounded text-sm font-medium hover:bg-orange-50 transition-colors flex justify-between items-center group">
+                            <span>Pod CrashLoopBackOff</span>
+                            <span class="opacity-0 group-hover:opacity-100 text-xs font-mono">INJECT</span>
+                        </button>
+                        <button onclick="window.triggerChaos('NETWORK_PARTITION')"
+                            class="w-full text-left px-4 py-2 bg-white border border-yellow-200 text-yellow-700 rounded text-sm font-medium hover:bg-yellow-50 transition-colors flex justify-between items-center group">
+                            <span>Network Partition</span>
+                            <span class="opacity-0 group-hover:opacity-100 text-xs font-mono">INJECT</span>
                         </button>
                     </div>
-                </div>
+                </section>
+
+                <!-- Guardrails Panel -->
+                <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-100 pb-2">Safety Guardrails
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600 font-medium">Auto-Recovery</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer" disabled>
+                                <div
+                                    class="w-9 h-5 bg-blue-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all">
+                                </div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600 font-medium">Circuit Breaker</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer" disabled>
+                                <div
+                                    class="w-9 h-5 bg-blue-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all">
+                                </div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600 font-medium">Production Mutations</span>
+                            <span class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded font-mono">BLOCKED</span>
+                        </div>
+                    </div>
+                </section>
+
             </div>
-        </div>
-    </div>
 
-    <!-- Liquid Glass Modal -->
-    <div id="onboarding-modal"
-        class="fixed inset-0 z-50 hidden flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
-        <div class="glass-card max-w-2xl w-full p-10 relative shadow-[0_0_50px_rgba(0,242,254,0.2)]">
-            <div class="absolute -top-20 -left-20 w-40 h-40 bg-blue-500/30 blur-3xl rounded-full"></div>
-            <div class="absolute -bottom-20 -right-20 w-40 h-40 bg-purple-500/30 blur-3xl rounded-full"></div>
+            <!-- Right Column: Feeds & Logs -->
+            <div class="lg:col-span-2 space-y-6 flex flex-col">
 
-            <h2
-                class="text-3xl font-black mb-8 tracking-tighter text-center bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200">
-                INITIALIZE CONTROL ENVIRONMENT</h2>
+                <!-- Deployment & OODA Logs -->
+                <section
+                    class="bg-white rounded-lg shadow-sm border border-gray-200 flex-1 flex flex-col min-h-[500px]">
+                    <div class="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+                        <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                            Deployment & Decision Logs
+                        </h2>
+                        <div class="flex space-x-2">
+                            <span id="sse-indicator"
+                                class="text-xs font-mono font-medium px-2 py-1 rounded bg-gray-200 text-gray-600 border border-gray-300">SSE
+                                DISCONNECTED</span>
+                            <button onclick="window.clearLogs()"
+                                class="text-xs px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors">Clear</button>
+                        </div>
+                    </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-                <button onclick="selectStack('aws')"
-                    class="p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-blue-400 hover:bg-blue-500/10 transition-all text-center group">
-                    <div
-                        class="text-5xl mb-4 group-hover:scale-110 transition-transform drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-                        ☁️</div>
-                    <div class="font-black text-xl mb-1 text-white">Cloud Configured</div>
-                    <div class="text-xs text-blue-300">AWS / GCP Deployment</div>
-                </button>
-                <button onclick="selectStack('local')"
-                    class="p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-purple-400 hover:bg-purple-500/10 transition-all text-center group">
-                    <div
-                        class="text-5xl mb-4 group-hover:scale-110 transition-transform drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-                        💻</div>
-                    <div class="font-black text-xl mb-1 text-white">Local Sandbox</div>
-                    <div class="text-xs text-purple-300">Docker Native Dev</div>
-                </button>
+                    <div id="logs-container"
+                        class="p-4 bg-[#f8f9fa] flex-1 overflow-y-auto font-mono text-sm space-y-1">
+                        <div class="text-gray-400 italic mb-2">System initialized. Waiting for telemetry data...</div>
+                    </div>
+                </section>
+
             </div>
-            <button onclick="skipOnboarding()"
-                class="w-full mt-8 text-xs font-bold text-slate-400 hover:text-white transition-colors">SKIP SETUP
-                →</button>
+
         </div>
-    </div>
-
-    <script>
-        const logContainer = document.getElementById('logs');
-        const onboardingModal = document.getElementById('onboarding-modal');
-        let isDemoMode = true;
-
-        const API_BASE = window.location.origin.includes('localhost') ? 'http://localhost:8001' : 'https://sre-space-cp.onrender.com';
-
-        window.onload = async () => {
-            try {
-                const res = await fetch(`${API_BASE}/system/health`);
-                const data = await res.json();
-                if (!data.env_stack) onboardingModal.classList.remove('hidden');
-                else document.getElementById('stack-tag').innerText = data.env_stack.toUpperCase();
-            } catch (e) {
-                onboardingModal.classList.remove('hidden');
-            }
-            triggerSSEStream(false);
-        };
-
-        function addLog(msg) {
-            const div = document.createElement('div');
-            div.className = "log-line border-l-2 border-white/10 pl-3 mb-2";
-
-            if (msg.includes('[SCOUT]')) div.innerHTML = `<span class="text-cyan-400 font-bold bg-cyan-900/30 px-1 rounded text-[11px] mr-1">SCOUT</span> <span class="text-slate-200">${msg.split('[SCOUT]')[1]}</span>`;
-            else if (msg.includes('[BRAIN]')) div.innerHTML = `<span class="text-purple-400 font-bold bg-purple-900/30 px-1 rounded text-[11px] mr-1">BRAIN</span> <span class="text-slate-200">${msg.split('[BRAIN]')[1]}</span>`;
-            else if (msg.includes('[FIXER]')) div.innerHTML = `<span class="text-orange-400 font-bold bg-orange-900/30 px-1 rounded text-[11px] mr-1">FIXER</span> <span class="text-slate-200">${msg.split('[FIXER]')[1]}</span>`;
-            else if (msg.includes('[ERROR]')) div.innerHTML = `<span class="text-rose-400 font-bold bg-rose-900/30 px-1 rounded text-[11px] mr-1">ERROR</span> <span class="text-rose-300 font-semibold">${msg.replace('[ERROR]', '')}</span>`;
-            else div.innerHTML = `<span class="text-slate-400">${msg}</span>`;
-
-            logContainer.appendChild(div);
-            logContainer.scrollTop = logContainer.scrollHeight;
-        }
-
-        function triggerChaos() {
-            triggerSimulation('AWS_EC2_DISK_FULL'); // Default chaos vector
-        }
-
-        function triggerSSEStream(isAnomaly) {
-            const es = new EventSource(`${API_BASE}/api/sre-loop?anomaly=${isAnomaly}&simulation=${isDemoMode}`);
-            es.onmessage = (e) => {
-                try {
-                    const data = JSON.parse(e.data);
-                    if (data.message) addLog(data.message);
-                    if (data.final_state) {
-                        es.close();
-                        updateStatus(data.final_state === 'Resolved' || data.final_state === 'Stable');
-                    }
-                } catch (e) { }
-            };
-            es.onerror = () => es.close();
-        }
-
-        function updateStatus(isNominal) {
-            const statusBadge = document.getElementById('system-status');
-            if (isNominal) {
-                statusBadge.className = "status-badge text-[10px] uppercase tracking-widest px-4 py-1.5 rounded-full flex items-center gap-2 transition-all";
-                statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> SYSTEM NOMINAL`;
-            } else {
-                statusBadge.className = "text-[10px] uppercase tracking-widest px-4 py-1.5 rounded-full flex items-center gap-2 bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-all font-bold";
-                statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_#f43f5e]"></span> ANOMALY DETECTED`;
-            }
-        }
-
-        function setMode(mode) {
-            isDemoMode = mode === 'demo';
-            const btnDemo = document.getElementById('btn-mode-demo');
-            const btnReal = document.getElementById('btn-mode-real');
-
-            if (isDemoMode) {
-                btnDemo.className = "px-3 py-1.5 text-[10px] font-black rounded-lg transition-all bg-gradient-to-r from-cyan-400 to-blue-500 text-black shadow-lg";
-                btnReal.className = "px-3 py-1.5 text-[10px] font-black rounded-lg transition-all text-slate-400 hover:bg-white/5";
-            } else {
-                btnReal.className = "px-3 py-1.5 text-[10px] font-black rounded-lg transition-all bg-gradient-to-r from-green-400 to-emerald-500 text-black shadow-lg";
-                btnDemo.className = "px-3 py-1.5 text-[10px] font-black rounded-lg transition-all text-slate-400 hover:bg-white/5";
-            }
-        }
-
-        async function triggerSimulation(type) {
-            logContainer.innerHTML = '';
-            updateStatus(false);
-            addLog(`>> INIT SIMULATION PROTOCOL: ${type}`);
-            try {
-                await fetch(`${API_BASE}/demo/chaos/trigger`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fault: type })
-                });
-                triggerSSEStream(true);
-            } catch (e) {
-                addLog("[ERROR] Endpoint connectivity lost.");
-                setTimeout(() => updateStatus(true), 3000);
-            }
-        }
-
-        async function startSandbox() {
-            logContainer.innerHTML = '';
-            addLog(">> 🧪 PROVISIONING SECURE SANDBOX...");
-            try {
-                await fetch(`${API_BASE}/demo/sandbox/start`, { method: 'POST' });
-            } catch (e) { }
-            triggerSSEStream(true);
-        }
-
-        function processQuote(plan) {
-            addLog(`[SCOUT] Transaction request received for: ${plan}`);
-            addLog(`[BRAIN] Validating state for ${plan} request...`);
-        }
-
-        function skipOnboarding() { onboardingModal.classList.add('hidden'); }
-
-        async function selectStack(s) {
-            try {
-                await fetch(`${API_BASE}/api/config/save`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ STACK_TYPE: s })
-                });
-            } catch (e) { }
-            document.getElementById('stack-tag').innerText = s.toUpperCase();
-            onboardingModal.classList.add('hidden');
-            addLog(`>> INFRASTRUCTURE BINDING: ${s.toUpperCase()} OK.`);
-        }
-    </script>
+    </main>
 </body>
 
 </html>
