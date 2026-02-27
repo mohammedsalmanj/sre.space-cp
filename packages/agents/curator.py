@@ -47,9 +47,11 @@ def curator_agent(state: dict) -> dict:
                 is_simulation=state.get("simulation_mode", False)
             )
             if success:
-                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] [ACT] Knowledge Base Update: Incident metadata archived to memory ({stack_type}).")
+                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] [ACT] 🌲 [PINECONE] Knowledge Base Update: 1 Record Saved to memory ({stack_type}).")
+            else:
+                logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] [ACT] ⚠️ [PINECONE] Knowledge Base Save FAILED.")
     except Exception as e:
-        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] [ACT] Warning: Knowledge Layer persistence failed: {str(e)}")
+        logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [CURATOR] [ACT] ❌ Knowledge Layer persistence error: {str(e)}")
 
     # 2. Lifecycle Closure: Graceful GitHub Issue Resolution
     issue_num = state.get("issue_number")

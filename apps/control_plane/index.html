@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRE.SPACE | Enterprise Control Plane</title>
+    <title>SRE.SPACE | Cognitive Reliability Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
@@ -21,35 +21,47 @@
                 <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white">
                     <i data-lucide="shield-check" class="w-5 h-5"></i>
                 </div>
-                <h1>SRE.SPACE | <span class="text-blue-600">Enterprise Control Plane</span></h1>
+                <div class="flex flex-col">
+                    <h1 class="leading-none text-[14px]">SRE.SPACE</h1>
+                    <span class="text-[9px] font-black text-blue-600 uppercase tracking-widest mt-1">Cognitive
+                        Reliability Engine</span>
+                </div>
             </div>
 
-            <div class="status-pills">
-                <div class="pill active">
+            <div class="status-pills hidden md:flex">
+                <div id="pill-sensory" class="pill active">
                     <span class="pill-dot pulse"></span>
                     Sensory: Nominal
                 </div>
-                <div class="pill">
+                <div id="pill-brain" class="pill">
                     <span class="pill-dot"></span>
                     Brain: Idle
                 </div>
-                <div class="pill">
+                <div id="pill-fixer" class="pill">
                     <span class="pill-dot"></span>
                     Fixer: Armed
                 </div>
             </div>
 
-            <div class="lead-engineer-badge">
-                <img src="./profile11.png" class="avatar" alt="Mohammed Salman">
-                <div class="profile-info">
-                    <span class="profile-name">Mohammed Salman</span>
-                    <span class="profile-title">Lead Engineer · AIOps</span>
-                </div>
-                <div class="profile-socials">
-                    <a href="https://github.com/mohammedsalmanj" target="_blank"><i data-lucide="github"
-                            class="w-3 h-3"></i></a>
-                    <a href="https://linkedin.com/in/mohammed-salman" target="_blank"><i data-lucide="linkedin"
-                            class="w-3 h-3"></i></a>
+            <div class="flex items-center gap-6">
+                <nav class="hidden lg:flex gap-6 text-[11px] font-black uppercase tracking-widest text-slate-400">
+                    <a href="/" class="text-blue-600">Dashboard</a>
+                    <a href="/about" class="hover:text-slate-900 transition-colors">About Architecture</a>
+                    <button onclick="toggleDrawer()" class="hover:text-slate-900 transition-colors">Setup
+                        Wizard</button>
+                </nav>
+                <div class="lead-engineer-badge">
+                    <img src="./profile11.png" class="avatar" alt="Mohammed Salman">
+                    <div class="profile-info">
+                        <span class="profile-name">Mohammed Salman</span>
+                        <span class="profile-title">Lead SRE · AIOps</span>
+                    </div>
+                    <div class="profile-socials">
+                        <a href="https://github.com/mohammedsalmanj" target="_blank" rel="noopener noreferrer"><i
+                                data-lucide="github" class="w-3 h-3"></i></a>
+                        <a href="https://www.linkedin.com/in/mohammed-salman-sre/" target="_blank"
+                            rel="noopener noreferrer"><i data-lucide="linkedin" class="w-3 h-3"></i></a>
+                    </div>
                 </div>
             </div>
         </header>
@@ -59,13 +71,13 @@
             <!-- LEFT: TELEMETRY FEED -->
             <section class="dashboard-panel">
                 <div class="panel-header">
-                    <h2>Real-Time Telemetry Feed</h2>
+                    <h2>Sensory Intake Terminal</h2>
                     <i data-lucide="activity" class="w-4 h-4 text-blue-500"></i>
                 </div>
                 <div id="event-log" class="event-log">
                     <!-- Events stream here -->
                     <div class="log-entry">
-                        <span class="log-ts">19:35:01</span>
+                        <span class="log-ts">Handshake</span>
                         <span class="text-blue-500 font-bold">[SYSTEM]</span>
                         <span class="log-msg">Handshaking with telemetry strata...</span>
                     </div>
@@ -84,28 +96,28 @@
                 </div>
                 <div class="ooda-hub">
                     <div class="cycle-visual">
-                        <div class="stage-row">
+                        <div class="stage-row" id="row-observe">
                             <span class="stage-label">OBSERVE</span>
                             <div class="progress-track">
                                 <div id="progress-observe" class="progress-bar"></div>
                             </div>
                             <span id="status-observe" class="stage-status text-slate-400">IDLE</span>
                         </div>
-                        <div class="stage-row">
+                        <div class="stage-row" id="row-orient">
                             <span class="stage-label">ORIENT</span>
                             <div class="progress-track">
                                 <div id="progress-orient" class="progress-bar"></div>
                             </div>
                             <span id="status-orient" class="stage-status text-slate-400">IDLE</span>
                         </div>
-                        <div class="stage-row">
+                        <div class="stage-row" id="row-decide">
                             <span class="stage-label">DECIDE</span>
                             <div class="progress-track">
                                 <div id="progress-decide" class="progress-bar"></div>
                             </div>
                             <span id="status-decide" class="stage-status text-slate-400">IDLE</span>
                         </div>
-                        <div class="stage-row">
+                        <div class="stage-row" id="row-act">
                             <span class="stage-label">ACT</span>
                             <div class="progress-track">
                                 <div id="progress-act" class="progress-bar"></div>
@@ -115,24 +127,24 @@
                     </div>
 
                     <div id="thought-bubble" class="mt-8 p-6 bg-blue-50/50 border border-blue-100 rounded-xl hidden">
-                        <p class="text-[13px] font-bold text-blue-900 leading-relaxed italic">
+                        <p id="thought-text" class="text-[13px] font-bold text-blue-900 leading-relaxed italic">
                             "Awaiting telemetry signals to initiate reasoning pipeline..."
                         </p>
                     </div>
 
                     <div class="mt-auto">
-                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Chaos
-                            Engineering Laboratory</h3>
+                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Deterministic
+                            Infrastructure Injection (Chaos Lab)</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <button onclick="triggerChaos('AWS_EC2_DISK_FULL')"
                                 class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-lg hover:border-red-500 transition-all text-left">
-                                <span class="text-[11px] font-bold uppercase">Disk Pressure</span>
+                                <span class="text-[11px] font-bold uppercase">Disk Pressure Injection</span>
                                 <i data-lucide="alert-triangle" class="w-4 h-4 text-red-500"></i>
                             </button>
                             <button onclick="triggerChaos('K8S_POD_CRASH')"
                                 class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-lg hover:border-amber-500 transition-all text-left">
-                                <span class="text-[11px] font-bold uppercase">Pod Crash</span>
-                                <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
+                                <span class="text-[11px] font-bold uppercase">Pod Crash Simulation</span>
+                                <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
                             </button>
                         </div>
                     </div>
@@ -142,67 +154,134 @@
             <!-- RIGHT: CLOUD MEMORY -->
             <section class="dashboard-panel">
                 <div class="panel-header">
-                    <h2>Vector Memory Recall</h2>
-                    <span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-bold">PINECONE</span>
+                    <h2>SLO Validation & Memory</h2>
+                    <span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-bold uppercase">RAG
+                        Persistence</span>
                 </div>
                 <div id="memory-list" class="memory-list">
-                    <div class="italic text-slate-400 text-center py-10 text-xs">Awaiting memory trigger...</div>
+                    <div class="italic text-slate-400 text-center py-10 text-xs">Waiting for Curator archival...</div>
                 </div>
             </section>
         </main>
 
-        <!-- ONBOARDING DRAWER -->
-        <div id="onboarding-drawer" class="onboarding-drawer animate-entrance">
-            <div class="track-card">
-                <div class="flex items-center gap-3 mb-4">
-                    <i data-lucide="monitor" class="w-5 h-5 text-slate-600"></i>
-                    <h3>Track 1: Local Sandbox</h3>
+        <!-- ONBOARDING DRAWER (WIZARD) -->
+        <div id="onboarding-drawer" class="onboarding-drawer collapsed">
+            <div id="wizard-container" class="col-span-2 space-y-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-black italic">Cloud Stratum Onboarding Wizard</h2>
+                    <div class="flex gap-2">
+                        <div id="step-dot-1" class="w-2 h-2 rounded-full bg-blue-600"></div>
+                        <div id="step-dot-2" class="w-2 h-2 rounded-full bg-slate-200"></div>
+                        <div id="step-dot-3" class="w-2 h-2 rounded-full bg-slate-200"></div>
+                        <div id="step-dot-4" class="w-2 h-2 rounded-full bg-slate-200"></div>
+                    </div>
                 </div>
-                <div class="code-box">
-                    <span>docker compose up -d</span>
-                    <button class="hover:text-blue-400"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                </div>
-                <button onclick="startSandbox()" class="btn-apm w-full">Run Local Simulation</button>
-            </div>
 
-            <div class="track-card border-l border-slate-200 pl-10">
-                <div class="flex items-center gap-3 mb-4">
-                    <i data-lucide="cloud-lightning" class="w-5 h-5 text-blue-600"></i>
-                    <h3>Track 2: Cloud Autopilot</h3>
+                <!-- STEP 1: SELECT PROVIDER -->
+                <div id="wizard-step-1" class="grid grid-cols-3 gap-6">
+                    <div onclick="setProvider('local')"
+                        class="p-8 border-2 border-slate-200 rounded-2xl hover:border-blue-500 cursor-pointer transition-all text-center group">
+                        <i data-lucide="laptop"
+                            class="w-10 h-10 mx-auto mb-4 text-slate-400 group-hover:text-blue-500"></i>
+                        <h4 class="font-black uppercase text-xs">Local Sandbox</h4>
+                        <p class="text-[10px] text-slate-400 mt-2">Zero-friction Docker simulation.</p>
+                    </div>
+                    <div onclick="setProvider('aws')"
+                        class="p-8 border-2 border-slate-200 rounded-2xl hover:border-blue-500 cursor-pointer transition-all text-center group">
+                        <img src="https://img.icons8.com/color/48/amazon-web-services.png"
+                            class="w-10 h-10 mx-auto mb-4 grayscale group-hover:grayscale-0" />
+                        <h4 class="font-black uppercase text-xs">AWS Enterprise</h4>
+                        <p class="text-[10px] text-slate-400 mt-2">EC2 & EKS managed strata.</p>
+                    </div>
+                    <div onclick="setProvider('k8s')"
+                        class="p-8 border-2 border-slate-200 rounded-2xl hover:border-blue-500 cursor-pointer transition-all text-center group">
+                        <img src="https://img.icons8.com/color/48/kubernetes.png"
+                            class="w-10 h-10 mx-auto mb-4 grayscale group-hover:grayscale-0" />
+                        <h4 class="font-black uppercase text-xs">K8S Cluster</h4>
+                        <p class="text-[10px] text-slate-400 mt-2">Native Pod orchestration.</p>
+                    </div>
                 </div>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <select id="cloud-provider" class="p-2 border border-slate-300 rounded text-sm outline-none">
-                        <option value="aws">AWS</option>
-                        <option value="gcp">GCP</option>
-                        <option value="k8s">Kubernetes</option>
-                    </select>
-                    <select id="stack-type" class="p-2 border border-slate-300 rounded text-sm outline-none">
-                        <option value="ec2">EC2 Instance</option>
-                        <option value="eks">EKS Cluster</option>
-                        <option value="gce">GCE VM</option>
-                    </select>
+
+                <!-- STEP 2: INPUT KEYS (AWS/K8S) -->
+                <div id="wizard-step-2" class="hidden space-y-4 max-w-md mx-auto">
+                    <h3 class="font-black text-center text-sm uppercase tracking-widest">Identify Credentials</h3>
+                    <div id="inputs-aws" class="space-y-4">
+                        <input type="text" id="aws-ak" placeholder="AWS Access Key ID"
+                            class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500">
+                        <input type="password" id="aws-sk" placeholder="AWS Secret Access Key"
+                            class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500">
+                    </div>
+                    <div id="inputs-local" class="text-center py-10 italic text-slate-400">
+                        No credentials required for Local Sandbox.
+                    </div>
+                    <button onclick="validateWizard()" id="btn-validate-wiz" class="btn-apm w-full !py-4">Perform
+                        Credential Handshake</button>
+                    <button onclick="gotoStep(1)"
+                        class="w-full text-[10px] uppercase font-bold text-slate-400 mt-2">Back</button>
                 </div>
-                <button onclick="initializeCloud()" class="btn-apm w-full">Initialize Enterprise Space</button>
+
+                <!-- STEP 3: VALIDATION & DEPLOY -->
+                <div id="wizard-step-3" class="hidden text-center space-y-6">
+                    <div id="validating-spinner" class="py-10">
+                        <div
+                            class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto">
+                        </div>
+                        <p class="mt-4 text-xs font-bold uppercase tracking-widest text-blue-600">Handshaking with
+                            API...</p>
+                    </div>
+                    <div id="validation-success" class="hidden">
+                        <i data-lucide="check-circle-2" class="w-16 h-16 mx-auto text-emerald-500 mb-4"></i>
+                        <h3 class="text-xl font-black">Link Established</h3>
+                        <p class="text-xs text-slate-500">Identity: <span id="auth-identity"
+                                class="font-mono text-blue-600">...</span></p>
+                        <button onclick="gotoStep(4)" class="btn-apm mt-8 px-10">Generate Deployment Stratum</button>
+                    </div>
+                    <div id="validation-error"
+                        class="hidden text-red-500 font-bold p-6 bg-red-50 rounded-xl border border-red-100">
+                        <i data-lucide="alert-octagon" class="w-10 h-10 mx-auto mb-2"></i>
+                        <p id="error-message">Handshake failed.</p>
+                        <button onclick="gotoStep(2)" class="text-blue-600 underline text-xs mt-4">Try again</button>
+                    </div>
+                </div>
+
+                <!-- STEP 4: ASSETS -->
+                <div id="wizard-step-4" class="hidden space-y-6 max-w-2xl mx-auto">
+                    <h3 class="font-black text-center text-sm uppercase tracking-widest">Deterministic OTel Injection
+                    </h3>
+                    <div class="bg-slate-900 rounded-xl p-6 relative group">
+                        <pre id="deployment-code"
+                            class="text-blue-400 font-mono text-xs overflow-x-auto whitespace-pre-wrap">helm upgrade --install sre-space-agent ...</pre>
+                        <button onclick="copyCode()"
+                            class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-slate-400 text-center">Execute this command on your cluster to complete
+                        the loop.</p>
+                    <button onclick="finalizeWizard()" class="btn-apm w-full !py-4">Finalize & Enter Operational
+                        Mode</button>
+                </div>
             </div>
 
             <div class="col-span-2 info-drawer border-t mt-6">
                 <div class="info-col">
-                    <h4>Problem</h4>
+                    <h4>The Problem</h4>
                     <p class="text-slate-600">Manual firefighting and alert fatigue cripple enterprise agility.</p>
                 </div>
                 <div class="info-col border-l pl-12">
-                    <h4>Solution</h4>
+                    <h4>The Solution</h4>
                     <p class="text-slate-600">Autonomic OODA loops + Pinecone vector memory transform anomalies into
                         uptime.</p>
                 </div>
-                <div class="ml-auto flex items-end">
-                    <span class="text-[10px] font-bold text-slate-400">"Transforming Anomalies into Uptime."</span>
-                </div>
+                <footer class="ml-auto flex flex-col items-end justify-center">
+                    <p class="text-[10px] font-bold text-slate-400">"Transforming Anomalies into Uptime."</p>
+                    <p class="text-[8px] text-slate-300 mt-1">© 2026 Mohammed Salman | SRE.SPACE v6.0</p>
+                </footer>
             </div>
 
             <button onclick="toggleDrawer()"
-                class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full px-4 py-1 bg-white border border-b-0 border-slate-200 rounded-t-lg text-[10px] font-black uppercase text-slate-400 hover:text-slate-900 transition-colors">
-                Setup & Info
+                class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full px-4 py-1 bg-white border border-b-0 border-slate-200 rounded-t-lg text-[10px] font-black uppercase text-slate-400 hover:text-slate-900 transition-colors shadow-sm">
+                Open Cloud Wizard
             </button>
         </div>
     </div>
