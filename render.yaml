@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: sre-control-plane
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn apps.control_plane.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: ENV
+        value: cloud
+      - key: PORT
+        value: 8001
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: REDIS_URL
+        fromService:
+          name: sre-bus
+          type: redis
+          property: connectionString
+      - key: GITHUB_PERSONAL_ACCESS_TOKEN
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+    disk:
+      name: chroma-disk
+      mountPath: /app/chroma_data
+      sizeGB: 1
+
+  - type: redis
+    name: sre-bus
+    ipAllowList: [] # Internal only for high-security SRE operations
