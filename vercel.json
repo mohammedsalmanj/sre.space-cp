@@ -2,5 +2,11 @@
     "version": 2,
     "outputDirectory": "dist",
     "cleanUrls": true,
-    "framework": "vite"
+    "framework": "vite",
+    "rewrites": [
+        {
+            "source": "/about",
+            "destination": "/about.html"
+        }
+    ]
 }
