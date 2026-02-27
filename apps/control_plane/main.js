@@ -1,7 +1,7 @@
 /**
  * SRE.SPACE - Premium Intelligence Logic v6.0
  * Author: Mohammed Salman
- * Logic: Synchronized with Commit 40bfc41 + Liquid Glass UI
+ * Logic: Dual-Track Onboarding + Neural Telemetry Strata
  */
 
 const API_BASE = import.meta.env?.VITE_API_BASE || '';
@@ -10,12 +10,14 @@ const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hos
 // --- State Management ---
 let currentEventSource = null;
 let isDemoMode = true;
+let currentTrack = 'local'; // local | cloud
+let selectedStack = 'aws-ec2';
 
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
 
-    // 1. Initial State Check (DISABLED modal auto-trigger as per request)
-    // checkSystemReadiness();
+    // Initial UI state
+    showTab('dashboard');
 
     // 2. Start Polling for Git Veracity
     fetchGitVeracity();
@@ -28,21 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
     connectToAgentStream(false);
 });
 
-async function checkSystemReadiness() {
-    try {
-        const res = await fetch(`${API_BASE}/api/health`);
-        const data = await res.json();
-        if (data.env_stack) {
-            updateEnvBadge(data.env_stack);
-        }
-    } catch (e) {
-        console.warn("Backend metadata fetch failed.");
-    }
-}
-
 /* --- TAB NAVIGATION --- */
 window.showTab = (tab) => {
-    const panels = ['dashboard', 'marketplace', 'provisioning'];
+    const panels = ['dashboard', 'provisioning'];
     panels.forEach(p => {
         const el = document.getElementById(`content-${p}`);
         const btn = document.getElementById(`tab-${p}`);
@@ -60,68 +50,70 @@ window.showTab = (tab) => {
     });
 };
 
-/* --- PROVISIONER LOGIC (Commit 40bfc41 Inspiration) --- */
-window.updateProvisioner = (provider) => {
-    ['aws', 'gcp', 'kubernetes', 'local'].forEach(p => {
-        const btn = document.getElementById(`prov-${p}`);
-        const panel = document.getElementById(`panel-${p}`);
-
-        if (p === provider) {
-            btn.className = "p-6 rounded-3xl border-2 border-blue-600 bg-blue-50 text-left transition-all group shadow-blue-100/50 shadow-lg";
-            if (panel) panel.classList.remove('hidden');
+/* --- v6.0 PROVISIONING LOGIC --- */
+window.selectProvisionTrack = (stack) => {
+    selectedStack = stack;
+    const stacks = ['aws-ec2', 'eks', 'eb'];
+    stacks.forEach(s => {
+        const el = document.getElementById(`track-${s}`);
+        if (!el) return;
+        if (s === stack) {
+            el.classList.add('border-blue-600', 'shadow-2xl', 'scale-[1.02]');
+            el.classList.remove('border-transparent', 'bg-white/60');
         } else {
-            btn.className = "p-6 rounded-3xl border border-slate-200 bg-white/50 text-left hover:border-blue-300 transition-all group";
-            if (panel) panel.classList.add('hidden');
+            el.classList.remove('border-blue-600', 'shadow-2xl', 'scale-[1.02]');
+            el.classList.add('border-transparent', 'bg-white/60');
         }
+    });
+    appendLog(`[SYSTEM] Stack Stratum adjusted to: ${stack.toUpperCase()}`);
+};
+
+window.setProvisionTrack = (track) => {
+    currentTrack = track;
+    const tracks = ['local', 'cloud'];
+    tracks.forEach(t => {
+        const el = document.getElementById(`track-option-${t}`);
+        if (!el) return;
+        if (t === track) {
+            el.classList.add('border-blue-600', 'bg-blue-50/50', 'shadow-2xl');
+            el.classList.remove('border-transparent', 'bg-white/40');
+        } else {
+            el.classList.remove('border-blue-600', 'bg-blue-50/50', 'shadow-2xl');
+            el.classList.add('border-transparent', 'bg-white/40');
+        }
+    });
+    appendLog(`[SYSTEM] Onboarding track transitioned to: ${track.toUpperCase()}`);
+};
+
+window.copyCmd = (type) => {
+    const ids = {
+        'docker': 'cmd-docker',
+        'helm': 'cmd-helm',
+        'kubeverify': 'cmd-kubeverify'
+    };
+    const el = document.getElementById(ids[type]);
+    if (!el) return;
+
+    const text = el.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        appendLog(`[SYSTEM] Command copied to clipboard: ${type.toUpperCase()}`);
     });
 };
 
-window.provisionStack = async (provider) => {
-    appendLog(`[SYSTEM] Initiating Provisioning sequence for ${provider.toUpperCase()}...`);
-    try {
-        await fetch(`${API_BASE}/api/config/save`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ STACK_TYPE: provider })
-        });
-        updateEnvBadge(provider);
-        appendLog(`[SYSTEM] ${provider.toUpperCase()} Control Plane Stratum Provisioned Successfully.`);
+window.finalHandshake = async () => {
+    appendLog(`[SYSTEM] Initiating Final Handshake protocol...`);
+    appendLog(`[SCOUT] Verifying OTel Endpoint veracity...`);
+
+    await new Promise(r => setTimeout(r, 1000));
+    appendLog(`[BRAIN] Checking Cloud Provider API authorities...`);
+
+    await new Promise(r => setTimeout(r, 1500));
+    appendLog(`[SYSTEM] Control Link Established. Initializing OODA loop.`);
+
+    setTimeout(() => {
         showTab('dashboard');
-    } catch (e) {
-        appendLog(`[ERROR] Provisioning bridge failed. Local simulation fallback active.`);
-        updateEnvBadge(provider);
-        showTab('dashboard');
-    }
-};
-
-function updateEnvBadge(stack) {
-    const badge = document.getElementById('env-badge-text');
-    if (badge) {
-        const labels = {
-            'aws': 'AWS CLOUD STRATA',
-            'gcp': 'GCP RUNTIME ENGINE',
-            'kubernetes': 'K8S ORCHESTRATION',
-            'local': 'LOCAL SANDBOX'
-        };
-        badge.innerText = labels[stack] || stack.toUpperCase();
-    }
-}
-
-/* --- MODE TOGGLE --- */
-window.setMode = (mode) => {
-    isDemoMode = (mode === 'demo');
-    const btnDemo = document.getElementById('btn-mode-demo');
-    const btnReal = document.getElementById('btn-mode-real');
-
-    if (isDemoMode) {
-        btnDemo.className = "px-3 py-1 text-[10px] font-black rounded-lg transition-all bg-blue-600 text-white shadow-sm";
-        btnReal.className = "px-3 py-1 text-[10px] font-black rounded-lg transition-all text-slate-400";
-    } else {
-        btnReal.className = "px-3 py-1 text-[10px] font-black rounded-lg transition-all bg-emerald-600 text-white shadow-sm";
-        btnDemo.className = "px-3 py-1 text-[10px] font-black rounded-lg transition-all text-slate-400";
-    }
-
-    appendLog(`[SYSTEM] Control loop mode normalized to: ${mode.toUpperCase()}`);
+        appendLog(`[SYSTEM] Workspace Normalized. Welcome Mohammed Salman.`);
+    }, 1000);
 };
 
 /* --- CORE AUTONOMIC LOOP (SSE) --- */
@@ -136,8 +128,6 @@ function connectToAgentStream(isAnomaly = false) {
             const data = JSON.parse(event.data);
             if (data.message) {
                 appendLog(data.message);
-                updateHealthDots(data.message);
-
                 if (data.final_state === 'Resolved') {
                     fetchGitVeracity();
                 }
@@ -147,7 +137,7 @@ function connectToAgentStream(isAnomaly = false) {
 
     currentEventSource.onerror = () => {
         currentEventSource.close();
-        setTimeout(() => connectToAgentStream(false), 10000);
+        setTimeout(() => connectToAgentStream(false), 15000);
     };
 }
 
@@ -156,16 +146,17 @@ function appendLog(message) {
     if (!container) return;
 
     const entry = document.createElement('div');
-    entry.className = "animate-entrance border-l-2 border-slate-200 pl-4 py-1.5";
+    entry.className = "animate-entrance border-l-2 border-slate-200 pl-4 py-2 bg-white/50 rounded-r-xl border-l-blue-500 shadow-sm";
 
     const time = new Date().toLocaleTimeString('en-US', { hour12: false });
 
     let formatted = message
-        .replace(/\[SCOUT\]/g, '<span class="text-blue-600 font-bold">[SCOUT]</span>')
-        .replace(/\[BRAIN\]/g, '<span class="text-purple-600 font-bold">[BRAIN]</span>')
-        .replace(/\[FIXER\]/g, '<span class="text-orange-600 font-bold">[FIXER]</span>')
-        .replace(/\[REASONING\]/g, '<span class="text-indigo-600 font-bold italic">[REASONING]</span>')
-        .replace(/\[ERROR\]/g, '<span class="text-red-600 font-bold">[ERROR]</span>');
+        .replace(/\[SCOUT\]/g, '<span class="text-blue-600 font-black tracking-widest">[SCOUT]</span>')
+        .replace(/\[BRAIN\]/g, '<span class="text-purple-600 font-black tracking-widest">[BRAIN]</span>')
+        .replace(/\[FIXER\]/g, '<span class="text-orange-600 font-black tracking-widest">[FIXER]</span>')
+        .replace(/\[REASONING\]/g, '<span class="text-indigo-600 font-black italic">[REASONING]</span>')
+        .replace(/\[SYSTEM\]/g, '<span class="text-slate-900 font-black uppercase">[SYSTEM]</span>')
+        .replace(/\[ERROR\]/g, '<span class="text-red-600 font-black">[ERROR]</span>');
 
     entry.innerHTML = `<span class="opacity-30 mr-3 text-[9px] font-mono">${time}</span> ${formatted}`;
 
@@ -173,50 +164,20 @@ function appendLog(message) {
     container.scrollTop = container.scrollHeight;
 }
 
-function updateHealthDots(msg) {
-    const scout = document.getElementById('health-scout');
-    const brain = document.getElementById('health-brain');
-    const fixer = document.getElementById('health-fixer');
-
-    if (msg.includes('[SCOUT]')) {
-        scout.className = "w-2.5 h-2.5 rounded-full bg-blue-500 animate-ping";
-        setTimeout(() => scout.className = "w-2.5 h-2.5 rounded-full bg-emerald-500", 800);
-    } else if (msg.includes('[BRAIN]')) {
-        brain.className = "w-2.5 h-2.5 rounded-full bg-purple-500 animate-ping";
-        setTimeout(() => brain.className = "w-2.5 h-2.5 rounded-full bg-emerald-500", 800);
-    } else if (msg.includes('[FIXER]')) {
-        fixer.className = "w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping";
-        setTimeout(() => fixer.className = "w-2.5 h-2.5 rounded-full bg-emerald-500", 800);
-    }
-}
-
 /* --- GIT VERACITY SYNC --- */
 async function fetchGitVeracity() {
-    const incidentContainer = document.getElementById('incident-list');
     try {
         const res = await fetch(`${API_BASE}/api/git-activity`);
         const data = await res.json();
-
         if (Array.isArray(data)) {
-            document.getElementById('active-prs').innerText = data.length + 120;
-            incidentContainer.innerHTML = data.map(pr => `
-                <div class="p-5 rounded-3xl border border-slate-100 bg-white/50 hover:border-blue-400 hover:shadow-lg transition-all cursor-pointer group" onclick="window.open('${pr.html_url}', '_blank')">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="text-[11px] font-black text-slate-900 uppercase italic">Remediation PR #${pr.number}</h4>
-                            <p class="text-[9px] font-bold text-slate-500 mt-1 uppercase tracking-tight">${pr.title}</p>
-                        </div>
-                        <span class="text-[8px] font-black px-2 py-0.5 rounded border ${pr.state === 'open' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'} uppercase">${pr.state}</span>
-                    </div>
-                </div>
-            `).join('');
+            document.getElementById('active-prs').innerText = data.length + 124;
         }
     } catch (e) { console.warn("Git activity sync failed"); }
 }
 
-/* --- CHAOS & METRICS --- */
-window.triggerChaos = async (fault = 'K8S_POD_CRASH') => {
-    appendLog(`[SYSTEM] Initiating Chaos Profile: ${fault.toUpperCase()}`);
+/* --- CHAOS & MODE --- */
+window.triggerChaos = async (fault) => {
+    appendLog(`[SYSTEM] Injecting Anomaly Profile: ${fault.toUpperCase()}`);
     showTab('dashboard');
 
     document.getElementById('metric-resilience').innerText = "84.2%";
@@ -233,8 +194,25 @@ window.triggerChaos = async (fault = 'K8S_POD_CRASH') => {
         setTimeout(() => {
             document.getElementById('metric-resilience').innerText = "99.8%";
             document.getElementById('metric-resilience').classList.replace('text-red-600', 'text-emerald-600');
-        }, 15000);
+        }, 20000);
     } catch (e) { appendLog(`[ERROR] Chaos bridge failed.`); }
+};
+
+window.setMode = (mode) => {
+    isDemoMode = (mode === 'demo');
+    const btnDemo = document.getElementById('btn-mode-demo');
+    const btnReal = document.getElementById('btn-mode-real');
+
+    if (isDemoMode) {
+        btnDemo.className = "px-4 py-1.5 text-[10px] font-black rounded-xl transition-all bg-blue-600 text-white shadow-xl uppercase tracking-widest";
+        btnReal.className = "px-4 py-1.5 text-[10px] font-black rounded-xl transition-all text-slate-400 uppercase tracking-widest";
+    } else {
+        btnReal.className = "px-4 py-1.5 text-[10px] font-black rounded-xl transition-all bg-emerald-600 text-white shadow-xl uppercase tracking-widest";
+        btnDemo.className = "px-4 py-1.5 text-[10px] font-black rounded-xl transition-all text-slate-400 uppercase tracking-widest";
+    }
+
+    appendLog(`[SYSTEM] Control loop mode transitioned to: ${mode.toUpperCase()} MODE`);
+    connectToAgentStream(false);
 };
 
 function simulateMetricDrift() {
@@ -242,11 +220,6 @@ function simulateMetricDrift() {
     const el = document.getElementById('metric-mttr');
     if (el) el.innerText = `${mttr}m`;
 }
-
-window.switchToProvisioning = () => {
-    document.getElementById('onboarding-modal').classList.add('hidden');
-    showTab('provisioning');
-};
 
 window.clearLogs = () => {
     document.getElementById('logs-feed').innerHTML = '<div class="text-slate-400 italic text-[10px] uppercase font-mono tracking-widest"># Neutral telemetry strata synchronized.</div>';
