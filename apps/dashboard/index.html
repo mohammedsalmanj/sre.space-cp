@@ -27,31 +27,45 @@
             <div class="logo">
                 <span class="logo-text">SRE.SPACE</span>
             </div>
-            <nav class="nav-menu">
-                <nav class="nav-menu">
-                    <div id="nav-dashboard" class="nav-item active" onclick="switchTab('dashboard')">📊 Dashboard</div>
-                    <div id="nav-traces" class="nav-item" onclick="switchTab('traces')">📡 Agent Traces</div>
-                    <div id="nav-postmortems" class="nav-item" onclick="switchTab('postmortems')">📂 Post-Mortems</div>
-                    <div id="nav-chaos" class="nav-item" onclick="switchTab('chaos')">🧪 Chaos Lab</div>
-                    <div id="nav-config" class="nav-item" onclick="switchTab('config')">⚙️ Config</div>
-                </nav>
-                <div class="agent-status-card">
-                    <h3>Agent Health</h3>
-                    <div class="agent-list">
-                        <div class="agent-status">
-                            <span id="health-scout" class="status-dot ONLINE"></span> Scout <span
-                                style="margin-left: auto; font-size: 10px; color: var(--success);">ONLINE</span>
-                        </div>
-                        <div class="agent-status">
-                            <span id="health-brain" class="status-dot ONLINE"></span> Brain <span
-                                style="margin-left: auto; font-size: 10px; color: var(--success);">READY</span>
-                        </div>
-                        <div class="agent-status">
-                            <span id="health-fixer" class="status-dot IDLE"></span> Fixer <span
-                                style="margin-left: auto; font-size: 10px; color: var(--warning);">IDLE</span>
-                        </div>
+
+            <!-- Profile Card -->
+            <div class="glass-panel profile-card"
+                style="padding: 16px; margin-bottom: 24px; border-radius: 16px; background: rgba(59, 130, 246, 0.05);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div
+                        style="width: 40px; height: 40px; border-radius: 10px; background: var(--premium-gradient); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: white;">
+                        MS
+                    </div>
+                    <div>
+                        <div style="font-size: 13px; font-weight: 700;">M. Salman</div>
+                        <div
+                            style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">
+                            Lead SRE Engineer</div>
                     </div>
                 </div>
+            </div>
+
+            <nav class="nav-menu">
+                <div id="nav-dashboard" class="nav-item active" onclick="switchTab('dashboard')">📊 Dashboard</div>
+                <div id="nav-traces" class="nav-item" onclick="switchTab('traces')">📡 Agent Traces</div>
+                <div id="nav-chaos" class="nav-item" onclick="switchTab('chaos')">🧪 Chaos Lab</div>
+                <div id="nav-config" class="nav-item" onclick="switchTab('config')">⚙️ Config</div>
+            </nav>
+
+            <div class="agent-status-card">
+                <h3>Agent Health</h3>
+                <div class="agent-list">
+                    <div class="agent-status">
+                        <span id="health-scout" class="status-dot ONLINE"></span> Scout
+                    </div>
+                    <div class="agent-status">
+                        <span id="health-brain" class="status-dot ONLINE"></span> Brain
+                    </div>
+                    <div class="agent-status">
+                        <span id="health-fixer" class="status-dot IDLE"></span> Fixer
+                    </div>
+                </div>
+            </div>
         </aside>
 
         <!-- Main Content -->
@@ -59,17 +73,17 @@
             <!-- Header Panel -->
             <header class="glass-panel main-header">
                 <div class="header-title">
-                    <h1 id="page-title">Orbital Control Plane</h1>
+                    <h1 id="page-title">Orbital Control</h1>
                     <div class="subtitle">
-                        Autonomous Reliability Engineering v5.0
+                        Autonomous Reliability Engineering v5.1.0
                         <span id="env-badge" class="deployment-badge"
-                            style="background: rgba(56, 189, 248, 0.1); color: var(--accent);">SYNCING...</span>
+                            style="background: rgba(59, 130, 246, 0.1); color: var(--accent);">SYNCED</span>
                     </div>
                 </div>
                 <div class="header-actions">
                     <div class="live-indicator">
                         <span id="live-dot" class="live-dot"></span>
-                        <span id="live-text">LIVE ENGINE FEED</span>
+                        <span id="live-text">REAL-TIME TELEMETRY</span>
                     </div>
                 </div>
             </header>

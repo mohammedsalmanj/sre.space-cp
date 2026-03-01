@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] [SRE
 logger = logging.getLogger("sre.control_plane")
 
 # App Initialization with dynamic title based on the deployment mode
-app = FastAPI(title=f"SRE-Space | {ENV.upper()} Control Loop v5.0")
+app = FastAPI(title=f"SRE-Space | {ENV.upper()} Control Loop v5.1.0")
 
 # --- Security & Connectivity (CORS) ---
 # Enable Cross-Origin Resource Sharing to allow the Vercel-hosted dashboard 
@@ -68,7 +68,7 @@ async def system_health():
         "env": ENV,
         "memory_usage_mb": round(psutil.Process().memory_info().rss / (1024 * 1024), 2),
         "memory_limit_mb": MEMORY_LIMIT_MB,
-        "version": "4.5.1"
+        "version": "5.1.0"
     }
 
 from packages.shared.sim_state import sim_state

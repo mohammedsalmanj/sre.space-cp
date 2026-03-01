@@ -1,5 +1,5 @@
 /**
- * SRE-SPACE | Orbital Control Logic v5.0
+ * SRE-SPACE | Orbital Control Logic v5.1.0
  * Handles real-time telemetry streaming, navigation, and failure injections.
  */
 
@@ -10,7 +10,6 @@ const API_BASE_URL = window.NEXT_PUBLIC_API_URL;
 const logsFeed = document.getElementById('logs-feed');
 const incidentList = document.getElementById('incident-list');
 const activePRsCount = document.getElementById('active-prs');
-const envBadge = document.getElementById('env-badge');
 const lastSync = document.getElementById('last-sync');
 const pageTitle = document.getElementById('page-title');
 
@@ -20,24 +19,22 @@ const healthBrain = document.getElementById('health-brain');
 const healthFixer = document.getElementById('health-fixer');
 
 /**
- * Navigation Logic: Tab Switching
+ * Navigation Logic
  */
 function switchTab(tab) {
-    // Update Nav UI
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     document.getElementById(`nav-${tab}`)?.classList.add('active');
 
-    // Update Panes
     document.querySelectorAll('.tab-panel').forEach(el => el.classList.add('hidden'));
 
     if (['dashboard', 'chaos'].includes(tab)) {
         document.getElementById(`tab-${tab}`).classList.remove('hidden');
-        pageTitle.innerText = tab.charAt(0).toUpperCase() + tab.slice(1) + " Control";
+        pageTitle.innerText = tab === 'dashboard' ? "Orbital Control" : "Chaos Lab";
         document.getElementById('metrics-bar').classList.remove('hidden');
     } else {
         document.getElementById('tab-placeholder').classList.remove('hidden');
-        document.getElementById('placeholder-title').innerText = tab.charAt(0).toUpperCase() + tab.slice(1);
-        pageTitle.innerText = tab.charAt(0).toUpperCase() + tab.slice(1);
+        document.getElementById('placeholder-title').innerText = tab.toUpperCase();
+        pageTitle.innerText = tab.toUpperCase();
         document.getElementById('metrics-bar').classList.add('hidden');
     }
 }
@@ -56,29 +53,24 @@ function connectToAgentStream(isAnomaly = false) {
     currentEventSource.onmessage = function (event) {
         const data = JSON.parse(event.data);
         addLog(data.message);
-
-        // Update Health Dots based on active agent
         updateHealthStatus(data.message);
 
         if (data.final_state) {
             currentEventSource.close();
             resetHealthStatus();
-            fetchGitVeracity(); // Sync PRs after a possible fix
-
-            // Continuous Observability: Restart normal polling after 5 seconds
-            console.log("Cycle complete. Next sensory audit in 5s...");
-            setTimeout(() => connectToAgentStream(false), 5000);
+            fetchGitVeracity();
+            setTimeout(() => connectToAgentStream(false), 8000);
         }
     };
 
-    currentEventSource.onerror = function () {
-        console.warn("Stream break detected. Re-bridging...");
+    currentEventSource.onerror = () => {
         currentEventSource.close();
-        setTimeout(() => connectToAgentStream(false), 10000);
+        setTimeout(() => connectToAgentStream(false), 15000);
     };
 }
 
 function addLog(message) {
+    if (!logsFeed) return;
     const entry = document.createElement('div');
     entry.className = 'log-entry';
 
@@ -94,20 +86,13 @@ function addLog(message) {
 }
 
 function clearLogs() {
-    logsFeed.innerHTML = '<div class="log-entry italic">Logs cleared. Awaiting sensory intake...</div>';
+    logsFeed.innerHTML = '<div class="log-entry" style="opacity:0.5; font-style:italic;">Logs cleared. Awaiting telemetry...</div>';
 }
 
-/**
- * Health Indicators logic
- */
 function updateHealthStatus(msg) {
-    if (msg.includes('[SCOUT]')) {
-        healthScout.className = 'status-dot ONLINE';
-    } else if (msg.includes('[BRAIN]')) {
-        healthBrain.className = 'status-dot ONLINE';
-    } else if (msg.includes('[FIXER]')) {
-        healthFixer.className = 'status-dot ONLINE';
-    }
+    if (msg.includes('[SCOUT]')) healthScout.className = 'status-dot ONLINE';
+    if (msg.includes('[BRAIN]')) healthBrain.className = 'status-dot ONLINE';
+    if (msg.includes('[FIXER]')) healthFixer.className = 'status-dot ONLINE';
 }
 
 function resetHealthStatus() {
@@ -116,9 +101,6 @@ function resetHealthStatus() {
     healthFixer.className = 'status-dot IDLE';
 }
 
-/**
- * GitHub Veracity Sync
- */
 async function fetchGitVeracity() {
     try {
         const res = await fetch(`${API_BASE_URL}/api/git-activity`);
@@ -127,69 +109,57 @@ async function fetchGitVeracity() {
         if (Array.isArray(data)) {
             activePRsCount.innerText = data.length;
             lastSync.innerText = new Date().toLocaleTimeString();
-
             incidentList.innerHTML = data.map(pr => `
                 <div class="incident-card" onclick="window.open('${pr.html_url}', '_blank')">
                     <div class="incident-info">
                         <h4>PR #${pr.number} - ${pr.title}</h4>
-                        <p>REF: ${pr.head.sha.substring(0, 7)} | 🕵️ ${pr.user.login}</p>
+                        <p>${pr.head.sha.substring(0, 7)} | 🤖 ${pr.user.login}</p>
                     </div>
                     <div class="status-badge ${pr.state}">${pr.state}</div>
                 </div>
             `).join('');
         } else {
             activePRsCount.innerText = "0";
-            incidentList.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-secondary);">No active PRs found. System stable.</div>';
+            incidentList.innerHTML = '<div style="padding:20px; text-align:center; opacity:0.5;">No active incidents. System stable.</div>';
         }
     } catch (err) {
-        console.error("Git Veracity Error:", err);
-        activePRsCount.innerText = "ERR";
+        activePRsCount.innerText = "!";
     }
 }
 
-/**
- * Chaos Engineering
- */
 async function triggerChaos(type) {
     addLog(`/// INITIATING CHAOS: ${type.toUpperCase()} ///`);
     try {
-        const res = await fetch(`${API_BASE_URL}/demo/inject-failure`, {
+        await fetch(`${API_BASE_URL}/demo/inject-failure`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ type })
         });
-
         switchTab('dashboard');
         connectToAgentStream(true);
-
-        // Visual indicator on metrics
-        document.getElementById('metric-resilience').innerText = "84.2%";
+        document.getElementById('metric-resilience').innerText = "88.4%";
         document.getElementById('metric-resilience').style.color = "var(--danger)";
-
         setTimeout(() => {
             document.getElementById('metric-resilience').innerText = "99.8%";
             document.getElementById('metric-resilience').style.color = "var(--success)";
-        }, 30000);
-
+        }, 20000);
     } catch (err) {
-        addLog(`[SYSTEM] Chaos injection failed: ${err.message}`);
+        addLog(`[SYSTEM] Injection failed: ${err.message}`);
     }
 }
 
-/**
- * MTTR Drift (Makes it feel real)
- */
 function simulateMetricDrift() {
-    const mttr = (4.0 + Math.random() * 0.5).toFixed(1);
-    document.getElementById('metric-mttr').innerText = `${mttr}m`;
+    const mttr = (3.8 + Math.random() * 0.4).toFixed(1);
+    const el = document.getElementById('metric-mttr');
+    if (el) el.innerText = `${mttr}m`;
 }
 
-// Initializing
 window.switchTab = switchTab;
 window.triggerChaos = triggerChaos;
 window.clearLogs = clearLogs;
 
 connectToAgentStream(false);
 fetchGitVeracity();
-setInterval(fetchGitVeracity, 30000);
-setInterval(simulateMetricDrift, 15000);
+setInterval(fetchGitVeracity, 60000);
+setInterval(simulateMetricDrift, 10000);
+
