@@ -1,11 +1,26 @@
+"""
+File: packages/agents/human.py
+Layer: Cognitive / Human-in-the-Loop
+Purpose: Escalate anomalies that cannot be resolved autonomously.
+Problem Solved: Prevents dangerous autonomous actions by pausing for human review during low-confidence or high-repetition scenarios.
+Interaction: Triggered by Brain (low-confidence) or Scout (repetition); alerts human SRE via GitHub and Email.
+Dependencies: packages.shared.notifications, packages.shared.github_service, packages.shared.reporting
+Inputs: Anomaly frequency, service name, and root cause from state
+Outputs: Human-needed GitHub issue and status 'Awaiting Human'
+"""
 from datetime import datetime
 import os
 
-def human_agent(state):
+def human_agent(state: dict) -> dict:
     """
-    Agent: Human (The Investigator) - Human-in-the-Loop
-    Trigger: Frequent anomalies or failed auto-remediations.
-    Mission: Alert human SRE and wait for manual intervention.
+    Agent Node: Human (The Investigator)
+    Phase: ESCALATE
+    Mission: Alert the human SRE squad and pause the autonomous remediation cycle.
+    
+    Args:
+        state (dict): The current LangGraph state.
+    Returns:
+        dict: Updated state with escalation logs and human status.
     """
     logs = state.get("logs", [])
     frequency = state.get("anomaly_frequency", 0)
@@ -13,7 +28,7 @@ def human_agent(state):
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] HUMAN INTERVENTION TRIGGERED!")
     logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] Reason: Issue detected {frequency} times in the last hour.")
     
-    # Send Email Notification
+    # 1. External Veracity Signal: Create a high-priority GitHub 'War Room' Issue
     from packages.shared.notifications import send_sre_alert
     from packages.shared.github_service import GitHubService
     from packages.shared.reporting import format_human_escalation
@@ -28,6 +43,7 @@ def human_agent(state):
     else:
         logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] [HUMAN] Warning: Failed to create GitHub Issue.")
 
+    # 2. Multi-Channel Alerting: SMTP Pager Notification
     success = send_sre_alert(
         subject=f"CRITICAL: Repeated SRE Anomaly in {state.get('service', 'Unknown Service')}",
         body=f"SRE Engine Alert:\nService: {state.get('service')}\nRoot Cause: {state.get('root_cause')}\nFrequency: {frequency} detections\nStatus: AUTO-REMEDIATION PAUSED."

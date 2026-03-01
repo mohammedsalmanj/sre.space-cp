@@ -1,13 +1,22 @@
+"""
+File: apps/control_plane/langgraph_logic.py
+Layer: Application / Orchestration
+Purpose: Defines the cognitive OODA loop (Observe-Orient-Decide-Act) using LangGraph.
+Problem Solved: Coordinates multiple specialized SRE agents into a unified, stateful recovery process.
+Interaction: Orchestrates Scout, Brain, Fixer, and other agents; invoked by the FastAPI main app.
+Dependencies: langgraph, packages.agents.*
+Inputs: Initial anomaly trigger (boolean)
+Outputs: Final recovery state and comprehensive OODA logs
+"""
 from typing import TypedDict, List, Dict, Any, Literal
 from langgraph.graph import StateGraph, END
 import os
 import sys
 
-# Ensure shared packages are discoverable
+# Ensure shared packages are discoverable in the monorepo root
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-# --- Agent Imports ---
-# Every node in the graph is a specialized SRE agent
+# --- Cognitive Agent Node Imports ---
 from packages.agents.scout import scout_agent
 from packages.agents.cag import cag_agent
 from packages.agents.brain import brain_agent
@@ -17,29 +26,41 @@ from packages.agents.jules import jules_agent
 from packages.agents.curator import curator_agent
 from packages.agents.human import human_agent
 
-# --- Pipeline State ---
-# This dictionary is passed between agents, representing the memory of the current recovery cycle.
 class SREState(TypedDict):
-    error_spans: List[Dict[str, Any]]    # OpenTelemetry trace data
-    root_cause: str                     # Found by Brain agent
-    remediation: str                   # Proposed fix
-    status: str                        # Current state (Stable/Fixing)
-    logs: List[str]                    # OODA loop logs for UI streaming
-    is_anomaly: bool                   # Trigger flag
-    anomaly_frequency: int             # Escalation counter
-    decision: str                      # Guardrail 'ALLOW' or 'DENY'
-    service: str                       # Targeting which service?
-    namespace: str                     # K8s/Docker namespace
-    env: str                           # Production/Staging
+    """
+    Global state shared across all agents in the recovery cycle.
+    Acts as the 'working memory' for a single autonomous OODA loop iteration.
+    """
+    error_spans: List[Dict[str, Any]]    # Normalized OpenTelemetry trace signatures
+    root_cause: str                     # Diagnosis produced by Brain agent
+    remediation: str                    # Proposed architectural or code-level fix
+    status: str                         # Loop status (Stable, Fixing, Escalated)
+    logs: List[str]                     # Real-time OODA logs for streaming to the Dashboard
+    is_anomaly: bool                    # Trigger flag for the control plane sensory intake
+    anomaly_frequency: int              # Tracks repeated failures for auto-escalation
+    decision: str                       # Guardrail outcome: 'ALLOW', 'DENY', or 'REQUIRE_APPROVAL'
+    service: str                        # Root service affected (e.g. policy-service)
+    namespace: str                      # Deployment namespace (e.g. K8s default)
+    env: str                            # Operational environment (prod/staging)
+    confidence_score: float             # AI diagnostic certainty (0.0 to 1.0)
+    blast_radius: int                   # Impact score assessment (1-10)
+    issue_number: int                   # GitHub issue ID for governance tracking
+    simulation_mode: bool               # Enables shadow execution (Dry-run mode)
+    top_incidents: List[Dict[str, Any]]  # RAG-retrieved historical context
 
-# --- The Agentic Graph (LangGraph) ---
 def create_sre_graph():
-    """Builds the state machine that governs autonomous SRE reasoning."""
+    """
+    Builds the state machine that governs autonomous SRE reasoning.
+    Defines the OODA transitions and conditional exits between agents.
+    
+    Returns:
+        CompiledGraph: The executable LangGraph state machine.
+    """
     from apps.control_plane.config import ACTIVE_AGENTS
     
     workflow = StateGraph(SREState)
     
-    # 1. Register Agents as Nodes
+    # 1. Node Registration: Mapping agent logic functions to graph nodes
     workflow.add_node("scout", scout_agent)
     workflow.add_node("cag", cag_agent)
     workflow.add_node("brain", brain_agent)
@@ -49,39 +70,38 @@ def create_sre_graph():
     workflow.add_node("curator", curator_agent)
     workflow.add_node("human", human_agent)
     
-    # 2. Define the Transitions (OODA Flow)
+    # 2. Define the Entry Point: Every cycle begins with sensory Observation (Scout)
     workflow.set_entry_point("scout")
     
-    # --- Dynamic Flow Logic ---
-    # These functions decide which agent to invoke next based on the system state
-    # and whether the agent is 'Active' in the current environment (Cloud vs Local).
+    # --- Dynamic Edge Logic: Hardening the Intelligent Flow ---
 
-    def scout_next(s):
-        # High-frequency anomalies require human intervention
-        if s["anomaly_frequency"] >= 3: return "human"
-        if not s["is_anomaly"]: return END
-        # Skip CAG (Cognitive Agent Guide) in Cloud mode to save token budget
+    def scout_next(s: dict):
+        """Logic for transitioning from Observe to Orient phase."""
+        if s["anomaly_frequency"] >= 3: return "human" # Escalation threshold
+        if not s["is_anomaly"]: return END             # False alarm or recovered
         return "cag" if "cag" in ACTIVE_AGENTS else "brain"
 
-    def cag_next(s):
-        # Brain handles logic, CAG provides architectural standards
+    def cag_next(s: dict):
+        """Handoff from fast-path pattern matching to deep reasoning if needed."""
         return "brain"
 
-    def brain_next(s):
-        # Guardrail must validate every proposed fix for safety
+    def brain_next(s: dict):
+        """Decision boundary based on AI diagnostic confidence."""
+        if s.get("confidence_score", 0) < 0.85:
+            return "human" # Safety fallback
         return "guardrail" if "guardrail" in ACTIVE_AGENTS else "fixer"
 
-    def guardrail_next(s):
-        # Fixer only runs if Guardrail grants 'ALLOW'
+    def guardrail_next(s: dict):
+        """Security validation exit point."""
         if s["decision"] == "ALLOW":
             return "fixer"
         return "jules" if "jules" in ACTIVE_AGENTS else "curator"
 
-    def fixer_next(s):
-        # Jules performs architectural deep clean after a hotfix
+    def fixer_next(s: dict):
+        """Cleanup and permanent refactoring check after a hotfix."""
         return "jules" if "jules" in ACTIVE_AGENTS else "curator"
 
-    # 3. Connect the Nodes
+    # 3. Finalize Transitions into a unified state machine
     workflow.add_conditional_edges("scout", scout_next)
     workflow.add_conditional_edges("cag", cag_next)
     workflow.add_conditional_edges("brain", brain_next)
@@ -94,17 +114,32 @@ def create_sre_graph():
     
     return workflow.compile()
 
-async def run_sre_loop(is_anomaly: bool = False):
-    """Entry point to trigger the autonomous control plane."""
-    graph = create_sre_graph()
-    initial_state = {
+# --- Initial State Factory ---
+def get_initial_state(is_anomaly: bool = False, simulation_mode: bool = False) -> SREState:
+    """Creates a fresh state for a new OODA loop iteration."""
+    return {
         "error_spans": [], "root_cause": "", "remediation": "", 
-        "status": "Starting", "logs": [], "is_anomaly": is_anomaly,
-        "anomaly_frequency": 0, "decision": "", "service": "policy-service", 
-        "namespace": "default", "env": "prod"
+        "status": "Observation Phase", "logs": [], "is_anomaly": is_anomaly,
+        "anomaly_frequency": 1 if is_anomaly else 0, "decision": "", "service": "policy-service", 
+        "namespace": "default", "env": "prod", "confidence_score": 1.0,
+        "blast_radius": 0, "issue_number": 0, "simulation_mode": simulation_mode,
+        "top_incidents": []
     }
-    
-    if is_anomaly:
-        initial_state["anomaly_frequency"] = 1
 
-    return await graph.ainvoke(initial_state)
+# --- Single Instance Pre-compiled Graph (Optimization) ---
+# Compiling the graph once at module load time prevents overhead during high-frequency telemetry audits.
+_sre_graph = create_sre_graph()
+
+async def run_sre_loop(is_anomaly: bool = False, simulation_mode: bool = False) -> dict:
+    """
+    Asynchronous entry point to trigger the autonomous control plane loop.
+    Reuses the pre-compiled state machine for optimized performance.
+    
+    Args:
+        is_anomaly (bool): Whether to force initial anomaly detection (default: False).
+        simulation_mode (bool): Whether to run in dry-run mode (default: False).
+    Returns:
+        dict: The final state object including audit logs.
+    """
+    initial_state = get_initial_state(is_anomaly, simulation_mode)
+    return await _sre_graph.ainvoke(initial_state)

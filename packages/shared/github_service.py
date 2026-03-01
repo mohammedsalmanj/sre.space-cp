@@ -10,7 +10,7 @@ class GitHubService:
     """
     def __init__(self):
         # Authentication token for GitHub API (must have 'repo' scope)
-        self.token = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN")
+        self.token = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN") or os.getenv("GITHUB_TOKEN")
         self.owner = "mohammedsalmanj"
         self.repo = "sre.space-cp"
         self.base_url = "https://api.github.com"

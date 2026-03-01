@@ -100,6 +100,22 @@ graph TD
     VectorStore -- Historical Context --> Brain
 ```
 
+## 🛠️ Operational Skills (Autonomous Remediation)
+
+SRE-Space is no longer limited to simple GitOps patches. It now possesses **Deep Stack Ops** capabilities to resolve infrastructure failures across:
+
+### ☁️ AWS (Amazon Web Services)
+- **Auto-Scaling**: Dynamically adjusts instance counts for Elastic Beanstalk environments based on CPU/Memory pressure.
+- **Instance Recovery**: Performs non-disruptive resets of unhealthy EC2 targets within Target Groups.
+
+### 🎡 Kubernetes (K8s) Standard
+- **Pod Self-Healing**: Resets CrashLooping containers and evicts pods from memory-exhausted nodes.
+- **Limit Patching**: Real-time remediation of `OOMKilled` pods via Deployment YAML hot-updates.
+
+### 🕸️ GCP (Google Cloud)
+- **GCE Hardware Reset**: Hard-reboot of GCE instances with automated snapshotting for post-incident veracity audits.
+- **Routing Reliability**: Automated reconfiguration of GCP Cloud Router rules to bypass network latency spikes.
+
 ---
 
 ## 🤖 Meet the Agent Squad
