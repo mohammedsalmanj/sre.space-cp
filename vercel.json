@@ -1,15 +1,13 @@
 {
     "version": 2,
     "name": "sre-space-orbital",
-    "builds": [
-        {
-            "src": "apps/dashboard/**",
-            "use": "@vercel/static"
-        }
-    ],
     "rewrites": [
         {
             "source": "/",
+            "destination": "/apps/dashboard/index.html"
+        },
+        {
+            "source": "/index.html",
             "destination": "/apps/dashboard/index.html"
         },
         {
